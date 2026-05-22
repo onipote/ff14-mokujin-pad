@@ -10,6 +10,8 @@ class UIManager {
     this._padStatusEl = document.getElementById('pad-status');
     this._enemyEl     = document.getElementById('enemy-figure');
     this._heartEls    = [];
+    this._enemyFlashId = null;
+    this._enemyAnimId  = null;
   }
 
   buildHearts(max) {
@@ -61,12 +63,26 @@ class UIManager {
     this._scoreAtkEl.classList.toggle('hidden', !show);
   }
 
-  flashEnemy(type) {
-    this._enemyEl.classList.remove('hit', 'miss');
-    void this._enemyEl.offsetWidth; // force reflow to restart CSS transition
-    this._enemyEl.classList.add(type === 'hit' ? 'hit' : 'miss');
-    const dur = type === 'hit' ? 300 : 500;
-    setTimeout(() => this._enemyEl.classList.remove('hit', 'miss'), dur);
+  // type: 'hit' | 'miss', combo: number
+  flashEnemy(type, combo) {
+    if (this._enemyFlashId) clearTimeout(this._enemyFlashId);
+    if (this._enemyAnimId)  clearTimeout(this._enemyAnimId);
+
+    this._enemyEl.classList.remove('hit', 'miss', 'enemy-shake', 'enemy-bounce');
+    void this._enemyEl.offsetWidth; // reflow to restart animations
+
+    if (type === 'hit') {
+      this._enemyEl.classList.add('hit');
+      // Big combo = bounce, otherwise shake
+      const anim = (combo > 0 && combo % MAX_COMBO_MULTIPLIER === 0) ? 'enemy-bounce' : 'enemy-shake';
+      this._enemyEl.classList.add(anim);
+      this._enemyFlashId = setTimeout(() => this._enemyEl.classList.remove('hit'), 300);
+      this._enemyAnimId  = setTimeout(() => this._enemyEl.classList.remove(anim), 400);
+    } else {
+      this._enemyEl.classList.add('miss', 'enemy-shake');
+      this._enemyFlashId = setTimeout(() => this._enemyEl.classList.remove('miss'), 500);
+      this._enemyAnimId  = setTimeout(() => this._enemyEl.classList.remove('enemy-shake'), 500);
+    }
   }
 
   setPadStatus(connected, id) {
@@ -75,22 +91,32 @@ class UIManager {
     el.textContent = connected ? `PAD: ${id.slice(0, 22)}` : 'PAD: 未接続';
   }
 
-  showGameOver(engine, reason) {
+  showGameOver(engine, reason, prevBest, isNewRecord) {
     const heading = document.getElementById('gameover-heading');
     heading.textContent = reason === 'time_up' ? 'TIME UP!' : 'GAME OVER';
     heading.className = 'gameover-title ' + (reason === 'time_up' ? 'clear' : 'over');
 
     const acc = engine.total > 0 ? Math.round(engine.hits / engine.total * 100) : 0;
+    const bestLine = isNewRecord
+      ? `<div class="stat-row"><span>前回ベスト</span><span class="stat-val">${prevBest}</span></div>`
+      : `<div class="stat-row"><span>ベストスコア</span><span class="stat-val">${Math.max(engine.score, prevBest)}</span></div>`;
+
     document.getElementById('gameover-stats').innerHTML = `
       <div class="stat-row"><span>スコア</span><span class="stat-val"><b class="stat-big">${engine.score}</b></span></div>
+      ${bestLine}
       <div class="stat-row"><span>正解数</span><span class="stat-val">${engine.hits} / ${engine.total}</span></div>
       <div class="stat-row"><span>正確率</span><span class="stat-val">${acc}%</span></div>
       <div class="stat-row"><span>最大コンボ</span><span class="stat-val">${engine.maxCombo}</span></div>
     `;
+
+    const badge = document.getElementById('new-record-badge');
+    badge.classList.toggle('hidden', !isNewRecord);
+
     document.getElementById('screen-gameover').classList.remove('hidden');
   }
 
   hideGameOver() {
     document.getElementById('screen-gameover').classList.add('hidden');
+    document.getElementById('new-record-badge').classList.add('hidden');
   }
 }

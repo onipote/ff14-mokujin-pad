@@ -1,8 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const xhb   = new XHBRenderer();
-  const ui    = new UIManager();
-  const input = new InputHandler();
-  const engine = new GameEngine(xhb, ui, input);
+  const xhb    = new XHBRenderer();
+  const ui     = new UIManager();
+  const input  = new InputHandler();
+  const sound  = new SoundManager();
+  const engine = new GameEngine(xhb, ui, input, sound);
 
   xhb.build();
   ui.buildHearts(PLAYER_MAX_HP);
@@ -42,4 +43,12 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-start').addEventListener('click', startGame);
   document.getElementById('btn-retry').addEventListener('click', startGame);
   document.getElementById('btn-menu').addEventListener('click', showMenu);
+
+  // Mute toggle
+  const btnMute = document.getElementById('btn-mute');
+  btnMute.addEventListener('click', () => {
+    sound.muted = !sound.muted;
+    btnMute.textContent = sound.muted ? '♪̶' : '♪';
+    btnMute.classList.toggle('btn-mute--off', sound.muted);
+  });
 });

@@ -119,3 +119,32 @@
 - **モード切替**: `initBtnGroup` で `.btn--sel` クラスをトグル
 
 ---
+
+## フェーズ6：仕上げ・ポリッシュ
+
+**日付**: 2026-05-23
+
+### 実装内容
+
+| ファイル | 内容 |
+|---------|------|
+| `src/sound.js` | `SoundManager` クラス：Web Audio API で効果音生成 |
+| `src/game.js` | ハイスコア保存（localStorage）統合、効果音呼び出し |
+| `src/ui.js` | NEW RECORD バッジ表示、ベストスコア行、木人アニメーション呼び出し |
+| `src/main.js` | `SoundManager` 初期化、ミュートボタン接続 |
+| `index.html` | ミュートボタン、NEW RECORD バッジ要素追加 |
+| `styles/main.css` | 木人シェイク・バウンス keyframe、ミュートボタン、NEW RECORD アニメーション |
+
+### 仕様
+
+- **効果音（Web Audio API）**: バックエンド不要、JS のみで音生成
+  - `playHit(combo)` コンボ数に応じて音程が上昇
+  - `playMiss()` 低音サウンド
+  - `playCombo(n)` コンボが5の倍数でファンファーレ
+  - `playGameOver()` / `playClear()` ゲーム終了音
+- **ハイスコア**: `localStorage` キー `pad-mokujin-hs` にモード×難易度の組み合わせで保存
+- **NEW RECORD**: 更新時はゲームオーバー画面に金色点滅バッジを表示
+- **木人アニメーション**: ヒット → `.enemy-shake`、コンボ5倍達成 → `.enemy-bounce`、ミス → `.enemy-shake`（青）
+- **ミュートボタン**: ヘッダーに ♪ ボタン追加。`sound.muted = true` でオフ
+
+---

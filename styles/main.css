@@ -418,6 +418,55 @@ body {
   to   { box-shadow: 0 0 22px var(--active-glow), 0 0 40px rgba(200, 164, 80, 0.18); border-color: var(--gold-bright); }
 }
 
+/* ===== Enemy animations ===== */
+@keyframes enemy-shake {
+  0%   { transform: translateX(0); }
+  20%  { transform: translateX(-7px) rotate(-2deg); }
+  45%  { transform: translateX(7px)  rotate(2deg); }
+  70%  { transform: translateX(-4px); }
+  100% { transform: translateX(0); }
+}
+@keyframes enemy-bounce {
+  0%   { transform: translateY(0)   scale(1); }
+  30%  { transform: translateY(-14px) scale(1.08); }
+  60%  { transform: translateY(4px)  scale(0.96); }
+  80%  { transform: translateY(-5px) scale(1.03); }
+  100% { transform: translateY(0)   scale(1); }
+}
+#enemy-figure.enemy-shake  { animation: enemy-shake  0.35s ease-out; }
+#enemy-figure.enemy-bounce { animation: enemy-bounce 0.40s ease-out; }
+
+/* ===== Mute button ===== */
+.header-right { display: flex; align-items: center; gap: 10px; }
+.btn-mute {
+  background: none;
+  border: 1px solid var(--slot-border);
+  border-radius: 3px;
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 2px 7px;
+  transition: color 0.15s, border-color 0.15s;
+  font-family: inherit;
+}
+.btn-mute:hover { color: var(--gold); border-color: var(--gold-dim); }
+.btn-mute--off  { color: #3a3050; border-color: #2a2540; }
+
+/* ===== NEW RECORD badge ===== */
+.new-record {
+  color: var(--gold-bright);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-shadow: 0 0 14px rgba(220, 190, 70, 0.6);
+  animation: record-pulse 0.7s ease-in-out infinite alternate;
+}
+@keyframes record-pulse {
+  from { opacity: 0.7; text-shadow: 0 0 8px rgba(220, 190, 70, 0.4); }
+  to   { opacity: 1;   text-shadow: 0 0 20px rgba(220, 190, 70, 0.8); }
+}
+
 /* ===== Key Guide ===== */
 #key-guide {
   background: rgba(6, 8, 14, 0.85);

@@ -53,13 +53,17 @@
           <button id="btn-retry" class="btn btn--primary">▶ RETRY</button>
           <button id="btn-menu" class="btn">MENU</button>
         </div>
+        <div id="new-record-badge" class="new-record hidden">★ NEW RECORD ★</div>
       </div>
     </div>
 
     <!-- ===== Header ===== -->
     <header id="header">
       <span class="header-title">PAD-MOKUJIN</span>
-      <span id="pad-status" class="pad-status pad-status--off">PAD: 未接続</span>
+      <div class="header-right">
+        <button id="btn-mute" class="btn-mute" title="ミュート切替">♪</button>
+        <span id="pad-status" class="pad-status pad-status--off">PAD: 未接続</span>
+      </div>
     </header>
 
     <!-- ===== Info Bar ===== -->
@@ -128,6 +132,7 @@
 
   <script src="src/constants.js"></script>
   <script src="src/xhb.js"></script>
+  <script src="src/sound.js"></script>
   <script src="src/input.js"></script>
   <script src="src/ui.js"></script>
   <script src="src/game.js"></script>

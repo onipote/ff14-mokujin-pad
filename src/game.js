@@ -1,8 +1,21 @@
+const HS_KEY = 'pad-mokujin-hs';
+
+function hsLoad() {
+  try { return JSON.parse(localStorage.getItem(HS_KEY)) || {}; } catch(_) { return {}; }
+}
+function hsSave(data) {
+  try { localStorage.setItem(HS_KEY, JSON.stringify(data)); } catch(_) {}
+}
+function hsKey(mode, difficulty) {
+  return `${mode}__${difficulty}`;
+}
+
 class GameEngine {
-  constructor(xhb, ui, input) {
+  constructor(xhb, ui, input, sound) {
     this.xhb   = xhb;
     this.ui    = ui;
     this.input = input;
+    this.sound = sound;
 
     this.mode        = 'default';
     this.difficulty  = 'normal';
@@ -16,13 +29,17 @@ class GameEngine {
     this.hits      = 0;
     this.total     = 0;
 
-    this.activeSlotId  = null;
-    this._timeoutId    = null;
-    this._feedbackId   = null;
-    this._timerRaf     = null;
-    this._timerStart   = 0;
-    this._scoreAtkRaf  = null;
+    this.activeSlotId   = null;
+    this._timeoutId     = null;
+    this._feedbackId    = null;
+    this._timerRaf      = null;
+    this._timerStart    = 0;
+    this._scoreAtkRaf   = null;
     this._scoreAtkStart = 0;
+  }
+
+  getBestScore(mode, difficulty) {
+    return hsLoad()[hsKey(mode, difficulty)] || 0;
   }
 
   start(mode, difficulty) {
@@ -144,7 +161,10 @@ class GameEngine {
     this.xhb.setSlotState(this.activeSlotId, 'success');
     this.ui.setTimerFill(1);
     this.ui.updateAll(this);
-    this.ui.flashEnemy('hit');
+    this.ui.flashEnemy('hit', this.combo);
+
+    this.sound.playHit(this.combo);
+    this.sound.playCombo(this.combo);
 
     if (this.enemyHp <= 0) this.enemyHp = ENEMY_MAX_HP;
 
@@ -164,7 +184,9 @@ class GameEngine {
     this.xhb.setSlotState(this.activeSlotId, 'fail');
     this.ui.setTimerFill(0);
     this.ui.updateAll(this);
-    this.ui.flashEnemy('miss');
+    this.ui.flashEnemy('miss', 0);
+
+    this.sound.playMiss();
 
     this._feedbackId = setTimeout(() => {
       if (this.state === 'gameover') return;
@@ -177,7 +199,21 @@ class GameEngine {
   }
 
   _endGame(reason) {
+    // Check and save highscore
+    const hs    = hsLoad();
+    const key   = hsKey(this.mode, this.difficulty);
+    const prev  = hs[key] || 0;
+    const isNew = this.score > prev;
+    if (isNew) { hs[key] = this.score; hsSave(hs); }
+
     this.stop();
-    this.ui.showGameOver(this, reason);
+
+    if (reason === 'time_up') {
+      this.sound.playClear();
+    } else {
+      this.sound.playGameOver();
+    }
+
+    this.ui.showGameOver(this, reason, prev, isNew);
   }
 }
