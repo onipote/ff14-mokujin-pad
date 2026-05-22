@@ -298,6 +298,7 @@ body {
   user-select: none;
 }
 #enemy-figure.hit  { color: #ff4848; text-shadow: 0 0 30px rgba(255, 72, 72, 0.8);  }
+#enemy-figure.miss { color: #4898e8; text-shadow: 0 0 28px rgba(72, 152, 232, 0.75); }
 #enemy-figure.dead { color: #3a3428; text-shadow: none; }
 
 /* Timer bar */
