@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PAD-MOKUJIN</title>
+  <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+  <div id="app">
+
+    <!-- ===== Start Screen ===== -->
+    <div id="screen-start" class="screen">
+      <div class="screen-panel">
+        <div class="ornament">◆ ─────── ◆</div>
+        <h1 class="game-title">PAD-MOKUJIN</h1>
+        <p class="game-sub">XHB 操作練習ツール</p>
+        <div class="ornament">◆ ─────── ◆</div>
+
+        <div class="setting-row">
+          <div class="setting-label">MODE</div>
+          <div class="btn-group" id="mode-btns">
+            <button class="btn btn--sel" data-value="default">
+              フリーモード<br><small>HP制・時間無制限</small>
+            </button>
+            <button class="btn" data-value="score_attack">
+              スコアアタック<br><small>60秒</small>
+            </button>
+          </div>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-label">DIFFICULTY</div>
+          <div class="btn-group" id="diff-btns">
+            <button class="btn btn--sm" data-value="slow">遅い<br><small>4秒</small></button>
+            <button class="btn btn--sm btn--sel" data-value="normal">普通<br><small>2.5秒</small></button>
+            <button class="btn btn--sm" data-value="fast">速い<br><small>1.5秒</small></button>
+          </div>
+        </div>
+
+        <button id="btn-start" class="btn btn--primary">▶ START</button>
+      </div>
+    </div>
+
+    <!-- ===== Game Over Screen ===== -->
+    <div id="screen-gameover" class="screen hidden">
+      <div class="screen-panel">
+        <div class="ornament">◆ ─────── ◆</div>
+        <h2 class="gameover-title" id="gameover-heading">GAME OVER</h2>
+        <div class="ornament">◆ ─────── ◆</div>
+        <div id="gameover-stats" class="gameover-stats"></div>
+        <div class="btn-group btn-group--col">
+          <button id="btn-retry" class="btn btn--primary">▶ RETRY</button>
+          <button id="btn-menu" class="btn">MENU</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== Header ===== -->
+    <header id="header">
+      <span class="header-title">PAD-MOKUJIN</span>
+      <span id="pad-status" class="pad-status pad-status--off">PAD: 未接続</span>
+    </header>
+
+    <!-- ===== Info Bar ===== -->
+    <div id="info-bar">
+      <div class="info-section">
+        <div class="label-sm">HP</div>
+        <div id="player-hearts"></div>
+      </div>
+      <div class="info-section info-section--center">
+        <div id="score-val">0</div>
+        <div id="combo-val"></div>
+        <div id="score-atk-timer" class="hidden"></div>
+      </div>
+      <div class="info-section info-section--right">
+        <div class="label-sm">木人 HP</div>
+        <div class="hp-bar-wrap">
+          <div id="enemy-hp-bar" class="hp-bar hp-bar--enemy"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== Game Area ===== -->
+    <div id="game-area">
+      <div id="enemy-area">
+        <div id="enemy-figure">木人</div>
+      </div>
+      <div id="timer-wrap">
+        <div id="timer-label">光ったボタンを押せ！</div>
+        <div id="timer-track">
+          <div id="timer-fill"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== XHB ===== -->
+    <div id="xhb-wrap">
+      <div id="xhb">
+        <div class="xhb-half">
+          <div class="xhb-label">L</div>
+          <div class="xhb-groups">
+            <div class="xhb-cross" id="xhb-L-dpad"></div>
+            <div class="xhb-cross" id="xhb-L-face"></div>
+          </div>
+        </div>
+        <div class="xhb-sep">✦</div>
+        <div class="xhb-half">
+          <div class="xhb-groups">
+            <div class="xhb-cross" id="xhb-R-dpad"></div>
+            <div class="xhb-cross" id="xhb-R-face"></div>
+          </div>
+          <div class="xhb-label">R</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== Key Guide ===== -->
+    <div id="key-guide">
+      <span>L側: <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> + <kbd>R</kbd><kbd>F</kbd><kbd>G</kbd><kbd>V</kbd></span>
+      <span class="key-guide-sep">｜</span>
+      <span>R側: <kbd>矢印</kbd> + <kbd>KP8</kbd><kbd>KP4</kbd><kbd>KP6</kbd><kbd>KP2</kbd></span>
+      <span class="key-guide-sep">｜</span>
+      <span>PAD: <kbd>L2</kbd>/<kbd>R2</kbd> + ボタン</span>
+    </div>
+
+  </div><!-- /#app -->
+
+  <script src="src/constants.js"></script>
+  <script src="src/xhb.js"></script>
+  <script src="src/input.js"></script>
+  <script src="src/ui.js"></script>
+  <script src="src/game.js"></script>
+  <script src="src/main.js"></script>
+</body>
+</html>
