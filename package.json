@@ -1,0 +1,8 @@
+{
+  "name": "pad-mokujin",
+  "version": "1.0.0",
+  "description": "FF14 XHBボタン練習ツール",
+  "scripts": {
+    "start": "npx serve ."
+  }
+}
