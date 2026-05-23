@@ -187,8 +187,12 @@ class GameEngine {
   _runTimer(totalMs) {
     const tick = () => {
       if (this.state !== 'showing') return;
-      const ratio = Math.max(0, 1 - (Date.now() - this._timerStart) / totalMs);
+      const elapsed      = Date.now() - this._timerStart;
+      const ratio        = Math.max(0, 1 - elapsed / totalMs);
+      const elapsedRatio = 1 - ratio;
+      const remainingMs  = Math.max(0, totalMs - elapsed);
       this.ui.setTimerFill(ratio);
+      this.xhb.setSlotRecast(this.activeSlotId, elapsedRatio, remainingMs);
       if (ratio > 0) this._timerRaf = requestAnimationFrame(tick);
     };
     this._timerRaf = requestAnimationFrame(tick);
@@ -210,14 +214,22 @@ class GameEngine {
 
   _onInput(slotId) {
     if (this.state !== 'showing') return;
+    const totalMs      = DIFFICULTIES[this.difficulty].timeMs;
+    const elapsedRatio = Math.min(1, (Date.now() - this._timerStart) / totalMs);
+
+    if (elapsedRatio < 0.75) {
+      this.xhb.setSlotFlash(slotId); // 早押し: 白フラッシュのみ
+      return;
+    }
+
+    if (slotId !== this.activeSlotId) {
+      this.xhb.setSlotFlash(slotId); // 誤ボタン: 白フラッシュのみ（失敗扱いなし）
+      return;
+    }
+
     clearTimeout(this._timeoutId);
     if (this._timerRaf) { cancelAnimationFrame(this._timerRaf); this._timerRaf = null; }
-
-    if (slotId === this.activeSlotId) {
-      this._processHit();
-    } else {
-      this._processMiss();
-    }
+    this._processHit();
   }
 
   _onTimeout() {
@@ -236,6 +248,7 @@ class GameEngine {
 
     this.state = 'feedback';
     this.xhb.setSlotState(this.activeSlotId, 'success');
+    this.xhb.setSlotRecast(this.activeSlotId, 1.0, 0);
     this.ui.setTimerFill(1);
     this.ui.updateAll(this);
     this.ui.flashEnemy('hit', this.combo);
@@ -259,6 +272,7 @@ class GameEngine {
 
     this.state = 'feedback';
     this.xhb.setSlotState(this.activeSlotId, 'fail');
+    this.xhb.setSlotRecast(this.activeSlotId, 1.0, 0);
     this.ui.setTimerFill(0);
     this.ui.updateAll(this);
     this.ui.flashEnemy('miss', 0);

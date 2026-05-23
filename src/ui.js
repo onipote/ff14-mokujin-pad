@@ -62,6 +62,7 @@ class UIManager {
   }
 
   setTimerFill(ratio) {
+    if (!this._timerFill) return;
     this._timerFill.style.width = (ratio * 100) + '%';
     this._timerFill.classList.toggle('low', ratio < 0.3 && ratio > 0);
   }
