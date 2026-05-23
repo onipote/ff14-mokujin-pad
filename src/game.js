@@ -43,6 +43,11 @@ class GameEngine {
     this._pausedFromState          = null;
     this._pausedTimerRemaining     = 0;
     this._pausedScoreAtkRemaining  = 0;
+
+    this._pendingSlotId     = null;
+    this._pendingTimerStart = 0;
+    this._pendingTimerRaf   = null;
+    this._halfTimeId        = null;
   }
 
   getBestScore(mode, difficulty) {
@@ -54,8 +59,10 @@ class GameEngine {
     this.state = 'gameover';
     clearTimeout(this._timeoutId);
     clearTimeout(this._feedbackId);
-    if (this._timerRaf)    { cancelAnimationFrame(this._timerRaf);    this._timerRaf    = null; }
-    if (this._scoreAtkRaf) { cancelAnimationFrame(this._scoreAtkRaf); this._scoreAtkRaf = null; }
+    clearTimeout(this._halfTimeId);
+    if (this._timerRaf)       { cancelAnimationFrame(this._timerRaf);       this._timerRaf       = null; }
+    if (this._scoreAtkRaf)    { cancelAnimationFrame(this._scoreAtkRaf);    this._scoreAtkRaf    = null; }
+    if (this._pendingTimerRaf){ cancelAnimationFrame(this._pendingTimerRaf); this._pendingTimerRaf = null; }
     this.input.stop();
 
     this.mode       = mode;
@@ -67,7 +74,11 @@ class GameEngine {
     this.maxCombo   = 0;
     this.hits       = 0;
     this.total      = 0;
-    this.activeSlotId = null;
+    this.activeSlotId       = null;
+    this._pendingSlotId     = null;
+    this._pendingTimerStart = 0;
+    this._pendingTimerRaf   = null;
+    this._halfTimeId        = null;
 
     this.input.onInput         = (slotId) => this._onInput(slotId);
     this.input.onStickUpdate   = (l, r)   => this.ui.updateStickCursors(l, r);
@@ -97,8 +108,12 @@ class GameEngine {
     this.input.stop();
     clearTimeout(this._timeoutId);
     clearTimeout(this._feedbackId);
-    if (this._timerRaf)    { cancelAnimationFrame(this._timerRaf);    this._timerRaf    = null; }
-    if (this._scoreAtkRaf) { cancelAnimationFrame(this._scoreAtkRaf); this._scoreAtkRaf = null; }
+    clearTimeout(this._halfTimeId);
+    this._halfTimeId = null;
+    if (this._timerRaf)       { cancelAnimationFrame(this._timerRaf);       this._timerRaf       = null; }
+    if (this._scoreAtkRaf)    { cancelAnimationFrame(this._scoreAtkRaf);    this._scoreAtkRaf    = null; }
+    if (this._pendingTimerRaf){ cancelAnimationFrame(this._pendingTimerRaf); this._pendingTimerRaf = null; }
+    this._pendingSlotId = null;
     this.xhb.clearAllStates();
   }
 
@@ -110,8 +125,12 @@ class GameEngine {
 
     clearTimeout(this._timeoutId);
     clearTimeout(this._feedbackId);
-    if (this._timerRaf)    { cancelAnimationFrame(this._timerRaf);    this._timerRaf    = null; }
-    if (this._scoreAtkRaf) { cancelAnimationFrame(this._scoreAtkRaf); this._scoreAtkRaf = null; }
+    clearTimeout(this._halfTimeId);
+    this._halfTimeId = null;
+    if (this._timerRaf)       { cancelAnimationFrame(this._timerRaf);       this._timerRaf       = null; }
+    if (this._scoreAtkRaf)    { cancelAnimationFrame(this._scoreAtkRaf);    this._scoreAtkRaf    = null; }
+    if (this._pendingTimerRaf){ cancelAnimationFrame(this._pendingTimerRaf); this._pendingTimerRaf = null; }
+    this._pendingSlotId = null;
 
     const totalMs = DIFFICULTIES[this.difficulty].timeMs;
     this._pausedTimerRemaining = this._pausedFromState === 'showing'
@@ -151,7 +170,8 @@ class GameEngine {
       const totalMs   = DIFFICULTIES[this.difficulty].timeMs;
       this._timerStart = Date.now() - (totalMs - remaining);
       this._runTimer(totalMs);
-      this._timeoutId = setTimeout(() => this._onTimeout(), remaining);
+      this._halfTimeId = setTimeout(() => this._onGaugeFull(), remaining);
+      this._timeoutId  = setTimeout(() => this._onTimeout(), remaining + totalMs);
     } else {
       // Was in feedback; go to next slot (total will increment, which is acceptable)
       if (this.mode === 'default' && this.playerHp <= 0) {
@@ -163,14 +183,29 @@ class GameEngine {
     }
   }
 
-  _nextSlot() {
-    this.total++;
-
-    // Pick a random slot, avoiding the same one twice in a row
+  _pickNextSlotId() {
     let slotId;
     do {
       slotId = SLOT_IDS[Math.floor(Math.random() * SLOT_IDS.length)];
     } while (slotId === this.activeSlotId && SLOT_IDS.length > 1);
+    return slotId;
+  }
+
+  _nextSlot() {
+    this.total++;
+
+    let slotId;
+    if (this._pendingSlotId) {
+      // pending スロットを引き継ぐ（ゲージはすでに進んでいる）
+      slotId = this._pendingSlotId;
+      this._timerStart = this._pendingTimerStart;
+      this._pendingSlotId = null;
+      this._pendingTimerStart = 0;
+      if (this._pendingTimerRaf) { cancelAnimationFrame(this._pendingTimerRaf); this._pendingTimerRaf = null; }
+    } else {
+      slotId = this._pickNextSlotId();
+      this._timerStart = Date.now();
+    }
     this.activeSlotId = slotId;
 
     this.state = 'showing';
@@ -179,12 +214,16 @@ class GameEngine {
     this.ui.showPrompt(SLOT_BY_ID[slotId]);
 
     const timeMs = DIFFICULTIES[this.difficulty].timeMs;
-    this._timerStart = Date.now();
     this._runTimer(timeMs);
-    this._timeoutId = setTimeout(() => this._onTimeout(), timeMs);
+
+    const elapsed       = Date.now() - this._timerStart;
+    const gaugeRemaining = Math.max(0, timeMs - elapsed);
+    this._halfTimeId = setTimeout(() => this._onGaugeFull(), gaugeRemaining);
+    this._timeoutId  = setTimeout(() => this._onTimeout(), gaugeRemaining + timeMs);
   }
 
   _runTimer(totalMs) {
+    if (this._timerRaf) { cancelAnimationFrame(this._timerRaf); this._timerRaf = null; }
     const tick = () => {
       if (this.state !== 'showing') return;
       const elapsed      = Date.now() - this._timerStart;
@@ -196,6 +235,33 @@ class GameEngine {
       if (ratio > 0) this._timerRaf = requestAnimationFrame(tick);
     };
     this._timerRaf = requestAnimationFrame(tick);
+  }
+
+  _startPendingTimer(totalMs) {
+    if (this._pendingTimerRaf) { cancelAnimationFrame(this._pendingTimerRaf); this._pendingTimerRaf = null; }
+    const tick = () => {
+      if (this.state === 'idle' || this.state === 'paused' || this.state === 'gameover') return;
+      const elapsed      = Date.now() - this._pendingTimerStart;
+      const ratio        = Math.max(0, 1 - elapsed / totalMs);
+      const elapsedRatio = 1 - ratio;
+      const remainingMs  = Math.max(0, totalMs - elapsed);
+      this.xhb.setSlotRecast(this._pendingSlotId, elapsedRatio, remainingMs);
+      if (ratio > 0) this._pendingTimerRaf = requestAnimationFrame(tick);
+    };
+    this._pendingTimerRaf = requestAnimationFrame(tick);
+  }
+
+  _onGaugeFull() {
+    if (this.state !== 'showing') return;
+    if (this._pendingSlotId) return; // 二重発火防止
+
+    const timeMs           = DIFFICULTIES[this.difficulty].timeMs;
+    this._pendingSlotId    = this._pickNextSlotId();
+    this._pendingTimerStart = Date.now();
+    this._startPendingTimer(timeMs);
+
+    // 次のスロットをゲージ付きで表示（現在のスロットはまだ押せる）
+    this.xhb.setSlotState(this._pendingSlotId, 'active');
   }
 
   _tickScoreAtkTimer() {
@@ -228,6 +294,8 @@ class GameEngine {
     }
 
     clearTimeout(this._timeoutId);
+    clearTimeout(this._halfTimeId);
+    this._halfTimeId = null;
     if (this._timerRaf) { cancelAnimationFrame(this._timerRaf); this._timerRaf = null; }
     this._processHit();
   }
@@ -239,6 +307,8 @@ class GameEngine {
   }
 
   _processHit() {
+    clearTimeout(this._halfTimeId);
+    this._halfTimeId = null;
     this.combo++;
     this.hits++;
     if (this.combo > this.maxCombo) this.maxCombo = this.combo;

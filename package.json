@@ -4,7 +4,8 @@
   "description": "FF14 XHBボタン練習ツール",
   "scripts": {
     "start": "npx serve .",
-    "test:aoe": "node tests/aoe-verify.js"
+    "test:aoe": "node tests/aoe-verify.js",
+    "test:gauge": "node tests/gauge-chaining-verify.js"
   },
   "devDependencies": {
     "playwright": "^1.60.0"
