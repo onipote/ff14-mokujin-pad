@@ -69,8 +69,9 @@ class GameEngine {
     this.total      = 0;
     this.activeSlotId = null;
 
-    this.input.onInput       = (slotId) => this._onInput(slotId);
-    this.input.onStickUpdate = (l, r)   => this.ui.updateStickCursors(l, r);
+    this.input.onInput         = (slotId) => this._onInput(slotId);
+    this.input.onStickUpdate   = (l, r)   => this.ui.updateStickCursors(l, r);
+    this.input.onTriggerChange = (side)   => this.xhb.setHalfActive(side);
     this.input.start();
 
     this.aoe.onHit   = () => this._onAoeHit();
@@ -91,7 +92,8 @@ class GameEngine {
   stop() {
     this.state = 'gameover';
     this.aoe.stop();
-    this.input.onStickUpdate = null;
+    this.input.onStickUpdate   = null;
+    this.input.onTriggerChange = null;
     this.input.stop();
     clearTimeout(this._timeoutId);
     clearTimeout(this._feedbackId);
@@ -119,16 +121,19 @@ class GameEngine {
       ? Math.max(0, SCORE_ATTACK_MS - (Date.now() - this._scoreAtkStart))
       : 0;
 
-    this.input.onStickUpdate = null;
+    this.input.onStickUpdate   = null;
+    this.input.onTriggerChange = null;
     this.input.stop();
+    this.xhb.setHalfActive(null);
     this.aoe.stop();
   }
 
   resume() {
     if (this.state !== 'paused') return;
 
-    this.input.onInput       = (slotId) => this._onInput(slotId);
-    this.input.onStickUpdate = (l, r)   => this.ui.updateStickCursors(l, r);
+    this.input.onInput         = (slotId) => this._onInput(slotId);
+    this.input.onStickUpdate   = (l, r)   => this.ui.updateStickCursors(l, r);
+    this.input.onTriggerChange = (side)   => this.xhb.setHalfActive(side);
     this.input.start();
 
     this.aoe.onHit   = () => this._onAoeHit();

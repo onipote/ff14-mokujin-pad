@@ -1,9 +1,10 @@
 class InputHandler {
   constructor() {
-    this.onInput        = null;
-    this.onPadStatus    = null;
-    this.onStickUpdate  = null;
-    this.onSystemButton = null; // OPTIONS/Start button
+    this.onInput         = null;
+    this.onPadStatus     = null;
+    this.onStickUpdate   = null;
+    this.onSystemButton  = null; // OPTIONS/Start button
+    this.onTriggerChange = null; // called with 'L' | 'R' | null when trigger state changes
     this.stickL = { x: 0, y: 0 };
     this.stickR = { x: 0, y: 0 };
 
@@ -87,6 +88,7 @@ class InputHandler {
     if (this._padRaf) cancelAnimationFrame(this._padRaf);
     const ACTION_BTNS = [0, 1, 2, 3, 12, 13, 14, 15];
     let prevTime = performance.now();
+    let prevTriggerSide = null;
 
     const loop = (now) => {
       if (!this._active) return;
@@ -147,6 +149,12 @@ class InputHandler {
           const r1 = (gp.buttons[5]?.value ?? 0) > 0.5;
           const r2 = (gp.buttons[7]?.value ?? 0) > 0.5;
           const trigger = (l1 || l2) ? 6 : (r1 || r2) ? 7 : null;
+
+          const triggerSide = trigger === 6 ? 'L' : trigger === 7 ? 'R' : null;
+          if (triggerSide !== prevTriggerSide) {
+            prevTriggerSide = triggerSide;
+            if (this.onTriggerChange) this.onTriggerChange(triggerSide);
+          }
 
           for (const idx of ACTION_BTNS) {
             const btn     = gp.buttons[idx];

@@ -1,9 +1,13 @@
 class XHBRenderer {
   constructor() {
-    this.slots = {};
+    this.slots  = {};
+    this.halves = {};
   }
 
   build() {
+    this.halves.L = document.getElementById('xhb-half-L');
+    this.halves.R = document.getElementById('xhb-half-R');
+
     ['L', 'R'].forEach(side => {
       ['dpad', 'face'].forEach(type => {
         const container = document.getElementById(`xhb-${side}-${type}`);
@@ -22,8 +26,8 @@ class XHBRenderer {
     const el = document.createElement('div');
     el.className = 'xhb-slot';
     el.id = `slot-${def.id}`;
-    el.style.gridColumn = def.gridCol;
-    el.style.gridRow    = def.gridRow;
+    el.style.left = def.posLeft;
+    el.style.top  = def.posTop;
 
     const sym = document.createElement('span');
     sym.className   = 'slot-sym';
@@ -31,6 +35,13 @@ class XHBRenderer {
 
     el.appendChild(sym);
     return el;
+  }
+
+  // side: 'L' | 'R' | null
+  setHalfActive(side) {
+    Object.entries(this.halves).forEach(([s, el]) => {
+      if (el) el.classList.toggle('xhb-half--active', s === side);
+    });
   }
 
   // state: 'default' | 'active' | 'success' | 'fail'
@@ -44,5 +55,6 @@ class XHBRenderer {
     Object.values(this.slots).forEach(el => {
       el.className = 'xhb-slot';
     });
+    this.setHalfActive(null);
   }
 }
