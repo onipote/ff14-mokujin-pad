@@ -219,6 +219,58 @@
 
 ---
 
+## XHBデザイン改修：FF14スタイル対応
+
+**日付**: 2026-05-23  
+**コミット**: `081aeed`, `cf49127`, `dda3b8c`
+
+### 変更内容
+
+| ファイル | 内容 |
+|---------|------|
+| `src/constants.js` | スロット位置定義を CSS calc 文字列（`posLeft` / `posTop`）に変更 |
+| `src/xhb.js` | `XHBRenderer` 全面書き直し：絶対配置・ハーフアクティブ制御 |
+| `src/input.js` | `onTriggerChange` コールバックとトリガー状態追跡を追加 |
+| `src/game.js` | `onTriggerChange` を start / resume / stop / pause で適切にワイヤリング |
+| `index.html` | `xhb-half-L` / `xhb-half-R` に `id` 追加、セパレーター要素を整理 |
+| `styles/main.css` | XHBセクション全体をFF14風デザインに刷新 |
+
+### デザイン仕様
+
+**レイアウト**
+
+各クラスター（dpad・face）は `position: relative` コンテナ内の絶対配置で構成。  
+ボタン中心座標は数学y-up系で以下の位置関係（1単位 = `slot-sz + slot-gap` = 48px）:
+
+```
+(-1, 0) → left   (0, +0.5) → up
+(0, -0.5) → down  (1, 0) → right
+```
+
+コンテナサイズ: `width = 3×slot-sz + 2×gap = 140px`, `height = 2×slot-sz + gap = 92px`
+
+**CSS変換式**（`--slot-sz: 44px`, `--slot-gap: 4px` 前提）:
+
+| 位置 | left | top |
+|------|------|-----|
+| up | `calc(slot-sz + gap)` | `0px` |
+| down | `calc(slot-sz + gap)` | `calc(slot-sz + gap)` |
+| left | `0px` | `calc((slot-sz + gap) / 2)` |
+| right | `calc((slot-sz + gap) * 2)` | `calc((slot-sz + gap) / 2)` |
+
+**スタイル変更**
+
+- アンバーのXHB外枠ボーダーを廃止
+- ハーフとハーフの間にのみ縦セパレーター（グラデーション縦線）を追加
+- トリガー（L1/L2 または R1/R2）を押した側ハーフが黄色く発光（`.xhb-half--active`）
+- トリガーラベル（L / R）をインジケーターボックス形式で表示
+
+**トリガーハーフ発光実装**
+
+`InputHandler._startMainLoop` 内でトリガーの押下側（`'L'` / `'R'` / `null`）が変化したタイミングで `onTriggerChange(side)` を発火。`GameEngine` が受け取り `XHBRenderer.setHalfActive(side)` を呼び出して `.xhb-half--active` クラスをトグル。
+
+---
+
 ## フェーズ8：コントローラー必須化・キーボードUI削除
 
 **日付**: 2026-05-23
