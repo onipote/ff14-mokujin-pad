@@ -585,3 +585,27 @@ body {
   color: var(--text-dim);
   box-shadow: none;
 }
+
+/* Controller-focused button (D-pad navigation) */
+.btn--focused {
+  background: rgba(200, 164, 80, 0.18);
+  border-color: var(--gold-bright);
+  color: var(--gold-bright);
+  box-shadow: 0 0 14px rgba(200, 164, 80, 0.35);
+}
+
+.pause-title {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  color: var(--gold-bright);
+  text-shadow: 0 0 20px rgba(220, 190, 70, 0.5);
+}
+
+.pad-hint {
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 0.10em;
+  text-align: center;
+  margin-top: -8px;
+}

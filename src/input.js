@@ -1,8 +1,9 @@
 class InputHandler {
   constructor() {
-    this.onInput       = null;
-    this.onPadStatus   = null;
-    this.onStickUpdate = null;
+    this.onInput        = null;
+    this.onPadStatus    = null;
+    this.onStickUpdate  = null;
+    this.onSystemButton = null; // OPTIONS/Start button
     this.stickL = { x: 0, y: 0 };
     this.stickR = { x: 0, y: 0 };
 
@@ -33,6 +34,10 @@ class InputHandler {
     for (const gp of gps) {
       if (gp) {
         this._padIndex = gp.index;
+        // Pre-populate prev state to avoid spurious triggers from held buttons
+        for (let i = 0; i < gp.buttons.length; i++) {
+          this._padPrevBtns[i] = !!(gp.buttons[i] && gp.buttons[i].pressed);
+        }
         if (this.onPadStatus) this.onPadStatus(true, gp.id);
         break;
       }
@@ -128,6 +133,13 @@ class InputHandler {
             this.stickR.x = Math.max(-1, Math.min(1, this.stickR.x + rax * STICK_SPEED * dt));
             this.stickR.y = Math.max(-1, Math.min(1, this.stickR.y + ray * STICK_SPEED * dt));
           }
+
+          // システムボタン (OPTIONS = 9)
+          const sysPressed = !!(gp.buttons[9] && gp.buttons[9].pressed);
+          if (sysPressed && !this._padPrevBtns[9]) {
+            if (this.onSystemButton) this.onSystemButton();
+          }
+          this._padPrevBtns[9] = sysPressed;
 
           // ボタン判定 (XHB入力)
           const l1 = (gp.buttons[4]?.value ?? 0) > 0.5;

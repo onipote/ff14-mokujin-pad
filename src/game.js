@@ -18,9 +18,11 @@ class GameEngine {
     this.sound = sound;
     this.aoe   = new AoeEngine(input, ui);
 
+    this.onGameOver  = null;
+
     this.mode        = 'default';
     this.difficulty  = 'normal';
-    this.state       = 'idle'; // 'idle' | 'showing' | 'feedback' | 'gameover'
+    this.state       = 'idle'; // 'idle' | 'showing' | 'feedback' | 'paused' | 'gameover'
 
     this.playerHp  = PLAYER_MAX_HP;
     this.enemyHp   = ENEMY_MAX_HP;
@@ -37,6 +39,10 @@ class GameEngine {
     this._timerStart    = 0;
     this._scoreAtkRaf   = null;
     this._scoreAtkStart = 0;
+
+    this._pausedFromState          = null;
+    this._pausedTimerRemaining     = 0;
+    this._pausedScoreAtkRemaining  = 0;
   }
 
   getBestScore(mode, difficulty) {
@@ -92,6 +98,64 @@ class GameEngine {
     if (this._timerRaf)    { cancelAnimationFrame(this._timerRaf);    this._timerRaf    = null; }
     if (this._scoreAtkRaf) { cancelAnimationFrame(this._scoreAtkRaf); this._scoreAtkRaf = null; }
     this.xhb.clearAllStates();
+  }
+
+  pause() {
+    if (this.state === 'gameover' || this.state === 'paused' || this.state === 'idle') return;
+
+    this._pausedFromState = this.state;
+    this.state = 'paused';
+
+    clearTimeout(this._timeoutId);
+    clearTimeout(this._feedbackId);
+    if (this._timerRaf)    { cancelAnimationFrame(this._timerRaf);    this._timerRaf    = null; }
+    if (this._scoreAtkRaf) { cancelAnimationFrame(this._scoreAtkRaf); this._scoreAtkRaf = null; }
+
+    const totalMs = DIFFICULTIES[this.difficulty].timeMs;
+    this._pausedTimerRemaining = this._pausedFromState === 'showing'
+      ? Math.max(0, totalMs - (Date.now() - this._timerStart))
+      : 0;
+    this._pausedScoreAtkRemaining = this.mode === 'score_attack'
+      ? Math.max(0, SCORE_ATTACK_MS - (Date.now() - this._scoreAtkStart))
+      : 0;
+
+    this.input.onStickUpdate = null;
+    this.input.stop();
+    this.aoe.stop();
+  }
+
+  resume() {
+    if (this.state !== 'paused') return;
+
+    this.input.onInput       = (slotId) => this._onInput(slotId);
+    this.input.onStickUpdate = (l, r)   => this.ui.updateStickCursors(l, r);
+    this.input.start();
+
+    this.aoe.onHit   = () => this._onAoeHit();
+    this.aoe.onDodge = null;
+    this.aoe.start();
+
+    if (this.mode === 'score_attack') {
+      this._scoreAtkStart = Date.now() - (SCORE_ATTACK_MS - this._pausedScoreAtkRemaining);
+      this._tickScoreAtkTimer();
+    }
+
+    if (this._pausedFromState === 'showing') {
+      this.state = 'showing';
+      const remaining = this._pausedTimerRemaining;
+      const totalMs   = DIFFICULTIES[this.difficulty].timeMs;
+      this._timerStart = Date.now() - (totalMs - remaining);
+      this._runTimer(totalMs);
+      this._timeoutId = setTimeout(() => this._onTimeout(), remaining);
+    } else {
+      // Was in feedback; go to next slot (total will increment, which is acceptable)
+      if (this.mode === 'default' && this.playerHp <= 0) {
+        this._endGame('hp_zero');
+      } else {
+        this.total--;
+        this._nextSlot();
+      }
+    }
   }
 
   _nextSlot() {
@@ -242,5 +306,6 @@ class GameEngine {
     }
 
     this.ui.showGameOver(this, reason, prev, isNew);
+    if (this.onGameOver) this.onGameOver(reason);
   }
 }

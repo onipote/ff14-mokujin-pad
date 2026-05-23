@@ -13,6 +13,8 @@ class UIManager {
     this._enemyFlashId = null;
     this._enemyAnimId  = null;
 
+    this._pauseEl    = document.getElementById('screen-pause');
+
     // AOE / stick panels
     this._aoeZone   = { L: document.getElementById('aoe-zone-L'),     R: document.getElementById('aoe-zone-R') };
     this._stickCur  = { L: document.getElementById('stick-cursor-L'), R: document.getElementById('stick-cursor-R') };
@@ -157,5 +159,13 @@ class UIManager {
   hideGameOver() {
     document.getElementById('screen-gameover').classList.add('hidden');
     document.getElementById('new-record-badge').classList.add('hidden');
+  }
+
+  showPause() {
+    this._pauseEl.classList.remove('hidden');
+  }
+
+  hidePause() {
+    this._pauseEl.classList.add('hidden');
   }
 }
