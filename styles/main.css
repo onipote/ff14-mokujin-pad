@@ -463,7 +463,7 @@ body {
   border-radius: 2px;
   padding: 3px 5px;
 }
-.xhb-groups { display: flex; gap: 8px; align-items: center; }
+.xhb-groups { display: flex; flex-direction: column; gap: var(--slot-gap); align-items: flex-start; }
 .xhb-sep {
   width: 1px;
   flex-shrink: 0;
@@ -478,8 +478,8 @@ body {
 
 .xhb-cross {
   position: relative;
-  width: calc(var(--slot-sz) * 2 + var(--slot-gap));
-  height: calc(var(--slot-sz) * 3 + var(--slot-gap) * 2);
+  width: calc(var(--slot-sz) * 4 + var(--slot-gap) * 3);
+  height: var(--slot-sz);
 }
 
 /* ===== XHB Slots ===== */
