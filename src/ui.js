@@ -12,6 +12,10 @@ class UIManager {
     this._heartEls    = [];
     this._enemyFlashId = null;
     this._enemyAnimId  = null;
+
+    // AOE / stick panels
+    this._aoeZone   = { L: document.getElementById('aoe-zone-L'),     R: document.getElementById('aoe-zone-R') };
+    this._stickCur  = { L: document.getElementById('stick-cursor-L'), R: document.getElementById('stick-cursor-R') };
   }
 
   buildHearts(max) {
@@ -113,6 +117,34 @@ class UIManager {
     badge.classList.toggle('hidden', !isNewRecord);
 
     document.getElementById('screen-gameover').classList.remove('hidden');
+  }
+
+  // ── AOE / スティックパネル ──
+
+  showAoeWarning(side, type) {
+    const el = this._aoeZone[side];
+    if (el) el.className = `aoe-zone aoe-zone--warning aoe-zone--${type}`;
+  }
+
+  showAoeResult(side, type, isHit) {
+    const el = this._aoeZone[side];
+    if (el) el.className = `aoe-zone aoe-zone--${isHit ? 'hit' : 'dodge'} aoe-zone--${type}`;
+  }
+
+  clearAoe(side) {
+    const el = this._aoeZone[side];
+    if (el) el.className = 'aoe-zone';
+  }
+
+  updateStickCursors(stickL, stickR) {
+    this._moveCursor(this._stickCur.L, stickL.x, stickL.y);
+    this._moveCursor(this._stickCur.R, stickR.x, stickR.y);
+  }
+
+  _moveCursor(el, x, y) {
+    if (!el) return;
+    el.style.left = ((x + 1) / 2 * 100) + '%';
+    el.style.top  = ((y + 1) / 2 * 100) + '%';
   }
 
   hideGameOver() {

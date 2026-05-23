@@ -16,6 +16,7 @@ class GameEngine {
     this.ui    = ui;
     this.input = input;
     this.sound = sound;
+    this.aoe   = new AoeEngine(input, ui);
 
     this.mode        = 'default';
     this.difficulty  = 'normal';
@@ -62,8 +63,13 @@ class GameEngine {
     this.total      = 0;
     this.activeSlotId = null;
 
-    this.input.onInput = (slotId) => this._onInput(slotId);
+    this.input.onInput       = (slotId) => this._onInput(slotId);
+    this.input.onStickUpdate = (l, r)   => this.ui.updateStickCursors(l, r);
     this.input.start();
+
+    this.aoe.onHit   = () => this._onAoeHit();
+    this.aoe.onDodge = null;
+    this.aoe.start();
 
     this.ui.updateAll(this);
     this.ui.setTimerFill(0);
@@ -78,6 +84,8 @@ class GameEngine {
 
   stop() {
     this.state = 'gameover';
+    this.aoe.stop();
+    this.input.onStickUpdate = null;
     this.input.stop();
     clearTimeout(this._timeoutId);
     clearTimeout(this._feedbackId);
@@ -196,6 +204,25 @@ class GameEngine {
         this._nextSlot();
       }
     }, FEEDBACK_FAIL_MS);
+  }
+
+  _onAoeHit() {
+    if (this.state === 'gameover') return;
+    this.combo = 0;
+
+    if (this.mode === 'default') {
+      this.playerHp = Math.max(0, this.playerHp - 1);
+    }
+
+    this.ui.updateAll(this);
+    this.ui.flashEnemy('miss', 0);
+    this.sound.playMiss();
+
+    if (this.mode === 'default' && this.playerHp <= 0) {
+      setTimeout(() => {
+        if (this.state !== 'gameover') this._endGame('hp_zero');
+      }, 50);
+    }
   }
 
   _endGame(reason) {

@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "FF14 XHBボタン練習ツール",
   "scripts": {
-    "start": "npx serve ."
+    "start": "npx serve .",
+    "test:aoe": "node tests/aoe-verify.js"
+  },
+  "devDependencies": {
+    "playwright": "^1.60.0"
   }
 }

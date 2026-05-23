@@ -87,9 +87,33 @@
 
     <!-- ===== Game Area ===== -->
     <div id="game-area">
-      <div id="enemy-area">
-        <div id="enemy-figure">木人</div>
+
+      <!-- スティック / AOE パネル -->
+      <div id="stick-area">
+        <!-- L パネル -->
+        <div class="stick-panel" id="stick-panel-L">
+          <div class="stick-field" id="stick-field-L">
+            <div class="aoe-zone" id="aoe-zone-L"></div>
+            <div class="stick-cursor" id="stick-cursor-L">◆</div>
+          </div>
+          <div class="stick-side-label">L</div>
+        </div>
+
+        <!-- 木人 (中央) -->
+        <div id="stick-center">
+          <div id="enemy-figure">木人</div>
+        </div>
+
+        <!-- R パネル -->
+        <div class="stick-panel" id="stick-panel-R">
+          <div class="stick-field" id="stick-field-R">
+            <div class="aoe-zone" id="aoe-zone-R"></div>
+            <div class="stick-cursor" id="stick-cursor-R">◆</div>
+          </div>
+          <div class="stick-side-label">R</div>
+        </div>
       </div>
+
       <div id="timer-wrap">
         <div id="timer-label">光ったボタンを押せ！</div>
         <div id="timer-track">
@@ -125,7 +149,9 @@
       <span class="key-guide-sep">｜</span>
       <span>R側: <kbd>矢印</kbd> + <kbd>KP8</kbd><kbd>KP4</kbd><kbd>KP6</kbd><kbd>KP2</kbd></span>
       <span class="key-guide-sep">｜</span>
-      <span>PAD: <kbd>L2</kbd>/<kbd>R2</kbd> + ボタン</span>
+      <span>AOE避け: <kbd>WASD</kbd>/<kbd>矢印</kbd>を押し続け</span>
+      <span class="key-guide-sep">｜</span>
+      <span>PAD: <kbd>L2</kbd>/<kbd>R2</kbd> + ボタン / スティックで回避</span>
     </div>
 
   </div><!-- /#app -->
@@ -134,6 +160,7 @@
   <script src="src/xhb.js"></script>
   <script src="src/sound.js"></script>
   <script src="src/input.js"></script>
+  <script src="src/aoe.js"></script>
   <script src="src/ui.js"></script>
   <script src="src/game.js"></script>
   <script src="src/main.js"></script>

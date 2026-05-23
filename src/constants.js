@@ -38,3 +38,11 @@ const FEEDBACK_FAIL_MS     = 550;
 const SCORE_ATTACK_MS      = 60_000;
 const BASE_SCORE_PER_HIT   = 10;
 const MAX_COMBO_MULTIPLIER = 5;
+
+// AOE dodge mechanic
+const AOE_WARNING_MS   = 1500;
+const AOE_FIRE_MS      = 500;
+const AOE_MIN_DELAY_MS = 3000;
+const AOE_MAX_DELAY_MS = 7000;
+const STICK_SPEED      = 2.2; // normalized units per second for keyboard cursor
+const STICK_DEADZONE   = 0.15;
