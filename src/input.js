@@ -130,9 +130,11 @@ class InputHandler {
           }
 
           // ボタン判定 (XHB入力)
-          const l2 = gp.buttons[6] && gp.buttons[6].value > 0.5;
-          const r2 = gp.buttons[7] && gp.buttons[7].value > 0.5;
-          const trigger = l2 ? 6 : r2 ? 7 : null;
+          const l1 = (gp.buttons[4]?.value ?? 0) > 0.5;
+          const l2 = (gp.buttons[6]?.value ?? 0) > 0.5;
+          const r1 = (gp.buttons[5]?.value ?? 0) > 0.5;
+          const r2 = (gp.buttons[7]?.value ?? 0) > 0.5;
+          const trigger = (l1 || l2) ? 6 : (r1 || r2) ? 7 : null;
 
           for (const idx of ACTION_BTNS) {
             const btn     = gp.buttons[idx];
