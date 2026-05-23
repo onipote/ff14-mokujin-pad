@@ -8,7 +8,23 @@ document.addEventListener('DOMContentLoaded', () => {
   xhb.build();
   ui.buildHearts(PLAYER_MAX_HP);
 
+  // Controller connection state
+  function refreshPadState() {
+    const pads = navigator.getGamepads ? [...navigator.getGamepads()] : [];
+    const pad  = pads.find(g => g);
+    ui.setPadStatus(!!pad, pad ? pad.id : null);
+    ui.setStartable(!!pad);
+  }
+
+  window.addEventListener('gamepadconnected',    (e) => {
+    ui.setPadStatus(true, e.gamepad.id);
+    ui.setStartable(true);
+  });
+  window.addEventListener('gamepaddisconnected', () => refreshPadState());
+
   input.onPadStatus = (connected, id) => ui.setPadStatus(connected, id);
+
+  refreshPadState();
 
   let selectedMode = 'default';
   let selectedDiff = 'normal';
@@ -38,6 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
     engine.stop();
     ui.hideGameOver();
     document.getElementById('screen-start').classList.remove('hidden');
+    refreshPadState();
   }
 
   document.getElementById('btn-start').addEventListener('click', startGame);

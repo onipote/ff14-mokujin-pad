@@ -562,27 +562,26 @@ body {
   to   { opacity: 1;   text-shadow: 0 0 20px rgba(220, 190, 70, 0.8); }
 }
 
-/* ===== Key Guide ===== */
-#key-guide {
-  background: rgba(6, 8, 14, 0.85);
-  border: 1px solid var(--panel-border);
-  border-top: none;
-  border-radius: 0 0 4px 4px;
-  padding: 6px 16px;
-  display: flex;
-  justify-content: center;
-  gap: 14px;
+/* ===== Controller required message ===== */
+.pad-required-msg {
   font-size: 11px;
   color: var(--text-dim);
-  flex-wrap: wrap;
+  letter-spacing: 0.12em;
+  text-align: center;
+  margin-top: -8px;
+  animation: record-pulse 1s ease-in-out infinite alternate;
 }
-.key-guide-sep { color: #2a2a3a; }
-kbd {
-  background: #141720;
-  border: 1px solid #252a3a;
-  border-radius: 3px;
-  padding: 0 4px;
-  font-size: 10px;
+
+.btn--primary:disabled {
+  background: rgba(255,255,255,0.02);
+  border-color: var(--slot-border);
   color: var(--text-dim);
-  font-family: inherit;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+.btn--primary:disabled:hover {
+  background: rgba(255,255,255,0.02);
+  border-color: var(--slot-border);
+  color: var(--text-dim);
+  box-shadow: none;
 }

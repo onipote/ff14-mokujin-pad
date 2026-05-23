@@ -49,7 +49,14 @@ class UIManager {
 
   showPrompt(slotDef) {
     const trigger = slotDef.side === 'L' ? 'L2' : 'R2';
-    this._timerLabel.textContent = `${trigger} + ${slotDef.sym}  (${slotDef.keyLabel})`;
+    this._timerLabel.textContent = `${trigger} + ${slotDef.sym}`;
+  }
+
+  setStartable(canStart) {
+    const btn = document.getElementById('btn-start');
+    const msg = document.getElementById('pad-required-msg');
+    btn.disabled = !canStart;
+    if (msg) msg.classList.toggle('hidden', canStart);
   }
 
   setTimerFill(ratio) {

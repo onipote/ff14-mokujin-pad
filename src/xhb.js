@@ -29,12 +29,7 @@ class XHBRenderer {
     sym.className   = 'slot-sym';
     sym.textContent = def.sym;
 
-    const key = document.createElement('span');
-    key.className   = 'slot-key';
-    key.textContent = def.keyLabel;
-
     el.appendChild(sym);
-    el.appendChild(key);
     return el;
   }
 
