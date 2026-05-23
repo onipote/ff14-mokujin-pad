@@ -33,19 +33,47 @@ document.addEventListener('DOMContentLoaded', () => {
   let selectedMode = 'default';
   let selectedDiff = 'normal';
 
+  // Start screen controller navigation state
+  let startSectionIdx = 0; // 0=mode, 1=diff, 2=start
+  let startModeIdx    = 0;
+  let startDiffIdx    = 1; // default: 'normal'
+
   function initBtnGroup(groupId, onChange) {
     const group = document.getElementById(groupId);
-    group.querySelectorAll('.btn').forEach(btn => {
+    group.querySelectorAll('.btn').forEach((btn, idx) => {
       btn.addEventListener('click', () => {
         group.querySelectorAll('.btn').forEach(b => b.classList.remove('btn--sel'));
         btn.classList.add('btn--sel');
-        onChange(btn.dataset.value);
+        onChange(btn.dataset.value, idx);
       });
     });
   }
 
-  initBtnGroup('mode-btns', v => { selectedMode = v; });
-  initBtnGroup('diff-btns', v => { selectedDiff = v; });
+  initBtnGroup('mode-btns', (v, idx) => { selectedMode = v; startModeIdx = idx; });
+  initBtnGroup('diff-btns', (v, idx) => { selectedDiff = v; startDiffIdx = idx; });
+
+  function applyModeSelection(idx) {
+    const btns = [...document.querySelectorAll('#mode-btns .btn')];
+    btns.forEach((b, i) => b.classList.toggle('btn--sel', i === idx));
+    if (btns[idx]) selectedMode = btns[idx].dataset.value;
+  }
+
+  function applyDiffSelection(idx) {
+    const btns = [...document.querySelectorAll('#diff-btns .btn')];
+    btns.forEach((b, i) => b.classList.toggle('btn--sel', i === idx));
+    if (btns[idx]) selectedDiff = btns[idx].dataset.value;
+  }
+
+  function updateStartFocus() {
+    document.querySelectorAll('#screen-start .btn').forEach(b => b.classList.remove('btn--focused'));
+    if (startSectionIdx === 0) {
+      document.querySelectorAll('#mode-btns .btn')[startModeIdx]?.classList.add('btn--focused');
+    } else if (startSectionIdx === 1) {
+      document.querySelectorAll('#diff-btns .btn')[startDiffIdx]?.classList.add('btn--focused');
+    } else {
+      document.getElementById('btn-start').classList.add('btn--focused');
+    }
+  }
 
   // ── Menu loop (controller nav on non-play screens) ──────
   let menuRaf      = null;
@@ -74,8 +102,10 @@ document.addEventListener('DOMContentLoaded', () => {
     menuPrevBtns = {};
     const initGp = getPad();
     if (initGp) {
-      menuPrevBtns.up      = !!(initGp.buttons[12]?.pressed || initGp.buttons[14]?.pressed);
-      menuPrevBtns.down    = !!(initGp.buttons[13]?.pressed || initGp.buttons[15]?.pressed);
+      menuPrevBtns.up      = !!(initGp.buttons[12]?.pressed);
+      menuPrevBtns.down    = !!(initGp.buttons[13]?.pressed);
+      menuPrevBtns.left    = !!(initGp.buttons[14]?.pressed);
+      menuPrevBtns.right   = !!(initGp.buttons[15]?.pressed);
       menuPrevBtns.cross   = !!(initGp.buttons[0]?.pressed);
       menuPrevBtns.options = !!(initGp.buttons[9]?.pressed);
     }
@@ -85,34 +115,58 @@ document.addEventListener('DOMContentLoaded', () => {
       const gp = getPad();
       if (!gp) return;
 
-      const up      = !!(gp.buttons[12]?.pressed || gp.buttons[14]?.pressed);
-      const down    = !!(gp.buttons[13]?.pressed || gp.buttons[15]?.pressed);
+      const dUp    = !!(gp.buttons[12]?.pressed);
+      const dDown  = !!(gp.buttons[13]?.pressed);
+      const dLeft  = !!(gp.buttons[14]?.pressed);
+      const dRight = !!(gp.buttons[15]?.pressed);
       const cross   = !!(gp.buttons[0]?.pressed);
       const options = !!(gp.buttons[9]?.pressed);
 
-      const upFresh      = up      && !menuPrevBtns.up;
-      const downFresh    = down    && !menuPrevBtns.down;
-      const crossFresh   = cross   && !menuPrevBtns.cross;
+      const upFresh      = dUp    && !menuPrevBtns.up;
+      const downFresh    = dDown  && !menuPrevBtns.down;
+      const leftFresh    = dLeft  && !menuPrevBtns.left;
+      const rightFresh   = dRight && !menuPrevBtns.right;
+      const crossFresh   = cross  && !menuPrevBtns.cross;
       const optionsFresh = options && !menuPrevBtns.options;
+
+      // For linear menus (pause/gameover) combine left/right with up/down
+      const navUp   = upFresh   || leftFresh;
+      const navDown = downFresh || rightFresh;
 
       if (appState === 'start') {
         const canStart = !document.getElementById('btn-start').disabled;
+
+        if (upFresh   && startSectionIdx > 0) { startSectionIdx--; updateStartFocus(); }
+        if (downFresh && startSectionIdx < 2) { startSectionIdx++; updateStartFocus(); }
+
+        if (startSectionIdx === 0) {
+          const modeCount = document.querySelectorAll('#mode-btns .btn').length;
+          if (leftFresh  && startModeIdx > 0)             { startModeIdx--; applyModeSelection(startModeIdx); updateStartFocus(); }
+          if (rightFresh && startModeIdx < modeCount - 1) { startModeIdx++; applyModeSelection(startModeIdx); updateStartFocus(); }
+        } else if (startSectionIdx === 1) {
+          const diffCount = document.querySelectorAll('#diff-btns .btn').length;
+          if (leftFresh  && startDiffIdx > 0)             { startDiffIdx--; applyDiffSelection(startDiffIdx); updateStartFocus(); }
+          if (rightFresh && startDiffIdx < diffCount - 1) { startDiffIdx++; applyDiffSelection(startDiffIdx); updateStartFocus(); }
+        }
+
         if (canStart && (optionsFresh || crossFresh)) startGame();
 
       } else if (appState === 'paused') {
-        if (upFresh   && menuSelIdx > 0)                   { menuSelIdx--; updateMenuFocus(); }
-        if (downFresh && menuSelIdx < menuButtons.length - 1) { menuSelIdx++; updateMenuFocus(); }
+        if (navUp   && menuSelIdx > 0)                    { menuSelIdx--; updateMenuFocus(); }
+        if (navDown && menuSelIdx < menuButtons.length - 1) { menuSelIdx++; updateMenuFocus(); }
         if (crossFresh)   menuButtons[menuSelIdx].action();
         if (optionsFresh) resumeGame();
 
       } else if (appState === 'gameover') {
-        if (upFresh   && menuSelIdx > 0)                   { menuSelIdx--; updateMenuFocus(); }
-        if (downFresh && menuSelIdx < menuButtons.length - 1) { menuSelIdx++; updateMenuFocus(); }
+        if (navUp   && menuSelIdx > 0)                    { menuSelIdx--; updateMenuFocus(); }
+        if (navDown && menuSelIdx < menuButtons.length - 1) { menuSelIdx++; updateMenuFocus(); }
         if (crossFresh) menuButtons[menuSelIdx].action();
       }
 
-      menuPrevBtns.up      = up;
-      menuPrevBtns.down    = down;
+      menuPrevBtns.up      = dUp;
+      menuPrevBtns.down    = dDown;
+      menuPrevBtns.left    = dLeft;
+      menuPrevBtns.right   = dRight;
       menuPrevBtns.cross   = cross;
       menuPrevBtns.options = options;
     };
@@ -184,7 +238,9 @@ document.addEventListener('DOMContentLoaded', () => {
     ui.hideGameOver();
     document.getElementById('screen-start').classList.remove('hidden');
     appState = 'start';
+    startSectionIdx = 0;
     refreshPadState();
+    updateStartFocus();
     startMenuLoop();
   }
 
@@ -204,5 +260,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ── Start polling on title screen ───────────────────────
+  updateStartFocus();
   startMenuLoop();
 });
