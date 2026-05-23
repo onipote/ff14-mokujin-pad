@@ -114,14 +114,20 @@ class InputHandler {
         const gps = navigator.getGamepads();
         const gp  = gps[this._padIndex];
         if (gp) {
-          // スティック軸はキーボードより優先
-          const lax = gp.axes[0] != null && Math.abs(gp.axes[0]) > STICK_DEADZONE ? gp.axes[0] : 0;
-          const lay = gp.axes[1] != null && Math.abs(gp.axes[1]) > STICK_DEADZONE ? gp.axes[1] : 0;
-          const rax = gp.axes[2] != null && Math.abs(gp.axes[2]) > STICK_DEADZONE ? gp.axes[2] : 0;
-          const ray = gp.axes[3] != null && Math.abs(gp.axes[3]) > STICK_DEADZONE ? gp.axes[3] : 0;
+          // スティック軸: キーボードと同じ速度ベース移動（倒している間だけ動く、離したら停止）
+          const lax = Math.abs(gp.axes[0] ?? 0) > STICK_DEADZONE ? (gp.axes[0] ?? 0) : 0;
+          const lay = Math.abs(gp.axes[1] ?? 0) > STICK_DEADZONE ? (gp.axes[1] ?? 0) : 0;
+          const rax = Math.abs(gp.axes[2] ?? 0) > STICK_DEADZONE ? (gp.axes[2] ?? 0) : 0;
+          const ray = Math.abs(gp.axes[3] ?? 0) > STICK_DEADZONE ? (gp.axes[3] ?? 0) : 0;
 
-          if (lax !== 0 || lay !== 0) { this.stickL.x = lax; this.stickL.y = lay; }
-          if (rax !== 0 || ray !== 0) { this.stickR.x = rax; this.stickR.y = ray; }
+          if (lax !== 0 || lay !== 0) {
+            this.stickL.x = Math.max(-1, Math.min(1, this.stickL.x + lax * STICK_SPEED * dt));
+            this.stickL.y = Math.max(-1, Math.min(1, this.stickL.y + lay * STICK_SPEED * dt));
+          }
+          if (rax !== 0 || ray !== 0) {
+            this.stickR.x = Math.max(-1, Math.min(1, this.stickR.x + rax * STICK_SPEED * dt));
+            this.stickR.y = Math.max(-1, Math.min(1, this.stickR.y + ray * STICK_SPEED * dt));
+          }
 
           // ボタン判定 (XHB入力)
           const l2 = gp.buttons[6] && gp.buttons[6].value > 0.5;
