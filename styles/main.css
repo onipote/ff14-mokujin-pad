@@ -1,8 +1,8 @@
 /* ===== Variables ===== */
 :root {
-  --bg:            #07090e;
-  --panel:         #0c1020;
-  --panel-border:  rgba(160, 128, 55, 0.3);
+  --bg:            #09090f;
+  --panel:         #141420;
+  --panel-border:  rgba(200, 164, 80, 0.55);
   --gold:          #c8a450;
   --gold-bright:   #e0c060;
   --gold-dim:      #6a5525;
@@ -68,7 +68,7 @@ body {
 
 .screen-panel {
   background: var(--panel);
-  border: 1px solid var(--panel-border);
+  border: 1px solid rgba(200, 164, 80, 0.65);
   border-radius: 6px;
   padding: 36px 52px;
   min-width: 360px;
@@ -76,7 +76,7 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 20px;
-  box-shadow: 0 0 60px rgba(0,0,0,0.8), 0 0 0 1px rgba(200, 164, 80, 0.06);
+  box-shadow: inset 0 0 0 1px rgba(200, 164, 80, 0.20), 0 0 60px rgba(0,0,0,0.8);
   position: relative;
 }
 .screen-panel::before { content: '◆'; position: absolute; top: 8px;    left: 8px;  color: var(--gold-dim); font-size: 10px; }
@@ -91,6 +91,7 @@ body {
 .game-title {
   font-size: 34px;
   font-weight: 700;
+  font-family: 'Cinzel', serif;
   color: var(--gold-bright);
   letter-spacing: 0.28em;
   text-shadow: 0 0 24px rgba(220, 180, 70, 0.45);
@@ -105,6 +106,7 @@ body {
 .gameover-title {
   font-size: 28px;
   font-weight: 700;
+  font-family: 'Cinzel', serif;
   letter-spacing: 0.2em;
   text-shadow: 0 0 20px currentColor;
 }
@@ -169,16 +171,18 @@ body {
 /* ===== Header ===== */
 #header {
   background: rgba(8, 10, 18, 0.96);
-  border: 1px solid var(--panel-border);
+  border: 1px solid rgba(200, 164, 80, 0.65);
   border-radius: 4px 4px 0 0;
   padding: 8px 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  box-shadow: inset 0 0 0 1px rgba(200, 164, 80, 0.18);
 }
 .header-title {
   font-size: 13px;
   font-weight: 700;
+  font-family: 'Cinzel', serif;
   color: var(--gold);
   letter-spacing: 0.22em;
 }
@@ -195,51 +199,28 @@ body {
 /* ===== Info Bar ===== */
 #info-bar {
   background: var(--panel);
-  border: 1px solid var(--panel-border);
+  border: 1px solid rgba(200, 164, 80, 0.65);
   border-top: none;
   padding: 10px 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   min-height: 58px;
+  box-shadow: inset 0 0 0 1px rgba(200, 164, 80, 0.18);
 }
 .info-section        { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
 .info-section--center { align-items: center; }
 .info-section--right  { align-items: flex-end; }
 .label-sm { font-size: 10px; letter-spacing: 0.16em; color: var(--text-dim); }
 
-/* Hearts */
-#player-hearts { display: flex; gap: 5px; }
-.heart {
-  width: 16px;
-  height: 16px;
-  background: var(--hp-player);
-  border-radius: 50% 50% 0 0;
-  position: relative;
-  transform: rotate(-45deg);
-  box-shadow: 0 0 6px rgba(184, 48, 48, 0.5);
-}
-.heart::before,
-.heart::after {
-  content: '';
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background: inherit;
-  border-radius: 50%;
-}
-.heart::before { top: -50%; left: 0; }
-.heart::after  { left: 50%; top: 0; }
-.heart--empty {
-  background: #221416;
-  box-shadow: none;
-}
-.heart--empty::before, .heart--empty::after { background: #221416; }
+/* Player HP bar */
+.hp-bar--player { background: var(--hp-player); width: 100%; transition: width 0.25s ease; }
 
 /* Score */
 #score-val {
   font-size: 30px;
   font-weight: 700;
+  font-family: 'Cinzel', serif;
   color: var(--gold-bright);
   line-height: 1;
   min-width: 80px;
@@ -271,13 +252,14 @@ body {
 /* ===== Game Area ===== */
 #game-area {
   background: var(--panel);
-  border: 1px solid var(--panel-border);
+  border: 1px solid rgba(200, 164, 80, 0.65);
   border-top: none;
   padding: 14px 16px 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 10px;
+  box-shadow: inset 0 0 0 1px rgba(200, 164, 80, 0.18);
 }
 
 /* ── スティック / AOE パネル ── */
@@ -322,6 +304,11 @@ body {
 #stick-panel-L .stick-field { border: 1px solid rgba(53, 175, 192, 0.3); }
 #stick-panel-R .stick-field { border: 1px solid rgba(72, 120, 200, 0.3); }
 
+.stick-field--active {
+  border: 1px solid rgba(255, 85, 0, 0.85) !important;
+  box-shadow: 0 0 16px rgba(255, 69, 0, 0.5), inset 0 0 20px rgba(255, 60, 0, 0.12);
+}
+
 .stick-side-label {
   font-size: 10px;
   font-weight: 700;
@@ -332,16 +319,31 @@ body {
 /* カーソル */
 .stick-cursor {
   position: absolute;
-  font-size: 18px;
-  line-height: 1;
   transform: translate(-50%, -50%);
   pointer-events: none;
   z-index: 2;
   user-select: none;
 }
 
-#stick-cursor-L { color: var(--teal); left: 50%; top: 50%; filter: drop-shadow(0 0 5px var(--teal)); }
-#stick-cursor-R { color: #4878c8;    left: 50%; top: 50%; filter: drop-shadow(0 0 5px #4878c8); }
+.cursor-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid #a0e8f8;
+  color: #c8f4ff;
+  font-size: 10px;
+  font-weight: 700;
+  font-family: 'Cinzel', serif;
+  background: rgba(160, 232, 248, 0.10);
+  text-shadow: 0 0 8px rgba(160, 230, 248, 1);
+  box-shadow: 0 0 10px rgba(160, 230, 248, 0.7), inset 0 0 6px rgba(160, 230, 248, 0.15);
+}
+
+#stick-cursor-L { left: 50%; top: 50%; }
+#stick-cursor-R { left: 50%; top: 50%; }
 
 /* AOE ゾーン */
 .aoe-zone {
@@ -356,8 +358,9 @@ body {
 .aoe-zone--bottom { left: 0;   top: 50%; width: 100%; height: 50%; }
 
 .aoe-zone--warning {
-  background: rgba(230, 140, 20, 0.18);
-  border: 2px solid rgba(230, 140, 20, 0.65);
+  background: rgba(255, 110, 0, 0.25);
+  border: 2px solid #FF5500;
+  box-shadow: 0 0 12px rgba(255, 69, 0, 0.6), inset 0 0 8px rgba(255, 69, 0, 0.25);
   animation: aoe-pulse 0.5s ease-in-out infinite alternate;
 }
 .aoe-zone--hit {
@@ -407,9 +410,10 @@ body {
 /* ===== XHB ===== */
 #xhb-wrap {
   background: #060810;
-  border: 1px solid var(--panel-border);
+  border: 1px solid rgba(200, 164, 80, 0.65);
   border-top: none;
   padding: 10px 14px 14px;
+  box-shadow: inset 0 0 0 1px rgba(200, 164, 80, 0.18);
 }
 #xhb {
   display: flex;
@@ -425,10 +429,15 @@ body {
   transition: background 0.12s, box-shadow 0.12s;
 }
 .xhb-half--active {
-  background: rgba(255, 215, 50, 0.08);
+  background: rgba(255, 215, 50, 0.10);
+  border: 1px solid rgba(255, 215, 50, 0.55);
+  border-radius: 3px;
   box-shadow:
-    inset 0 0 60px rgba(255, 215, 50, 0.20),
-    inset 0 0 20px rgba(255, 215, 50, 0.12);
+    inset 0 0 60px rgba(255, 215, 50, 0.25),
+    inset 0 0 20px rgba(255, 215, 50, 0.15),
+    0 0 30px rgba(255, 200, 0, 0.35),
+    0 0 60px rgba(255, 180, 0, 0.15);
+  animation: xhb-neon-pulse 0.8s ease-in-out infinite alternate;
 }
 .xhb-label {
   font-size: 10px;
@@ -550,6 +559,20 @@ body {
   from { box-shadow: 0 0 8px var(--active-glow), inset 0 0 6px rgba(200, 164, 80, 0.12); }
   to   { box-shadow: 0 0 22px var(--active-glow), 0 0 40px rgba(200, 164, 80, 0.18), inset 0 0 16px rgba(200, 164, 80, 0.32); }
 }
+@keyframes xhb-neon-pulse {
+  from {
+    box-shadow:
+      inset 0 0 40px rgba(255, 215, 50, 0.20),
+      0 0 20px rgba(255, 200, 0, 0.25);
+  }
+  to {
+    box-shadow:
+      inset 0 0 80px rgba(255, 215, 50, 0.35),
+      inset 0 0 30px rgba(255, 215, 50, 0.20),
+      0 0 50px rgba(255, 200, 0, 0.45),
+      0 0 100px rgba(255, 180, 0, 0.20);
+  }
+}
 @keyframes march-ants {
   to { background-position: 8px 0, -8px 100%, 0 -8px, 100% 8px; }
 }
@@ -557,29 +580,34 @@ body {
 /* ===== Recast Overlay ===== */
 .slot-recast {
   position: absolute;
-  inset: 4px;
+  inset: 3px;
   border-radius: 50%;
   pointer-events: none;
   z-index: 2;
   display: none;
+  /* 0% = 何も表示しない → 時計回りに白が進む → 100% = 完全な円 */
   background: conic-gradient(
     from 0deg,
-    transparent calc((var(--recast-pct, 0) - 0.015) * 360deg),
-    rgba(230, 200, 70, 0.85) calc(var(--recast-pct, 0) * 360deg),
-    rgba(4, 8, 40, 0.82) calc(var(--recast-pct, 0) * 360deg)
+    rgba(255, 255, 255, 0.45) 0deg,
+    rgba(255, 255, 255, 0.45) calc(var(--recast-pct, 0) * 360deg),
+    transparent calc(var(--recast-pct, 0) * 360deg)
   );
 }
-.xhb-slot--active .slot-recast { display: block; }
+.xhb-slot--active .slot-recast {
+  display: block;
+  border: 2px solid rgba(255, 255, 255, 0.70);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.35), inset 0 0 4px rgba(255, 255, 255, 0.10);
+}
 
 .slot-recast-num {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 700;
-  color: rgba(230, 220, 190, 0.95);
-  text-shadow: 0 0 5px rgba(0, 0, 0, 1), 0 1px 3px rgba(0, 0, 0, 1);
+  color: rgba(255, 255, 255, 0.95);
+  text-shadow: 0 0 6px rgba(0, 0, 0, 1), 0 1px 4px rgba(0, 0, 0, 1);
   line-height: 1;
   z-index: 3;
   pointer-events: none;
@@ -672,6 +700,7 @@ body {
 .pause-title {
   font-size: 28px;
   font-weight: 700;
+  font-family: 'Cinzel', serif;
   letter-spacing: 0.22em;
   color: var(--gold-bright);
   text-shadow: 0 0 20px rgba(220, 190, 70, 0.5);
