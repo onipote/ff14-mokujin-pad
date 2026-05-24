@@ -6,7 +6,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const engine = new GameEngine(xhb, ui, input, sound);
 
   xhb.build();
-  ui.buildHearts(PLAYER_MAX_HP);
 
   // ── App state ──────────────────────────────────────────
   let appState = 'start'; // 'start' | 'playing' | 'paused' | 'gameover'

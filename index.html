@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PAD-MOKUJIN</title>
   <link rel="stylesheet" href="styles/main.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
   <div id="app">
@@ -87,7 +88,9 @@
     <div id="info-bar">
       <div class="info-section">
         <div class="label-sm">HP</div>
-        <div id="player-hearts"></div>
+        <div class="hp-bar-wrap">
+          <div id="player-hp-bar" class="hp-bar hp-bar--player"></div>
+        </div>
       </div>
       <div class="info-section info-section--center">
         <div id="score-val">0</div>
@@ -95,7 +98,7 @@
         <div id="score-atk-timer" class="hidden"></div>
       </div>
       <div class="info-section info-section--right">
-        <div class="label-sm">木人 HP</div>
+        <div class="label-sm">Lv.100 Striking Dummy</div>
         <div class="hp-bar-wrap">
           <div id="enemy-hp-bar" class="hp-bar hp-bar--enemy"></div>
         </div>
@@ -111,21 +114,21 @@
         <div class="stick-panel" id="stick-panel-L">
           <div class="stick-field" id="stick-field-L">
             <div class="aoe-zone" id="aoe-zone-L"></div>
-            <div class="stick-cursor" id="stick-cursor-L">◆</div>
+            <div class="stick-cursor" id="stick-cursor-L"><span class="cursor-icon">L</span></div>
           </div>
           <div class="stick-side-label">L</div>
         </div>
 
         <!-- 木人 (中央) -->
         <div id="stick-center">
-          <div id="enemy-figure">木人</div>
+          <div id="enemy-figure"></div>
         </div>
 
         <!-- R パネル -->
         <div class="stick-panel" id="stick-panel-R">
           <div class="stick-field" id="stick-field-R">
             <div class="aoe-zone" id="aoe-zone-R"></div>
-            <div class="stick-cursor" id="stick-cursor-R">◆</div>
+            <div class="stick-cursor" id="stick-cursor-R"><span class="cursor-icon">R</span></div>
           </div>
           <div class="stick-side-label">R</div>
         </div>

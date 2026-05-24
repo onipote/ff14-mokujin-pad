@@ -595,8 +595,23 @@ body {
 }
 .xhb-slot--active .slot-recast {
   display: block;
-  border: 2px solid rgba(255, 255, 255, 0.70);
-  box-shadow: 0 0 8px rgba(255, 255, 255, 0.35), inset 0 0 4px rgba(255, 255, 255, 0.10);
+}
+
+.slot-recast-sector {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  display: none;
+  overflow: visible;
+}
+.xhb-slot--active .slot-recast-sector { display: block; }
+.recast-sector-path {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.80);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.5));
 }
 
 .slot-recast-num {

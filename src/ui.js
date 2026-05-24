@@ -1,6 +1,6 @@
 class UIManager {
   constructor() {
-    this._heartsEl    = document.getElementById('player-hearts');
+    this._playerHpBar = document.getElementById('player-hp-bar');
     this._scoreEl     = document.getElementById('score-val');
     this._comboEl     = document.getElementById('combo-val');
     this._timerFill   = document.getElementById('timer-fill');
@@ -9,7 +9,6 @@ class UIManager {
     this._scoreAtkEl  = document.getElementById('score-atk-timer');
     this._padStatusEl = document.getElementById('pad-status');
     this._enemyEl     = document.getElementById('enemy-figure');
-    this._heartEls    = [];
     this._enemyFlashId = null;
     this._enemyAnimId  = null;
 
@@ -18,23 +17,12 @@ class UIManager {
     // AOE / stick panels
     this._aoeZone   = { L: document.getElementById('aoe-zone-L'),     R: document.getElementById('aoe-zone-R') };
     this._stickCur  = { L: document.getElementById('stick-cursor-L'), R: document.getElementById('stick-cursor-R') };
-  }
-
-  buildHearts(max) {
-    this._heartsEl.innerHTML = '';
-    this._heartEls = [];
-    for (let i = 0; i < max; i++) {
-      const h = document.createElement('div');
-      h.className = 'heart';
-      this._heartsEl.appendChild(h);
-      this._heartEls.push(h);
-    }
+    this._stickField = { L: document.getElementById('stick-field-L'), R: document.getElementById('stick-field-R') };
   }
 
   updateAll(engine) {
-    this._heartEls.forEach((h, i) => {
-      h.className = 'heart' + (i < engine.playerHp ? '' : ' heart--empty');
-    });
+    const playerRatio = engine.playerHp / PLAYER_MAX_HP;
+    this._playerHpBar.style.width = (playerRatio * 100) + '%';
 
     this._scoreEl.textContent = engine.score;
 
@@ -134,6 +122,7 @@ class UIManager {
   showAoeWarning(side, type) {
     const el = this._aoeZone[side];
     if (el) el.className = `aoe-zone aoe-zone--warning aoe-zone--${type}`;
+    if (this._stickField[side]) this._stickField[side].classList.add('stick-field--active');
   }
 
   showAoeResult(side, type, isHit) {
@@ -144,6 +133,7 @@ class UIManager {
   clearAoe(side) {
     const el = this._aoeZone[side];
     if (el) el.className = 'aoe-zone';
+    if (this._stickField[side]) this._stickField[side].classList.remove('stick-field--active');
   }
 
   updateStickCursors(stickL, stickR) {
