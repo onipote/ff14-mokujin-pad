@@ -21,8 +21,6 @@
   --fail-bg:       rgba(185, 45, 45, 0.15);
   --fail-bdr:      #b83535;
   --fail-glow:     rgba(185, 55, 55, 0.6);
-  --hp-player:     #b83030;
-  --hp-enemy:      #7530b0;
   --timer:         #3070b0;
   --timer-low:     #b85520;
   --slot-sz:       44px;
@@ -213,8 +211,30 @@ body {
 .info-section--right  { align-items: flex-end; }
 .label-sm { font-size: 10px; letter-spacing: 0.16em; color: var(--text-dim); }
 
-/* Player HP bar */
-.hp-bar--player { background: var(--hp-player); width: 100%; transition: width 0.25s ease; }
+/* Combo gauge */
+.combo-gauge-wrap {
+  width: 140px;
+  height: 8px;
+  background: #0d1a1a;
+  border-radius: 2px;
+  overflow: hidden;
+  border: 1px solid rgba(53, 175, 192, 0.35);
+}
+.combo-gauge-fill {
+  height: 100%;
+  background: var(--teal);
+  border-radius: 2px;
+  transition: width 0.1s ease;
+}
+.combo-gauge-wrap.combo-gauge--burst .combo-gauge-fill {
+  background: linear-gradient(90deg, var(--gold), #ffe080);
+  box-shadow: 0 0 10px rgba(220, 190, 70, 0.7);
+  animation: burst-pulse 0.5s ease-in-out infinite alternate;
+}
+@keyframes burst-pulse {
+  from { box-shadow: 0 0 6px rgba(220, 190, 70, 0.5); }
+  to   { box-shadow: 0 0 18px rgba(220, 190, 70, 0.9); }
+}
 
 /* Score */
 #score-val {
@@ -233,21 +253,63 @@ body {
   letter-spacing: 0.1em;
   min-height: 15px;
 }
-#score-atk-timer        { font-size: 12px; color: var(--text-dim); letter-spacing: 0.05em; }
-#score-atk-timer.urgent { color: var(--timer-low); font-weight: 700; }
 .hidden { display: none !important; }
 
-/* Enemy HP bar */
-.hp-bar-wrap {
-  width: 120px;
-  height: 8px;
-  background: #12092a;
-  border-radius: 2px;
-  overflow: hidden;
-  border: 1px solid #22104a;
+/* Countdown display */
+.countdown-val {
+  font-size: 36px;
+  font-weight: 700;
+  font-family: 'Cinzel', serif;
+  color: var(--gold-bright);
+  line-height: 1;
+  min-width: 60px;
+  text-align: center;
+  text-shadow: 0 0 12px rgba(220, 192, 80, 0.3);
+  transition: color 0.3s;
 }
-.hp-bar { height: 100%; border-radius: 2px; transition: width 0.25s ease; }
-.hp-bar--enemy { background: var(--hp-enemy); width: 100%; }
+.countdown-val.countdown--urgent {
+  color: var(--timer-low);
+  text-shadow: 0 0 12px rgba(185, 85, 32, 0.6);
+  animation: record-pulse 0.5s ease-in-out infinite alternate;
+}
+
+/* Floating judgment text */
+.judgment-float-container {
+  position: relative;
+  height: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+.judgment-float {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  -webkit-text-stroke: 2px #000;
+  paint-order: stroke fill;
+  animation: judgment-rise 0.9s ease-out forwards;
+  pointer-events: none;
+}
+.judgment-float--great { color: #ffe080; }
+.judgment-float--good  { color: #80e8ff; }
+.judgment-float--miss  { color: #ff6060; }
+.judgment-float--bonus { color: #80ff90; font-size: 14px; }
+@keyframes judgment-rise {
+  0%   { opacity: 1; transform: translateX(-50%) translateY(0); }
+  60%  { opacity: 1; transform: translateX(-50%) translateY(-28px); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-48px); }
+}
+
+/* GOOD slot state */
+.xhb-slot--success-good {
+  background: rgba(45, 120, 185, 0.15);
+  border: 2px solid #3590cc;
+  box-shadow: 0 0 18px rgba(53, 145, 205, 0.6);
+}
+.xhb-slot--success-good .slot-sym { color: #70c8e8; }
 
 /* ===== Game Area ===== */
 #game-area {

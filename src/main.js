@@ -28,13 +28,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   refreshPadState();
 
-  // ── Mode / difficulty selection ─────────────────────────
-  let selectedMode = 'default';
+  // ── Difficulty selection ─────────────────────────────────
   let selectedDiff = 'normal';
 
   // Start screen controller navigation state
-  let startSectionIdx = 0; // 0=mode, 1=diff, 2=start
-  let startModeIdx    = 0;
+  let startSectionIdx = 0; // 0=diff, 1=start
   let startDiffIdx    = 1; // default: 'normal'
 
   function initBtnGroup(groupId, onChange) {
@@ -48,14 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  initBtnGroup('mode-btns', (v, idx) => { selectedMode = v; startModeIdx = idx; });
   initBtnGroup('diff-btns', (v, idx) => { selectedDiff = v; startDiffIdx = idx; });
-
-  function applyModeSelection(idx) {
-    const btns = [...document.querySelectorAll('#mode-btns .btn')];
-    btns.forEach((b, i) => b.classList.toggle('btn--sel', i === idx));
-    if (btns[idx]) selectedMode = btns[idx].dataset.value;
-  }
 
   function applyDiffSelection(idx) {
     const btns = [...document.querySelectorAll('#diff-btns .btn')];
@@ -66,8 +57,6 @@ document.addEventListener('DOMContentLoaded', () => {
   function updateStartFocus() {
     document.querySelectorAll('#screen-start .btn').forEach(b => b.classList.remove('btn--focused'));
     if (startSectionIdx === 0) {
-      document.querySelectorAll('#mode-btns .btn')[startModeIdx]?.classList.add('btn--focused');
-    } else if (startSectionIdx === 1) {
       document.querySelectorAll('#diff-btns .btn')[startDiffIdx]?.classList.add('btn--focused');
     } else {
       document.getElementById('btn-start').classList.add('btn--focused');
@@ -136,13 +125,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const canStart = !document.getElementById('btn-start').disabled;
 
         if (upFresh   && startSectionIdx > 0) { startSectionIdx--; updateStartFocus(); }
-        if (downFresh && startSectionIdx < 2) { startSectionIdx++; updateStartFocus(); }
+        if (downFresh && startSectionIdx < 1) { startSectionIdx++; updateStartFocus(); }
 
         if (startSectionIdx === 0) {
-          const modeCount = document.querySelectorAll('#mode-btns .btn').length;
-          if (leftFresh  && startModeIdx > 0)             { startModeIdx--; applyModeSelection(startModeIdx); updateStartFocus(); }
-          if (rightFresh && startModeIdx < modeCount - 1) { startModeIdx++; applyModeSelection(startModeIdx); updateStartFocus(); }
-        } else if (startSectionIdx === 1) {
           const diffCount = document.querySelectorAll('#diff-btns .btn').length;
           if (leftFresh  && startDiffIdx > 0)             { startDiffIdx--; applyDiffSelection(startDiffIdx); updateStartFocus(); }
           if (rightFresh && startDiffIdx < diffCount - 1) { startDiffIdx++; applyDiffSelection(startDiffIdx); updateStartFocus(); }
@@ -201,9 +186,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('screen-start').classList.add('hidden');
     ui.hidePause();
     ui.hideGameOver();
-    ui.showScoreAtkTimer(selectedMode === 'score_attack');
     appState = 'playing';
-    engine.start(selectedMode, selectedDiff);
+    engine.start(selectedDiff);
   }
 
   function pauseGame() {

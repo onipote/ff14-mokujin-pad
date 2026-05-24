@@ -36,18 +36,22 @@ const KEY_TO_SLOT = Object.fromEntries(SLOT_DEFS.map((s) => [s.keyCode, s.id]));
 const SLOT_BY_ID  = Object.fromEntries(SLOT_DEFS.map((s) => [s.id, s]));
 
 const DIFFICULTIES = {
-  slow:   { timeMs: 4000, label: "遅い",  sublabel: "4秒"   },
+  slow:   { timeMs: 3500, label: "遅い",  sublabel: "3.5秒" },
   normal: { timeMs: 2500, label: "普通",  sublabel: "2.5秒" },
   fast:   { timeMs: 1500, label: "速い",  sublabel: "1.5秒" },
 };
 
-const PLAYER_MAX_HP        = 5;
-const ENEMY_MAX_HP         = 8;
-const FEEDBACK_SUCCESS_MS  = 350;
-const FEEDBACK_FAIL_MS     = 550;
-const SCORE_ATTACK_MS      = 60_000;
-const BASE_SCORE_PER_HIT   = 10;
-const MAX_COMBO_MULTIPLIER = 5;
+const FEEDBACK_SUCCESS_MS    = 350;
+const FEEDBACK_FAIL_MS       = 550;
+const GAME_DURATION_MS       = 90_000;
+const MISS_PENALTY_MS        = 5_000;
+const COMBO_BONUS_THRESHOLD  = 10;
+const COMBO_BONUS_MS         = 2_000;
+const BURST_THRESHOLDS       = { slow: 10, normal: 15, fast: 20 };
+const BURST_DURATION_MS      = 10_000;
+const BURST_GCD_MULTIPLIER   = 1.4;
+const BURST_SCORE_MULTIPLIER = 2;
+const GREAT_RATIO_MIN        = 0.75;
 
 // AOE dodge mechanic
 const AOE_WARNING_MS   = 3000;

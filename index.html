@@ -19,18 +19,6 @@
         <div class="ornament">◆ ─────── ◆</div>
 
         <div class="setting-row">
-          <div class="setting-label">MODE</div>
-          <div class="btn-group" id="mode-btns">
-            <button class="btn btn--sel" data-value="default">
-              フリーモード<br><small>HP制・時間無制限</small>
-            </button>
-            <button class="btn" data-value="score_attack">
-              スコアアタック<br><small>60秒</small>
-            </button>
-          </div>
-        </div>
-
-        <div class="setting-row">
           <div class="setting-label">DIFFICULTY</div>
           <div class="btn-group" id="diff-btns">
             <button class="btn btn--sm" data-value="slow">遅い<br><small>4秒</small></button>
@@ -41,7 +29,7 @@
 
         <button id="btn-start" class="btn btn--primary" disabled>▶ START</button>
         <p id="pad-required-msg" class="pad-required-msg">コントローラーを接続してください</p>
-        <p class="pad-hint">↑↓: セクション移動 &nbsp;←→: 選択変更 &nbsp;✕: 決定</p>
+        <p class="pad-hint">←→: 選択変更 &nbsp;✕: 決定</p>
       </div>
     </div>
 
@@ -87,21 +75,19 @@
     <!-- ===== Info Bar ===== -->
     <div id="info-bar">
       <div class="info-section">
-        <div class="label-sm">HP</div>
-        <div class="hp-bar-wrap">
-          <div id="player-hp-bar" class="hp-bar hp-bar--player"></div>
+        <div class="label-sm">COMBO</div>
+        <div id="combo-gauge-wrap" class="combo-gauge-wrap">
+          <div id="combo-gauge-fill" class="combo-gauge-fill"></div>
         </div>
+        <div id="combo-val"></div>
       </div>
       <div class="info-section info-section--center">
         <div id="score-val">0</div>
-        <div id="combo-val"></div>
-        <div id="score-atk-timer" class="hidden"></div>
+        <div id="judgment-float" class="judgment-float-container"></div>
       </div>
       <div class="info-section info-section--right">
-        <div class="label-sm">Lv.100 Striking Dummy</div>
-        <div class="hp-bar-wrap">
-          <div id="enemy-hp-bar" class="hp-bar hp-bar--enemy"></div>
-        </div>
+        <div class="label-sm">残り時間</div>
+        <div id="countdown-val" class="countdown-val">90</div>
       </div>
     </div>
 

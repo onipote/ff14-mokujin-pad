@@ -1,14 +1,15 @@
 class UIManager {
   constructor() {
-    this._playerHpBar = document.getElementById('player-hp-bar');
-    this._scoreEl     = document.getElementById('score-val');
-    this._comboEl     = document.getElementById('combo-val');
-    this._timerFill   = document.getElementById('timer-fill');
-    this._timerLabel  = document.getElementById('timer-label');
-    this._enemyHpBar  = document.getElementById('enemy-hp-bar');
-    this._scoreAtkEl  = document.getElementById('score-atk-timer');
-    this._padStatusEl = document.getElementById('pad-status');
-    this._enemyEl     = document.getElementById('enemy-figure');
+    this._scoreEl        = document.getElementById('score-val');
+    this._comboEl        = document.getElementById('combo-val');
+    this._timerFill      = document.getElementById('timer-fill');
+    this._timerLabel     = document.getElementById('timer-label');
+    this._padStatusEl    = document.getElementById('pad-status');
+    this._enemyEl        = document.getElementById('enemy-figure');
+    this._comboGaugeWrap = document.getElementById('combo-gauge-wrap');
+    this._comboGaugeFill = document.getElementById('combo-gauge-fill');
+    this._countdownEl    = document.getElementById('countdown-val');
+    this._judgmentEl     = document.getElementById('judgment-float');
     this._enemyFlashId = null;
     this._enemyAnimId  = null;
 
@@ -31,20 +32,10 @@ class UIManager {
   }
 
   updateAll(engine) {
-    const playerRatio = engine.playerHp / PLAYER_MAX_HP;
-    this._playerHpBar.style.width = (playerRatio * 100) + '%';
-
     this._scoreEl.textContent = engine.score;
-
-    if (engine.combo >= 2) {
-      const mult = Math.min(engine.combo, MAX_COMBO_MULTIPLIER);
-      this._comboEl.textContent = `× ${mult} COMBO`;
-    } else {
-      this._comboEl.textContent = '';
-    }
-
-    const ratio = engine.enemyHp / ENEMY_MAX_HP;
-    this._enemyHpBar.style.width = (ratio * 100) + '%';
+    const gaugeRatio = Math.min(1, engine.combo / BURST_THRESHOLDS[engine.difficulty]);
+    this._comboGaugeFill.style.width = (gaugeRatio * 100) + '%';
+    this._comboEl.textContent = engine.combo >= 1 ? `COMBO ${engine.combo}` : '';
   }
 
   showPrompt(slotDef) {
@@ -65,14 +56,26 @@ class UIManager {
     this._timerFill.classList.toggle('low', ratio < 0.3 && ratio > 0);
   }
 
-  setScoreAtkTimer(ms) {
-    const secs = Math.ceil(ms / 1000);
-    this._scoreAtkEl.textContent = `残り ${secs}s`;
-    this._scoreAtkEl.classList.toggle('urgent', secs <= 10);
+  setCountdown(ms) {
+    this._countdownEl.textContent = Math.ceil(ms / 1000);
+    this._countdownEl.classList.toggle('countdown--urgent', ms < 10_000);
   }
 
-  showScoreAtkTimer(show) {
-    this._scoreAtkEl.classList.toggle('hidden', !show);
+  setBurstState(active) {
+    this._comboGaugeWrap.classList.toggle('combo-gauge--burst', active);
+  }
+
+  setBurstGauge(ratio) {
+    this._comboGaugeFill.style.width = (ratio * 100) + '%';
+  }
+
+  showJudgment(type) {
+    const labels = { great: '◎ GREAT', good: '○ GOOD', miss: '✕ MISS' };
+    const el = document.createElement('div');
+    el.className = `judgment-float judgment-float--${type}`;
+    el.textContent = type === 'bonus' ? '+2s' : (labels[type] || '');
+    this._judgmentEl.appendChild(el);
+    setTimeout(() => el.remove(), 1000);
   }
 
   // type: 'hit' | 'miss', combo: number
@@ -85,8 +88,7 @@ class UIManager {
 
     if (type === 'hit') {
       this._enemyEl.classList.add('hit');
-      // Big combo = bounce, otherwise shake
-      const anim = (combo > 0 && combo % MAX_COMBO_MULTIPLIER === 0) ? 'enemy-bounce' : 'enemy-shake';
+      const anim = (combo === COMBO_BONUS_THRESHOLD || Object.values(BURST_THRESHOLDS).includes(combo)) ? 'enemy-bounce' : 'enemy-shake';
       this._enemyEl.classList.add(anim);
       this._enemyFlashId = setTimeout(() => this._enemyEl.classList.remove('hit'), 300);
       this._enemyAnimId  = setTimeout(() => this._enemyEl.classList.remove(anim), 400);
@@ -105,8 +107,8 @@ class UIManager {
 
   showGameOver(engine, reason, prevBest, isNewRecord) {
     const heading = document.getElementById('gameover-heading');
-    heading.textContent = reason === 'time_up' ? 'TIME UP!' : 'GAME OVER';
-    heading.className = 'gameover-title ' + (reason === 'time_up' ? 'clear' : 'over');
+    heading.textContent = 'TIME UP!';
+    heading.className = 'gameover-title clear';
 
     const acc = engine.total > 0 ? Math.round(engine.hits / engine.total * 100) : 0;
     const bestLine = isNewRecord

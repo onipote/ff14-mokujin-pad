@@ -34,11 +34,15 @@ class SoundManager {
     } catch (_) {}
   }
 
-  playHit(combo) {
-    // Base hit tone; pitch climbs with combo
+  playHit(combo, judgment = 'great') {
     const base = 440 + Math.min(combo - 1, 9) * 40;
-    this._beep(base,       'sine',     0.10, 0.20);
-    this._beep(base * 1.5, 'sine',     0.08, 0.10, 0.06);
+    if (judgment === 'great') {
+      this._beep(base,       'sine', 0.10, 0.20);
+      this._beep(base * 1.5, 'sine', 0.08, 0.10, 0.06);
+    } else {
+      // GOOD: softer, slightly lower pitch
+      this._beep(base * 0.9, 'sine', 0.08, 0.14);
+    }
   }
 
   playMiss() {
@@ -47,10 +51,15 @@ class SoundManager {
   }
 
   playCombo(n) {
-    // Fanfare on multiples of 5 (capped at MAX_COMBO_MULTIPLIER)
-    if (n % 5 !== 0) return;
-    const notes = [523, 659, 784, 1047]; // C5 E5 G5 C6
-    notes.forEach((f, i) => this._beep(f, 'sine', 0.12, 0.15, i * 0.07));
+    if (n === COMBO_BONUS_THRESHOLD) {
+      // コンボ10: タイムボーナスファンファーレ
+      const notes = [523, 659, 784, 1047];
+      notes.forEach((f, i) => this._beep(f, 'sine', 0.12, 0.15, i * 0.07));
+    } else if (Object.values(BURST_THRESHOLDS).includes(n)) {
+      // コンボ20: バースト発動ファンファーレ
+      const notes = [523, 659, 784, 1047, 1319];
+      notes.forEach((f, i) => this._beep(f, 'sine', 0.14, 0.18, i * 0.06));
+    }
   }
 
   playGameOver() {
