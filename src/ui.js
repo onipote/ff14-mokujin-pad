@@ -1,3 +1,15 @@
+function _buildFanClipPath(baseDeg, halfDeg) {
+  const startDeg = baseDeg - halfDeg;
+  const endDeg   = baseDeg + halfDeg;
+  const steps    = Math.max(6, Math.ceil(halfDeg * 2 / 5));
+  const pts      = ['50% 50%'];
+  for (let i = 0; i <= steps; i++) {
+    const a = (startDeg + (endDeg - startDeg) * i / steps) * Math.PI / 180;
+    pts.push(`${(50 + 150 * Math.cos(a)).toFixed(1)}% ${(50 + 150 * Math.sin(a)).toFixed(1)}%`);
+  }
+  return `polygon(${pts.join(', ')})`;
+}
+
 class UIManager {
   constructor() {
     this._scoreEl        = document.getElementById('score-val');
@@ -322,13 +334,34 @@ class UIManager {
           const size = aoeData.r * 100;
           return mk(`position:absolute;left:${pct(c.cx)}%;top:${pct(c.cy)}%;width:${size}%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%`);
         });
-      case 'band-h': {
-        const h = aoeData.halfThick * 100;
-        return [mk(`position:absolute;left:0;width:100%;top:${pct(aoeData.cy)}%;height:${h}%;transform:translateY(-50%);border-radius:0`)];
+      case 'fan': {
+        const shapes = Array.from({ length: 4 }, (_, i) => {
+          const clip = _buildFanClipPath(aoeData.baseAngle + i * 90, aoeData.halfAngle);
+          return mk(`position:absolute;left:0;top:0;width:100%;height:100%;clip-path:${clip};border-radius:0`);
+        });
+        // 放射線（中心→外縁）: 各扇の両辺を細い div で描く
+        // stick-field は aspect-ratio 3:2 のため、角度を補正する
+        const lines = [];
+        for (let i = 0; i < 4; i++) {
+          for (const side of [-1, 1]) {
+            const mathRad = (aoeData.baseAngle + i * 90 + side * aoeData.halfAngle) * Math.PI / 180;
+            const scrDeg  = Math.atan2(Math.sin(mathRad) * (2 / 3), Math.cos(mathRad)) * 180 / Math.PI;
+            lines.push(mk(
+              `position:absolute;left:calc(50% - 1px);top:50%;width:2px;height:100%;` +
+              `transform-origin:top center;transform:rotate(${(scrDeg - 90).toFixed(2)}deg);border-radius:0`
+            ));
+          }
+        }
+        return [...shapes, ...lines];
       }
-      case 'band-v': {
-        const w = aoeData.halfThick * 100;
-        return [mk(`position:absolute;top:0;height:100%;left:${pct(aoeData.cx)}%;width:${w}%;transform:translateX(-50%);border-radius:0`)];
+      case 'band': {
+        const thick = aoeData.halfThick * 100;
+        return aoeData.bands.map(b => {
+          if (b.dir === 'h')
+            return mk(`position:absolute;left:0;width:100%;top:${pct(b.pos)}%;height:${thick}%;transform:translateY(-50%);border-radius:0`);
+          else
+            return mk(`position:absolute;top:0;height:100%;left:${pct(b.pos)}%;width:${thick}%;transform:translateX(-50%);border-radius:0`);
+        });
       }
     }
     return [];
@@ -352,8 +385,22 @@ class UIManager {
       case 'bottom':       return y > 1 - d.sizeScale;
       case 'large-circle': { const dx=x-d.cx, dy=y-d.cy; return dx*dx + dy*dy/2.25 < d.r*d.r; }
       case 'small-circles':return d.circles.some(c => { const dx=x-c.cx, dy=y-c.cy; return dx*dx + dy*dy/2.25 < d.r*d.r; });
-      case 'band-h':       return Math.abs(y - d.cy) < d.halfThick;
-      case 'band-v':       return Math.abs(x - d.cx) < d.halfThick;
+      case 'fan': {
+        if (x === 0 && y === 0) return true;
+        const deg = Math.atan2(y, x) * 180 / Math.PI;
+        for (let i = 0; i < 4; i++) {
+          const base = d.baseAngle + i * 90;
+          let diff = ((deg - base) % 360 + 360) % 360;
+          if (diff > 180) diff -= 360;
+          if (Math.abs(diff) <= d.halfAngle) return true;
+        }
+        return false;
+      }
+      case 'band':
+        return d.bands.some(b =>
+          b.dir === 'h' ? Math.abs(y - b.pos) < d.halfThick
+                        : Math.abs(x - b.pos) < d.halfThick
+        );
     }
     return false;
   }

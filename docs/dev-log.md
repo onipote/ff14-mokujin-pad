@@ -541,3 +541,48 @@ L/R押下時に対応サイドの各クラスタ（4ボタン単位の `.xhb-cro
 | 外側グロー | 背景色（`rgba(255,215,50,0.10)`）と同色・同程度以下のopacityで自然にフェード |
 
 ---
+
+## AoEパターン追加・帯パターン修正
+
+**日付**: 2026-05-25
+
+### 変更内容
+
+| ファイル | 内容 |
+|---------|------|
+| `src/aoe.js` | `band-h` / `band-v` を廃止し `fan` / `band` を追加。`_buildAoeData()` / `_checkHit()` 更新 |
+| `src/ui.js` | `_buildFanClipPath()` ヘルパー追加。`_buildShapeEls()` / `_isInAoe()` に `fan` / `band` ケース追加 |
+| `styles/main.css` | 扇形用 `filter: drop-shadow()` ルール追加（`clip-path` で消える border/box-shadow の代替） |
+| `README.md` | 左パネルAoEパターン一覧を新2種対応に更新 |
+
+### 新AoEパターン
+
+**扇形（`fan`）**
+
+- 中心から放射状に広がる扇形を4本同時表示
+- 中心角: 30〜60度（halfAngle 15〜30度）ランダム。4本すべて同じ角度
+- 基準方向: 0〜360度ランダム。4本は基準から90度ずつ等間隔
+- 描画: `clip-path: polygon()` で扇形を近似（半径150%、5度ごとに1頂点）
+- 放射線（中心→外縁の直線辺）は 2px 幅の div を aspect-ratio 補正済みの角度で回転して描画
+- 枠線: `filter: drop-shadow()` で clip-path 輪郭に沿ったグロー（通常の `border` は clip-path でクリップされるため使用不可）
+- 当たり判定: `atan2(y, x)` で角度を求め、4扇のいずれかの `±halfAngle` 範囲内なら HIT。中心点 (0,0) は常に HIT
+
+**帯（`band`）**
+
+- 2本の帯を同時表示。旧 `band-h` / `band-v` を統合
+- バリエーション（各1/3確率）:
+  - 横×2: 上下ゾーンに分けて配置（重複ゼロ保証）
+  - 縦×2: 左右ゾーンに分けて配置（重複ゼロ保証）
+  - 横+縦: 1本ずつ独立配置
+- 太さは同一（`halfThick = 0.20 × sizeScale`）
+- 重複禁止の実装: 同方向の場合、1本目を `[-available, -halfThick]`、2本目を `[halfThick, available]` の範囲からそれぞれ選択。`|pos2 - pos1| ≥ 2 × halfThick` を保証
+
+### 技術メモ
+
+**扇形の放射線描画とアスペクト比補正**
+
+`stick-field` は `aspect-ratio: 3/2` のため、角度の数学的な値と CSS 上の視覚的な角度が一致しない。  
+`_buildFanClipPath` の % 座標での方向ベクトル `(cos θ, sin θ)` は、ピクセル空間では `(cos θ × W, sin θ × H)` になるため、  
+CSS 回転角は `atan2(sin θ × H/W, cos θ) = atan2(sin θ × 2/3, cos θ)` で補正する。
+
+---

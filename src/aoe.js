@@ -56,7 +56,7 @@ class AoeEngine {
     }
 
     const types = ['left', 'right', 'top', 'bottom',
-                   'large-circle', 'small-circles', 'band-h', 'band-v'];
+                   'large-circle', 'small-circles', 'fan', 'band'];
     this._type    = types[Math.floor(Math.random() * types.length)];
     this._aoeData = this._buildAoeData(this._type);
     this.ui.showAoeWarning(this._side, this._aoeData);
@@ -119,13 +119,31 @@ class AoeEngine {
         });
         return { type, r, circles };
       }
-      case 'band-h': {
-        const halfThick = 0.20 * sizeScale;
-        return { type, cy: (Math.random()*2-1)*(1-halfThick), halfThick };
+      case 'fan': {
+        const halfAngle = 15 + Math.random() * 15;
+        const baseAngle = Math.random() * 360;
+        return { type, halfAngle, baseAngle };
       }
-      case 'band-v': {
+      case 'band': {
         const halfThick = 0.20 * sizeScale;
-        return { type, cx: (Math.random()*2-1)*(1-halfThick), halfThick };
+        const available = 1 - halfThick;
+        const roll = Math.random();
+        let bands;
+        if (roll < 0.33) {
+          const a = -available + Math.random() * (available - halfThick);
+          const b =  halfThick + Math.random() * (available - halfThick);
+          bands = [{ dir: 'h', pos: a }, { dir: 'h', pos: b }];
+        } else if (roll < 0.67) {
+          const a = -available + Math.random() * (available - halfThick);
+          const b =  halfThick + Math.random() * (available - halfThick);
+          bands = [{ dir: 'v', pos: a }, { dir: 'v', pos: b }];
+        } else {
+          bands = [
+            { dir: 'h', pos: (Math.random() * 2 - 1) * available },
+            { dir: 'v', pos: (Math.random() * 2 - 1) * available }
+          ];
+        }
+        return { type, halfThick, bands };
       }
     }
     return { type: 'left', sizeScale: 1.0 };
@@ -140,8 +158,22 @@ class AoeEngine {
       case 'bottom':       return y > 1 - d.sizeScale;
       case 'large-circle': { const dx=x-d.cx, dy=y-d.cy; return dx*dx + dy*dy/2.25 < d.r*d.r; }
       case 'small-circles':return d.circles.some(c => { const dx=x-c.cx, dy=y-c.cy; return dx*dx + dy*dy/2.25 < d.r*d.r; });
-      case 'band-h':       return Math.abs(y - d.cy) < d.halfThick;
-      case 'band-v':       return Math.abs(x - d.cx) < d.halfThick;
+      case 'fan': {
+        if (x === 0 && y === 0) return true;
+        const deg = Math.atan2(y, x) * 180 / Math.PI;
+        for (let i = 0; i < 4; i++) {
+          const base = d.baseAngle + i * 90;
+          let diff = ((deg - base) % 360 + 360) % 360;
+          if (diff > 180) diff -= 360;
+          if (Math.abs(diff) <= d.halfAngle) return true;
+        }
+        return false;
+      }
+      case 'band':
+        return d.bands.some(b =>
+          b.dir === 'h' ? Math.abs(y - b.pos) < d.halfThick
+                        : Math.abs(x - b.pos) < d.halfThick
+        );
     }
     return false;
   }
