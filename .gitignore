@@ -4,3 +4,4 @@ talklog/
 .DS_Store
 Thumbs.db
 .claude/
+tests/screenshots/
