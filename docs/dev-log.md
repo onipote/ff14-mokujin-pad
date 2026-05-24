@@ -371,6 +371,53 @@
 
 ---
 
+## 左スティックAoEパターン拡張・操作感調整
+
+**日付**: 2026-05-24
+
+### 変更内容
+
+| ファイル | 内容 |
+|---------|------|
+| `src/aoe.js` | AoEタイプを4種→8種に拡張、`_buildAoeData()` 追加、`_checkHit()` をオブジェクト受け取りに変更 |
+| `src/ui.js` | `_buildShapeEls()` / `_setAoeChildState()` / `_isInAoe()` 追加、AoEゾーンの動的DOM生成に移行 |
+| `src/constants.js` | `AOE_SIZE_SCALE_BASE` / `AOE_SIZE_SCALE_RANGE` / `STICK_SPEED_L` を追加 |
+| `src/input.js` | 左スティックの速度を `STICK_SPEED_L`（15%減）に変更 |
+| `styles/main.css` | `.aoe-zone--container` 追加、AoE内外の色対比を大幅強化 |
+| `tests/aoe-verify.js` | 新タイプのハイフン付きクラス名対応・試行回数を4に拡大 |
+| `README.md` | 左パネルAoEの説明を8種パターン対応に更新 |
+
+### 新AoEタイプ
+
+| タイプ | 内容 | サイズパラメータ |
+|--------|------|----------------|
+| `large-circle` | 大きな円形（直径〜35%）、中心ランダム | r = 0.35 × sizeScale |
+| `small-circles` | 小さな円形 2〜4個・同サイズ | r = 0.18 × sizeScale |
+| `band-h` | 横帯（全幅）、縦位置ランダム | halfThick = 0.20 × sizeScale |
+| `band-v` | 縦帯（全高）、横位置ランダム | halfThick = 0.20 × sizeScale |
+
+既存の `left/right/top/bottom` も sizeScale ±15% のランダム変化を適用。
+
+### アーキテクチャ変更
+
+**AoEゾーン描画を動的DOM生成に移行**
+
+旧方式: `#aoe-zone-L` 単一divにCSSクラスで形状・位置を制御  
+新方式: `#aoe-zone-L` を透明コンテナとして使い、タイプに応じた子divを `_buildShapeEls()` で動的生成。インラインスタイルで形状・位置を指定。
+
+これにより `small-circles` のように複数要素が必要なタイプに対応できる。テスト後方互換のため、コンテナ自身にも状態クラスを付与。
+
+**当たり判定の楕円化（真円表示対応）**
+
+フィールドは `aspect-ratio:3/2` のため、円の CSS height を `width × 1.5` で補正して視覚的な真円を実現。対応する当たり判定も楕円式 `(x-cx)² + (y-cy)²×(4/9) < r²` に変更。
+
+### 操作感調整
+
+- **左カーソル速度 -15%**: 左スティック専用の `STICK_SPEED_L = 1.275 × 0.85 ≈ 1.084` を追加。右スティックは変更なし。
+- **AoE色対比強化**: `warning-in`（危険）を深い赤（opacity 0.60）に、`warning-out`（安全）を明るい緑（opacity 0.38）に。カーソルのグロー半径も拡大。
+
+---
+
 ## XHBデザイン改修：R/Lハイライト＋クラスタスケーリング
 
 **日付**: 2026-05-24

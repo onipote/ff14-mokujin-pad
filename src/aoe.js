@@ -12,7 +12,8 @@ class AoeEngine {
     this._fireId  = null;
     this._clearId = null;
     this._side    = null; // 'L' | 'R'
-    this._type    = null; // 'left' | 'right' | 'top' | 'bottom'
+    this._type    = null;
+    this._aoeData = null; // 幾何データ
     this._gazeEyeX = 0;
     this._gazeEyeY = 0;
   }
@@ -34,6 +35,7 @@ class AoeEngine {
     }
     this._side = null;
     this._type = null;
+    this._aoeData = null;
     this._gazeEyeX = 0;
     this._gazeEyeY = 0;
   }
@@ -53,20 +55,22 @@ class AoeEngine {
       return;
     }
 
-    const types = ['left', 'right', 'top', 'bottom'];
-    this._type = types[Math.floor(Math.random() * 4)];
-    this.ui.showAoeWarning(this._side, this._type);
+    const types = ['left', 'right', 'top', 'bottom',
+                   'large-circle', 'small-circles', 'band-h', 'band-v'];
+    this._type    = types[Math.floor(Math.random() * types.length)];
+    this._aoeData = this._buildAoeData(this._type);
+    this.ui.showAoeWarning(this._side, this._aoeData);
 
     this._fireId = setTimeout(() => {
       if (!this._active) return;
-      const isHit = this._checkHit(this.input.stickL.x, this.input.stickL.y, this._type);
-      this.ui.showAoeResult(this._side, this._type, isHit);
+      const isHit = this._checkHit(this.input.stickL.x, this.input.stickL.y, this._aoeData);
+      this.ui.showAoeResult(this._side, this._aoeData, isHit);
       if (isHit) { if (this.onHit)   this.onHit();   }
       else        { if (this.onDodge) this.onDodge(); }
       this._clearId = setTimeout(() => {
         if (!this._active) return;
         this.ui.clearAoe(this._side);
-        this._side = this._type = null;
+        this._side = this._type = this._aoeData = null;
         this._scheduleNext();
       }, AOE_FIRE_MS);
     }, AOE_WARNING_MS);
@@ -96,13 +100,48 @@ class AoeEngine {
     }, AOE_WARNING_MS);
   }
 
-  // カーソルがAOEゾーン内にいるか判定（左パネル用）
-  _checkHit(x, y, type) {
+  _buildAoeData(type) {
+    const sizeScale = AOE_SIZE_SCALE_BASE + Math.random() * AOE_SIZE_SCALE_RANGE;
     switch (type) {
-      case 'left':   return x < 0;
-      case 'right':  return x > 0;
-      case 'top':    return y < 0;
-      case 'bottom': return y > 0;
+      case 'left': case 'right': case 'top': case 'bottom':
+        return { type, sizeScale };
+      case 'large-circle': {
+        const r = 0.55 * sizeScale;
+        return { type, cx: (Math.random()*2-1)*(1-r), cy: (Math.random()*2-1)*(1-r), r };
+      }
+      case 'small-circles': {
+        const r = 0.25 * sizeScale;
+        const count = 2 + Math.floor(Math.random() * 3);
+        const circles = Array.from({ length: count }, (_, i) => {
+          // ② 1つ目は必ずプレイヤーの現在位置
+          if (i === 0) return { cx: this.input.stickL.x, cy: this.input.stickL.y };
+          return { cx: (Math.random()*2-1)*(1-r), cy: (Math.random()*2-1)*(1-r) };
+        });
+        return { type, r, circles };
+      }
+      case 'band-h': {
+        const halfThick = 0.20 * sizeScale;
+        return { type, cy: (Math.random()*2-1)*(1-halfThick), halfThick };
+      }
+      case 'band-v': {
+        const halfThick = 0.20 * sizeScale;
+        return { type, cx: (Math.random()*2-1)*(1-halfThick), halfThick };
+      }
+    }
+    return { type: 'left', sizeScale: 1.0 };
+  }
+
+  // カーソルがAOEゾーン内にいるか判定（左パネル用）
+  _checkHit(x, y, d) {
+    switch (d.type) {
+      case 'left':         return x < d.sizeScale - 1;
+      case 'right':        return x > 1 - d.sizeScale;
+      case 'top':          return y < d.sizeScale - 1;
+      case 'bottom':       return y > 1 - d.sizeScale;
+      case 'large-circle': { const dx=x-d.cx, dy=y-d.cy; return dx*dx + dy*dy/2.25 < d.r*d.r; }
+      case 'small-circles':return d.circles.some(c => { const dx=x-c.cx, dy=y-c.cy; return dx*dx + dy*dy/2.25 < d.r*d.r; });
+      case 'band-h':       return Math.abs(y - d.cy) < d.halfThick;
+      case 'band-v':       return Math.abs(x - d.cx) < d.halfThick;
     }
     return false;
   }

@@ -21,12 +21,13 @@ class UIManager {
     // 視線ギミック（右パネル）
     this._gazeEye    = document.getElementById('gaze-eye-R');
     this._gazeFrame  = document.getElementById('gaze-frame-R');
-    this._gazeActive = false;
-    this._gazeEyeX   = 0;
-    this._gazeEyeY   = 0;
+    this._gazeActive  = false;
+    this._gazeEyeX    = 0;
+    this._gazeEyeY    = 0;
+    this._gazeOverlay = null;
     // AOEカーソル色（左パネル）
     this._aoeActive  = false;
-    this._aoeType    = null;
+    this._aoeData    = null;
   }
 
   updateAll(engine) {
@@ -128,26 +129,41 @@ class UIManager {
 
   // ── AOE / スティックパネル ──
 
-  showAoeWarning(side, type) {
+  showAoeWarning(side, aoeData) {
     const el = this._aoeZone[side];
-    if (el) el.className = `aoe-zone aoe-zone--warning-out aoe-zone--${type}`;
+    if (el) {
+      el.className = `aoe-zone aoe-zone--container aoe-zone--warning-out aoe-zone--${aoeData.type}`;
+      el.innerHTML = '';
+      // ① AoE外を暗転するオーバーレイ（shape要素より前に追加 → DOM順で後ろに描画）
+      const overlay = document.createElement('div');
+      overlay.className = 'aoe-overlay';
+      el.appendChild(overlay);
+      this._buildShapeEls(aoeData).forEach(child => {
+        child.classList.add('aoe-zone--warning-out');
+        el.appendChild(child);
+      });
+    }
     if (this._stickField[side]) this._stickField[side].classList.add('stick-field--active');
     this._aoeActive = true;
-    this._aoeType   = type;
+    this._aoeData   = aoeData;
   }
 
-  showAoeResult(side, type, isHit) {
+  showAoeResult(side, aoeData, isHit) {
     this._aoeActive = false;
+    const state = isHit ? 'aoe-zone--hit' : 'aoe-zone--dodge';
     const el = this._aoeZone[side];
-    if (el) el.className = `aoe-zone aoe-zone--${isHit ? 'hit' : 'dodge'} aoe-zone--${type}`;
+    if (el) {
+      el.className = `aoe-zone aoe-zone--container ${state} aoe-zone--${aoeData.type}`;
+      this._setAoeChildState(side, state);
+    }
     if (this._stickCur.L) this._stickCur.L.className = 'stick-cursor';
   }
 
   clearAoe(side) {
     this._aoeActive = false;
-    this._aoeType   = null;
+    this._aoeData   = null;
     const el = this._aoeZone[side];
-    if (el) el.className = 'aoe-zone';
+    if (el) { el.className = 'aoe-zone'; el.innerHTML = ''; }
     if (this._stickField[side]) this._stickField[side].classList.remove('stick-field--active');
     if (this._stickCur.L) this._stickCur.L.className = 'stick-cursor';
   }
@@ -161,17 +177,15 @@ class UIManager {
     if (!el) return;
     el.style.left = ((x + 1) / 2 * 100) + '%';
     el.style.top  = ((y + 1) / 2 * 100) + '%';
-    if (this._aoeActive) {
-      let inside = false;
-      switch (this._aoeType) {
-        case 'left':   inside = x < 0; break;
-        case 'right':  inside = x > 0; break;
-        case 'top':    inside = y < 0; break;
-        case 'bottom': inside = y > 0; break;
-      }
+    if (this._aoeActive && this._aoeData) {
+      const inside = this._isInAoe(x, y, this._aoeData);
       el.className = 'stick-cursor ' + (inside ? 'stick-cursor--in' : 'stick-cursor--out');
+      const state = inside ? 'aoe-zone--warning-in' : 'aoe-zone--warning-out';
       const zone = this._aoeZone.L;
-      if (zone) zone.className = `aoe-zone aoe-zone--${inside ? 'warning-in' : 'warning-out'} aoe-zone--${this._aoeType}`;
+      if (zone) {
+        zone.className = `aoe-zone aoe-zone--container ${state} aoe-zone--${this._aoeData.type}`;
+        this._setAoeChildState('L', state);
+      }
     }
   }
 
@@ -193,6 +207,76 @@ class UIManager {
     }
   }
 
+  _buildShapeEls(aoeData) {
+    const pct = v => ((v + 1) / 2 * 100);
+    const mk = style => {
+      const el = document.createElement('div');
+      el.className = 'aoe-zone';
+      el.style.cssText = style;
+      return el;
+    };
+    switch (aoeData.type) {
+      case 'left': {
+        const w = 50 * aoeData.sizeScale;
+        return [mk(`position:absolute;left:0;top:0;width:${w}%;height:100%;border-radius:0`)];
+      }
+      case 'right': {
+        const w = 50 * aoeData.sizeScale;
+        return [mk(`position:absolute;left:${100-w}%;top:0;width:${w}%;height:100%;border-radius:0`)];
+      }
+      case 'top': {
+        const h = 50 * aoeData.sizeScale;
+        return [mk(`position:absolute;left:0;top:0;width:100%;height:${h}%;border-radius:0`)];
+      }
+      case 'bottom': {
+        const h = 50 * aoeData.sizeScale;
+        return [mk(`position:absolute;left:0;top:${100-h}%;width:100%;height:${h}%;border-radius:0`)];
+      }
+      case 'large-circle': {
+        const size = aoeData.r * 100;
+        return [mk(`position:absolute;left:${pct(aoeData.cx)}%;top:${pct(aoeData.cy)}%;width:${size}%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%`)];
+      }
+      case 'small-circles':
+        return aoeData.circles.map(c => {
+          const size = aoeData.r * 100;
+          return mk(`position:absolute;left:${pct(c.cx)}%;top:${pct(c.cy)}%;width:${size}%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%`);
+        });
+      case 'band-h': {
+        const h = aoeData.halfThick * 100;
+        return [mk(`position:absolute;left:0;width:100%;top:${pct(aoeData.cy)}%;height:${h}%;transform:translateY(-50%);border-radius:0`)];
+      }
+      case 'band-v': {
+        const w = aoeData.halfThick * 100;
+        return [mk(`position:absolute;top:0;height:100%;left:${pct(aoeData.cx)}%;width:${w}%;transform:translateX(-50%);border-radius:0`)];
+      }
+    }
+    return [];
+  }
+
+  _setAoeChildState(side, stateClass) {
+    const container = this._aoeZone[side];
+    if (!container) return;
+    const states = ['aoe-zone--warning-out','aoe-zone--warning-in','aoe-zone--hit','aoe-zone--dodge'];
+    container.querySelectorAll('.aoe-zone').forEach(el => {
+      states.forEach(s => el.classList.remove(s));
+      el.classList.add(stateClass);
+    });
+  }
+
+  _isInAoe(x, y, d) {
+    switch (d.type) {
+      case 'left':         return x < d.sizeScale - 1;
+      case 'right':        return x > 1 - d.sizeScale;
+      case 'top':          return y < d.sizeScale - 1;
+      case 'bottom':       return y > 1 - d.sizeScale;
+      case 'large-circle': { const dx=x-d.cx, dy=y-d.cy; return dx*dx + dy*dy/2.25 < d.r*d.r; }
+      case 'small-circles':return d.circles.some(c => { const dx=x-c.cx, dy=y-c.cy; return dx*dx + dy*dy/2.25 < d.r*d.r; });
+      case 'band-h':       return Math.abs(y - d.cy) < d.halfThick;
+      case 'band-v':       return Math.abs(x - d.cx) < d.halfThick;
+    }
+    return false;
+  }
+
   showGazeWarning(eyeX, eyeY) {
     this._gazeActive = true;
     this._gazeEyeX   = eyeX;
@@ -202,7 +286,14 @@ class UIManager {
       this._gazeEye.style.top  = ((eyeY + 1) / 2 * 100) + '%';
       this._gazeEye.className  = 'gaze-eye gaze-eye--visible';
     }
-    if (this._stickField.R) this._stickField.R.classList.add('stick-field--active');
+    if (this._stickField.R) {
+      this._stickField.R.classList.add('stick-field--active');
+      if (!this._gazeOverlay) {
+        this._gazeOverlay = document.createElement('div');
+        this._gazeOverlay.className = 'gaze-overlay';
+        this._stickField.R.appendChild(this._gazeOverlay);
+      }
+    }
   }
 
   showGazeResult(isHit) {
@@ -220,6 +311,7 @@ class UIManager {
     if (this._gazeEye)   this._gazeEye.className  = 'gaze-eye';
     if (this._gazeFrame) this._gazeFrame.className = 'gaze-frame';
     if (this._stickField.R) this._stickField.R.classList.remove('stick-field--active');
+    if (this._gazeOverlay) { this._gazeOverlay.remove(); this._gazeOverlay = null; }
   }
 
   hideGameOver() {

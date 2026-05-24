@@ -141,15 +141,16 @@ async function run() {
   const emptyBefore = await page.locator('.heart--empty').count();
 
   // AOE warning を待ち、その種別に合わせてカーソルを危険ゾーンへ移動させる
-  // キー: 方向 → 危険側へ動かすキー (L/R パネルそれぞれ)
+  // キー: 方向 → 危険側へ動かすキー (L/R パネルそれぞれ)。null = スキップ
   const DANGER_KEYS = {
-    L: { left: 'A', right: 'D', top: 'W', bottom: 'S' },
+    L: { left: 'A', right: 'D', top: 'W', bottom: 'S',
+         'band-h': null, 'band-v': null, 'large-circle': null, 'small-circles': null },
     R: { left: 'ArrowLeft', right: 'ArrowRight', top: 'ArrowUp', bottom: 'ArrowDown' },
   };
 
   let hitFound = false;
-  // 最大 2 AOE サイクル（~14秒）試みる
-  for (let attempt = 0; attempt < 2 && !hitFound; attempt++) {
+  // 最大 4 AOE サイクル試みる（新タイプ混在のため増やす）
+  for (let attempt = 0; attempt < 4 && !hitFound; attempt++) {
     // warning 検出までポーリング
     let warnPanel = null, warnType = null;
     for (let i = 0; i < 50; i++) {
@@ -157,21 +158,24 @@ async function run() {
       const clL = await page.locator('#aoe-zone-L').getAttribute('class') || '';
       const clR = await page.locator('#aoe-zone-R').getAttribute('class') || '';
       const src  = clL.includes('warning') ? clL : clR;
-      const match = src.match(/aoe-zone--(\w+)$/);
+      // ハイフン付きタイプ名（large-circle 等）に対応した正規表現
+      const match = src.match(/aoe-zone--([\w-]+)$/);
       if (src.includes('warning') && match) {
         warnPanel = clL.includes('warning') ? 'L' : 'R';
-        warnType  = match[1]; // 'left'|'right'|'top'|'bottom'
+        warnType  = match[1]; // 'left'|'right'|...|'large-circle' など
         break;
       }
     }
 
     if (!warnPanel) break;
 
-    // warning 発見 → 危険ゾーンへカーソルを押し込む
-    const key = DANGER_KEYS[warnPanel][warnType];
-    await page.keyboard.down(key);
-    await page.waitForTimeout(900); // 危険ゾーンへ十分移動
-    await page.keyboard.up(key);
+    // warning 発見 → 危険ゾーンへカーソルを押し込む（対応キーがある場合のみ）
+    const key = DANGER_KEYS[warnPanel] && DANGER_KEYS[warnPanel][warnType];
+    if (key) {
+      await page.keyboard.down(key);
+      await page.waitForTimeout(900); // 危険ゾーンへ十分移動
+      await page.keyboard.up(key);
+    }
 
     // fire フェーズ待機
     await page.waitForTimeout(800);

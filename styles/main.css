@@ -370,6 +370,16 @@ body {
 .aoe-zone--right  { left: 50%; top: 0; width: 50%;  height: 100%; }
 .aoe-zone--top    { left: 0;   top: 0; width: 100%; height: 50%;  }
 .aoe-zone--bottom { left: 0;   top: 50%; width: 100%; height: 50%; }
+.aoe-zone--container {
+  left: 0; top: 0; width: 100%; height: 100%;
+  background: none; border: none; box-shadow: none; border-radius: 0;
+}
+.aoe-overlay {
+  position: absolute;
+  left: 0; top: 0; width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+}
 
 .aoe-zone--warning {
   background: rgba(255, 110, 0, 0.25);
@@ -772,6 +782,13 @@ body {
 .gaze-frame--out {
   border-color: rgba(55, 200, 85, 0.75);
   box-shadow: 0 0 14px rgba(35, 185, 75, 0.5), inset 0 0 10px rgba(35, 185, 75, 0.2);
+}
+.gaze-overlay {
+  position: absolute;
+  left: 0; top: 0; width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+  z-index: 0;
 }
 .gaze-frame--hit {
   border-color: rgba(230, 60, 60, 0.9);
