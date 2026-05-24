@@ -174,7 +174,7 @@ class GameEngine {
       this._timeoutId  = setTimeout(() => this._onTimeout(), remaining + totalMs);
     } else {
       // Was in feedback; go to next slot (total will increment, which is acceptable)
-      if (this.mode === 'default' && this.playerHp <= 0) {
+      if (this.playerHp <= 0 && this.mode === 'score_attack') {
         this._endGame('hp_zero');
       } else {
         this.total--;
@@ -336,9 +336,7 @@ class GameEngine {
   _processMiss() {
     this.combo = 0;
 
-    if (this.mode === 'default') {
-      this.playerHp = Math.max(0, this.playerHp - 1);
-    }
+    this.playerHp = Math.max(0, this.playerHp - 1);
 
     this.state = 'feedback';
     this.xhb.setSlotState(this.activeSlotId, 'fail');
@@ -351,8 +349,14 @@ class GameEngine {
 
     this._feedbackId = setTimeout(() => {
       if (this.state === 'gameover') return;
-      if (this.mode === 'default' && this.playerHp <= 0) {
-        this._endGame('hp_zero');
+      if (this.playerHp <= 0) {
+        if (this.mode === 'score_attack') {
+          this._endGame('hp_zero');
+        } else {
+          this.playerHp = PLAYER_MAX_HP;
+          this.ui.updateAll(this);
+          this._nextSlot();
+        }
       } else {
         this._nextSlot();
       }
@@ -363,17 +367,21 @@ class GameEngine {
     if (this.state === 'gameover') return;
     this.combo = 0;
 
-    if (this.mode === 'default') {
-      this.playerHp = Math.max(0, this.playerHp - 1);
-    }
+    this.playerHp = Math.max(0, this.playerHp - 1);
 
     this.ui.updateAll(this);
     this.ui.flashEnemy('miss', 0);
     this.sound.playMiss();
 
-    if (this.mode === 'default' && this.playerHp <= 0) {
+    if (this.playerHp <= 0) {
       setTimeout(() => {
-        if (this.state !== 'gameover') this._endGame('hp_zero');
+        if (this.state === 'gameover') return;
+        if (this.mode === 'score_attack') {
+          this._endGame('hp_zero');
+        } else {
+          this.playerHp = PLAYER_MAX_HP;
+          this.ui.updateAll(this);
+        }
       }, 50);
     }
   }
