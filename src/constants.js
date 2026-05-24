@@ -50,9 +50,16 @@ const BASE_SCORE_PER_HIT   = 10;
 const MAX_COMBO_MULTIPLIER = 5;
 
 // AOE dodge mechanic
-const AOE_WARNING_MS   = 1500;
+const AOE_WARNING_MS   = 3000;
 const AOE_FIRE_MS      = 500;
 const AOE_MIN_DELAY_MS = 3000;
 const AOE_MAX_DELAY_MS = 7000;
-const STICK_SPEED      = 1.5; // normalized units per second (keyboard & gamepad)
+const STICK_SPEED      = 1.275; // normalized units per second (keyboard & gamepad)
 const STICK_DEADZONE   = 0.15;
+
+// 視線ギミック（右パネル）
+const GAZE_FRAME_W_PCT  = 48.875;   // フレーム幅（フィールドwidth比%）
+const GAZE_FRAME_H_PCT  = 48.875;   // フレーム高さ（フィールドheight比%）= W_PCTと同値→3:2比率
+const GAZE_FRAME_HALF_W = 0.48875; // 正規化半幅 = (GAZE_FRAME_W_PCT/2) / 50
+const GAZE_FRAME_HALF_H = 0.48875; // 正規化半高 = (GAZE_FRAME_H_PCT/2) / 50
+const GAZE_EYE_RANGE    = 0.8;  // 目スポーン範囲 ±0.8（正規化）

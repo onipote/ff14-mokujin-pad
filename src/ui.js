@@ -15,9 +15,18 @@ class UIManager {
     this._pauseEl    = document.getElementById('screen-pause');
 
     // AOE / stick panels
-    this._aoeZone   = { L: document.getElementById('aoe-zone-L'),     R: document.getElementById('aoe-zone-R') };
-    this._stickCur  = { L: document.getElementById('stick-cursor-L'), R: document.getElementById('stick-cursor-R') };
+    this._aoeZone   = { L: document.getElementById('aoe-zone-L') };
+    this._stickCur  = { L: document.getElementById('stick-cursor-L') };
     this._stickField = { L: document.getElementById('stick-field-L'), R: document.getElementById('stick-field-R') };
+    // 視線ギミック（右パネル）
+    this._gazeEye    = document.getElementById('gaze-eye-R');
+    this._gazeFrame  = document.getElementById('gaze-frame-R');
+    this._gazeActive = false;
+    this._gazeEyeX   = 0;
+    this._gazeEyeY   = 0;
+    // AOEカーソル色（左パネル）
+    this._aoeActive  = false;
+    this._aoeType    = null;
   }
 
   updateAll(engine) {
@@ -121,30 +130,96 @@ class UIManager {
 
   showAoeWarning(side, type) {
     const el = this._aoeZone[side];
-    if (el) el.className = `aoe-zone aoe-zone--warning aoe-zone--${type}`;
+    if (el) el.className = `aoe-zone aoe-zone--warning-out aoe-zone--${type}`;
     if (this._stickField[side]) this._stickField[side].classList.add('stick-field--active');
+    this._aoeActive = true;
+    this._aoeType   = type;
   }
 
   showAoeResult(side, type, isHit) {
+    this._aoeActive = false;
     const el = this._aoeZone[side];
     if (el) el.className = `aoe-zone aoe-zone--${isHit ? 'hit' : 'dodge'} aoe-zone--${type}`;
+    if (this._stickCur.L) this._stickCur.L.className = 'stick-cursor';
   }
 
   clearAoe(side) {
+    this._aoeActive = false;
+    this._aoeType   = null;
     const el = this._aoeZone[side];
     if (el) el.className = 'aoe-zone';
     if (this._stickField[side]) this._stickField[side].classList.remove('stick-field--active');
+    if (this._stickCur.L) this._stickCur.L.className = 'stick-cursor';
   }
 
   updateStickCursors(stickL, stickR) {
     this._moveCursor(this._stickCur.L, stickL.x, stickL.y);
-    this._moveCursor(this._stickCur.R, stickR.x, stickR.y);
+    this._moveFrameCursor(stickR.x, stickR.y);
   }
 
   _moveCursor(el, x, y) {
     if (!el) return;
     el.style.left = ((x + 1) / 2 * 100) + '%';
     el.style.top  = ((y + 1) / 2 * 100) + '%';
+    if (this._aoeActive) {
+      let inside = false;
+      switch (this._aoeType) {
+        case 'left':   inside = x < 0; break;
+        case 'right':  inside = x > 0; break;
+        case 'top':    inside = y < 0; break;
+        case 'bottom': inside = y > 0; break;
+      }
+      el.className = 'stick-cursor ' + (inside ? 'stick-cursor--in' : 'stick-cursor--out');
+      const zone = this._aoeZone.L;
+      if (zone) zone.className = `aoe-zone aoe-zone--${inside ? 'warning-in' : 'warning-out'} aoe-zone--${this._aoeType}`;
+    }
+  }
+
+  _moveFrameCursor(x, y) {
+    if (!this._gazeFrame) return;
+    const halfW = GAZE_FRAME_W_PCT / 2;
+    const halfH = GAZE_FRAME_H_PCT / 2;
+    const leftPct = Math.max(halfW, Math.min(100 - halfW, (x + 1) / 2 * 100));
+    const topPct  = Math.max(halfH, Math.min(100 - halfH, (y + 1) / 2 * 100));
+    this._gazeFrame.style.left = leftPct + '%';
+    this._gazeFrame.style.top  = topPct  + '%';
+
+    if (this._gazeActive) {
+      const cx = Math.max(-(1 - GAZE_FRAME_HALF_W), Math.min(1 - GAZE_FRAME_HALF_W, x));
+      const cy = Math.max(-(1 - GAZE_FRAME_HALF_H), Math.min(1 - GAZE_FRAME_HALF_H, y));
+      const inside = Math.abs(this._gazeEyeX - cx) <= GAZE_FRAME_HALF_W &&
+                     Math.abs(this._gazeEyeY - cy) <= GAZE_FRAME_HALF_H;
+      this._gazeFrame.className = 'gaze-frame ' + (inside ? 'gaze-frame--in' : 'gaze-frame--out');
+    }
+  }
+
+  showGazeWarning(eyeX, eyeY) {
+    this._gazeActive = true;
+    this._gazeEyeX   = eyeX;
+    this._gazeEyeY   = eyeY;
+    if (this._gazeEye) {
+      this._gazeEye.style.left = ((eyeX + 1) / 2 * 100) + '%';
+      this._gazeEye.style.top  = ((eyeY + 1) / 2 * 100) + '%';
+      this._gazeEye.className  = 'gaze-eye gaze-eye--visible';
+    }
+    if (this._stickField.R) this._stickField.R.classList.add('stick-field--active');
+  }
+
+  showGazeResult(isHit) {
+    this._gazeActive = false;
+    if (this._gazeEye) {
+      this._gazeEye.className = 'gaze-eye ' + (isHit ? 'gaze-eye--hit' : 'gaze-eye--dodge');
+    }
+    if (this._gazeFrame) {
+      this._gazeFrame.className = 'gaze-frame ' + (isHit ? 'gaze-frame--hit' : 'gaze-frame--dodge');
+    }
+  }
+
+  clearGaze() {
+    this._gazeActive = false;
+    if (this._gazeEye)   this._gazeEye.className  = 'gaze-eye';
+    if (this._gazeFrame) this._gazeFrame.className = 'gaze-frame';
+    if (this._stickField.R) this._stickField.R.classList.remove('stick-field--active');
   }
 
   hideGameOver() {
