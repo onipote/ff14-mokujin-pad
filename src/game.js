@@ -28,6 +28,13 @@ class GameEngine {
     this.hits        = 0;
     this.total       = 0;
 
+    this.greatCount    = 0;
+    this.goodCount     = 0;
+    this.missCount     = 0;
+    this.pureStreak    = 0;
+    this.maxPureStreak = 0;
+    this.slotStats     = Object.fromEntries(SLOT_IDS.map(id => [id, { greats: 0, goods: 0, total: 0 }]));
+
     this.activeSlotId   = null;
     this._timeoutId     = null;
     this._feedbackId    = null;
@@ -74,6 +81,12 @@ class GameEngine {
     this.maxCombo    = 0;
     this.hits        = 0;
     this.total       = 0;
+    this.greatCount    = 0;
+    this.goodCount     = 0;
+    this.missCount     = 0;
+    this.pureStreak    = 0;
+    this.maxPureStreak = 0;
+    this.slotStats     = Object.fromEntries(SLOT_IDS.map(id => [id, { greats: 0, goods: 0, total: 0 }]));
     this.activeSlotId       = null;
     this._pendingSlotId     = null;
     this._pendingTimerStart = 0;
@@ -231,6 +244,7 @@ class GameEngine {
       this._timerStart = Date.now();
     }
     this.activeSlotId = slotId;
+    this.slotStats[slotId].total++;
 
     this.state = 'showing';
     this.xhb.clearAllStates();
@@ -322,6 +336,16 @@ class GameEngine {
     this._halfTimeId = null;
     this.hits++;
 
+    if (judgment === 'great') {
+      this.greatCount++;
+      this.pureStreak++;
+      if (this.pureStreak > this.maxPureStreak) this.maxPureStreak = this.pureStreak;
+      this.slotStats[this.activeSlotId].greats++;
+    } else {
+      this.goodCount++;
+      this.slotStats[this.activeSlotId].goods++;
+    }
+
     const baseTimeMs = DIFFICULTIES[this.difficulty].timeMs;
     let pts = Math.round(baseTimeMs / 10);
     if (this.isBurst) pts *= BURST_SCORE_MULTIPLIER;
@@ -393,6 +417,8 @@ class GameEngine {
 
   _processMiss() {
     if (!this.isBurst) this.combo = 0;
+    this.missCount++;
+    this.pureStreak = 0;
     this.remainingMs = Math.max(0, this.remainingMs - MISS_PENALTY_MS);
     this._rearmCountdown();
 

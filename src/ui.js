@@ -110,23 +110,102 @@ class UIManager {
     heading.textContent = 'TIME UP!';
     heading.className = 'gameover-title clear';
 
-    const acc = engine.total > 0 ? Math.round(engine.hits / engine.total * 100) : 0;
-    const bestLine = isNewRecord
-      ? `<div class="stat-row"><span>前回ベスト</span><span class="stat-val">${prevBest}</span></div>`
-      : `<div class="stat-row"><span>ベストスコア</span><span class="stat-val">${Math.max(engine.score, prevBest)}</span></div>`;
+    const basePoints = Math.round(DIFFICULTIES[engine.difficulty].timeMs / 10);
+    const maxScore   = engine.total * basePoints;
+    const achievePct = maxScore > 0
+      ? Math.min(100, Math.round(engine.score / maxScore * 100))
+      : 0;
+    const rankInfo = this._getRankInfo(achievePct);
+
+    const displayBest = isNewRecord ? prevBest : Math.max(engine.score, prevBest);
+    const bestLabel   = isNewRecord ? '前回ベスト' : 'ベストスコア';
 
     document.getElementById('gameover-stats').innerHTML = `
-      <div class="stat-row"><span>スコア</span><span class="stat-val"><b class="stat-big">${engine.score}</b></span></div>
-      ${bestLine}
-      <div class="stat-row"><span>正解数</span><span class="stat-val">${engine.hits} / ${engine.total}</span></div>
-      <div class="stat-row"><span>正確率</span><span class="stat-val">${acc}%</span></div>
-      <div class="stat-row"><span>最大コンボ</span><span class="stat-val">${engine.maxCombo}</span></div>
+      <div class="result-top">
+        <div class="rank-display">
+          <span class="rank-letter" style="color:${rankInfo.color};text-shadow:0 0 28px ${rankInfo.color},0 0 60px ${rankInfo.color}">${rankInfo.rank}</span>
+          <span class="rank-label">rank</span>
+        </div>
+        <div class="result-right">
+          <div class="rank-pct" style="color:${rankInfo.color}">DPS ${achievePct}%</div>
+          <div class="rank-divider"></div>
+          <div class="judgment-list">
+            <span class="judgment-lbl judgment-great">GREAT</span>
+            <span class="judgment-cnt judgment-great">${engine.greatCount}</span>
+            <span class="judgment-lbl judgment-good">GOOD</span>
+            <span class="judgment-cnt judgment-good">${engine.goodCount}</span>
+            <span class="judgment-lbl judgment-miss">MISS</span>
+            <span class="judgment-cnt judgment-miss">${engine.missCount}</span>
+          </div>
+        </div>
+      </div>
+      <div class="result-scores">
+        <div class="score-row">
+          <span class="score-lbl">スコア：</span>
+          <span class="score-val">${engine.score}</span>
+          <span class="score-sep"></span>
+          <span class="score-lbl">${bestLabel}：</span>
+          <span class="score-val score-val--sub">${displayBest}</span>
+        </div>
+      </div>
+      ${this._buildHeatmapHtml(engine.slotStats)}
     `;
 
     const badge = document.getElementById('new-record-badge');
     badge.classList.toggle('hidden', !isNewRecord);
 
     document.getElementById('screen-gameover').classList.remove('hidden');
+  }
+
+  _getRankInfo(pct) {
+    if (pct >= 99) return { rank: 'SSS', color: '#e268a8' };
+    if (pct >= 95) return { rank: 'SS',  color: '#ff8000' };
+    if (pct >= 75) return { rank: 'S',   color: '#a335ee' };
+    if (pct >= 50) return { rank: 'A',   color: '#0070ff' };
+    if (pct >= 25) return { rank: 'B',   color: '#1eff00' };
+    return           { rank: 'C',   color: '#666666' };
+  }
+
+  _buildHeatmapHtml(slotStats) {
+    const buildSlots = (slots) => slots.map(def => {
+      const st = slotStats[def.id];
+      const appeared = st && st.total > 0;
+      let bgStyle = '';
+      let pctHtml = '';
+      if (appeared) {
+        const rate = st.greats / st.total;
+        // 失敗: #b83535 (184,53,53) → 成功: #35b855 (53,184,85)
+        const r  = Math.round(184 - 131 * rate);
+        const g  = Math.round(53  + 131 * rate);
+        const b  = Math.round(53  +  32 * rate);
+        bgStyle = `background-color:rgba(${r},${g},${b},0.28);border-color:rgba(${r},${g},${b},0.9);box-shadow:0 0 8px rgba(${r},${g},${b},0.5);`;
+        pctHtml = `<span class="heatmap-pct">${Math.round(rate * 100)}%</span>`;
+      }
+      return `<div class="heatmap-slot" style="left:${def.posLeft};top:${def.posTop};${bgStyle}">${pctHtml}</div>`;
+    }).join('');
+
+    const buildHalf = (side) => {
+      const dpad = SLOT_DEFS.filter(s => s.side === side && s.type === 'dpad');
+      const face = SLOT_DEFS.filter(s => s.side === side && s.type === 'face');
+      const label = `<div class="xhb-label">${side}</div>`;
+      return `<div class="heatmap-half">
+        ${side === 'L' ? label : ''}
+        <div class="heatmap-groups">
+          <div class="heatmap-cross">${buildSlots(dpad)}</div>
+          <div class="heatmap-cross">${buildSlots(face)}</div>
+        </div>
+        ${side === 'R' ? label : ''}
+      </div>`;
+    };
+
+    return `<div class="gameover-heatmap">
+      <div class="heatmap-title">— 弱点マップ —</div>
+      <div class="heatmap-xhb">
+        ${buildHalf('L')}
+        <div class="xhb-sep"></div>
+        ${buildHalf('R')}
+      </div>
+    </div>`;
   }
 
   // ── AOE / スティックパネル ──

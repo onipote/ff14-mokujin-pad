@@ -43,7 +43,7 @@ const DIFFICULTIES = {
 
 const FEEDBACK_SUCCESS_MS    = 350;
 const FEEDBACK_FAIL_MS       = 550;
-const GAME_DURATION_MS       = 90_000;
+const GAME_DURATION_MS       = 60_000;
 const MISS_PENALTY_MS        = 5_000;
 const COMBO_BONUS_THRESHOLD  = 10;
 const COMBO_BONUS_MS         = 2_000;

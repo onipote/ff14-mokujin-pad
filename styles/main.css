@@ -116,10 +116,175 @@ body {
   font-size: 13px;
   line-height: 2;
   color: var(--text);
+  width: 100%;
 }
-.gameover-stats .stat-row { display: flex; justify-content: space-between; gap: 24px; }
+.gameover-stats .stat-row { display: flex; justify-content: flex-start; gap: 8px; }
 .gameover-stats .stat-val { color: var(--gold); font-weight: 700; }
 .gameover-stats .stat-big { font-size: 30px; color: var(--gold-bright); font-weight: 700; text-align: center; display: block; }
+
+/* ===== Result top: rank(left) + right panel ===== */
+.result-top {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  justify-content: center;
+}
+
+/* 左カラム：ランク文字 + rank ラベル */
+.rank-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  padding-top: 10px;
+}
+.rank-label {
+  font-size: 12px;
+  font-weight: 700;
+  font-family: 'Cinzel', serif;
+  color: var(--gold-dim);
+  letter-spacing: 0.22em;
+  margin-top: -10px;
+}
+.rank-letter {
+  font-size: 80px;
+  font-weight: 900;
+  font-family: 'Cinzel', serif;
+  line-height: 1;
+  letter-spacing: 0.06em;
+}
+
+/* 右カラム：DPS% + 区切り線 + 判定リスト */
+.result-right {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 110px;
+}
+.rank-pct {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  margin-bottom: -4px;
+}
+.rank-divider {
+  height: 1px;
+  background: rgba(200,164,80,0.35);
+  margin: 0;
+}
+.judgment-list {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 3px 14px;
+  align-items: center;
+}
+.judgment-lbl {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+.judgment-cnt {
+  font-size: 18px;
+  font-weight: 700;
+  font-family: 'Cinzel', serif;
+  text-align: right;
+  line-height: 1;
+}
+.judgment-great { color: #ffe080; }
+.judgment-good  { color: #80e8ff; }
+.judgment-miss  { color: #ff6060; }
+
+/* スコア行（中央寄せ） */
+.result-scores {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  margin: 18px 0;
+}
+.score-row {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 6px;
+}
+.score-lbl { font-size: 13px; color: var(--text); }
+.score-val {
+  font-size: 22px;
+  font-weight: 700;
+  font-family: 'Cinzel', serif;
+  color: var(--gold-bright);
+}
+.score-val--sub { font-size: 18px; color: var(--gold); }
+.score-sep {
+  width: 1px;
+  height: 18px;
+  background: rgba(200,164,80,0.3);
+  align-self: center;
+  margin: 0 6px;
+}
+
+/* ===== Heatmap ===== */
+.gameover-heatmap { width: 100%; }
+.heatmap-title {
+  text-align: center;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  color: var(--gold-dim);
+  margin-bottom: 6px;
+}
+.heatmap-xhb {
+  --slot-sz: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.heatmap-half {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 6px;
+}
+.heatmap-groups { display: flex; gap: 12px; align-items: center; }
+.heatmap-cross {
+  position: relative;
+  width: calc(var(--slot-sz) * 3 + var(--slot-gap) * 2);
+  height: calc(var(--slot-sz) * 2 + var(--slot-gap));
+}
+.heatmap-slot {
+  position: absolute;
+  width: var(--slot-sz);
+  height: var(--slot-sz);
+  background: var(--slot-bg);
+  border: 1px solid var(--slot-border);
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  user-select: none;
+}
+.heatmap-slot .slot-sym { font-size: 13px; color: rgba(255,255,255,0.75); line-height: 1; }
+.heatmap-pct {
+  font-size: 8px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 0 3px rgba(0,0,0,1);
+  line-height: 1;
+  margin-top: 2px;
+  letter-spacing: 0;
+}
+
+/* Gameover panel wider to fit heatmap */
+#screen-gameover .screen-panel {
+  min-width: 520px;
+  max-width: 680px;
+  width: calc(100% - 32px);
+  padding: 28px 36px;
+  gap: 14px;
+  overflow-y: auto;
+  max-height: calc(100vh - 32px);
+}
 
 /* ===== Buttons ===== */
 .btn {
