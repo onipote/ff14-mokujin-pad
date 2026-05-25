@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PAD-MOKUJIN</title>
   <link rel="stylesheet" href="styles/main.css">
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Roboto+Mono:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
 </head>
 <body>
   <div id="app">
@@ -74,20 +75,38 @@
 
     <!-- ===== Info Bar ===== -->
     <div id="info-bar">
-      <div class="info-section">
-        <div class="label-sm">COMBO</div>
-        <div id="combo-gauge-wrap" class="combo-gauge-wrap">
-          <div id="combo-gauge-fill" class="combo-gauge-fill"></div>
+      <div class="info-col info-col--limit">
+        <div class="info-label limit-break-label">LIMIT BREAK</div>
+        <div class="info-value-wrap">
+          <div>
+            <div id="combo-gauge-wrap" class="combo-gauge-wrap">
+              <div id="combo-gauge-fill" class="combo-gauge-fill"></div>
+            </div>
+            <div id="combo-val"></div>
+          </div>
         </div>
-        <div id="combo-val"></div>
       </div>
-      <div class="info-section info-section--center">
-        <div id="score-val">0</div>
-        <div id="judgment-float" class="judgment-float-container"></div>
+
+      <div class="info-divider"></div>
+
+      <div class="info-col info-col--score">
+        <div class="info-label">SCORE</div>
+        <div class="info-value-wrap">
+          <div id="score-val">0</div>
+          <div id="judgment-float" class="judgment-float-container"></div>
+        </div>
       </div>
-      <div class="info-section info-section--right">
-        <div class="label-sm">残り時間</div>
-        <div id="countdown-val" class="countdown-val">60</div>
+
+      <div class="info-divider"></div>
+
+      <div class="info-col info-col--timer">
+        <div class="info-label">残り時間</div>
+        <div class="info-value-wrap">
+          <div id="countdown-row" class="countdown-row">
+            <i class="fa-regular fa-clock countdown-icon"></i>
+            <span id="countdown-val" class="countdown-val">60.0s</span>
+          </div>
+        </div>
       </div>
     </div>
 

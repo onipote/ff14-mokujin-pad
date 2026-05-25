@@ -542,6 +542,52 @@ L/R押下時に対応サイドの各クラスタ（4ボタン単位の `.xhb-cro
 
 ---
 
+## Info Bar 全面リデザイン
+
+**日付**: 2026-05-26
+
+### 変更内容
+
+| ファイル | 内容 |
+|---------|------|
+| `index.html` | Font Awesome CDN追加・info-barをinfo-col/info-divider構造に変更・「SCORE」見出し追加 |
+| `src/ui.js` | `setCountdown` の整数部ゼロ埋め（常に5文字固定）・`_countdownRowEl` 追加 |
+| `styles/main.css` | info-bar全面リデザイン・Roboto Mono フォント追加 |
+
+### 仕様
+
+**レイアウト**
+
+- info-bar を3カラム構成に変更（`info-col--limit` / `info-col--score` / `info-col--timer`）
+- カラム間に縦仕切り線（`info-divider`: 1px、金色 `rgba(200,164,80,0.35)`）
+- 各セクションの中身は水平・垂直ともに中央揃え（`align-items: center` / `justify-content: center`）
+- LIMIT BREAKセクションは将来の3分割対応のため `flex: 1.8`（他2セクションは `flex: 1`）
+
+**LIMIT BREAKゲージ**
+
+- ラベル名を「COMBO」→「LIMIT BREAK」に変更（金色・発光付き）
+- ゲージ幅を160px → 240px に拡大
+- ゲージ枠: 金メタリック（`border: 2px solid #c8a040`）+ 内側シャドウ
+- ゲージ塗り: 青グラデ（`#1a7ab8 → #3db8e8 → #a0e4ff`）
+- バースト時: 金グラデ + パルスアニメーション（変更なし）
+
+**タイマー表示**
+
+- Font Awesome `fa-regular fa-clock`（輪郭・3時方向）アイコンを追加
+- 文字色: 白 + 水色グロー（`text-shadow: 0 0 10px rgba(80,200,230,0.85)`）
+- 残り10秒未満でアイコン・数値ともにオレンジ点滅（`countdown--urgent` をラッパーに付与）
+- 表示フォーマット: `MM.Ds`（整数部を `padStart(2, '0')` でゼロ埋め → 常に5文字固定）
+  - 例: `60.0s` → `59.9s` → `09.9s` → `00.1s`
+- フォント: Cinzel → **Roboto Mono**（全グリフ等幅）に変更し数字の幅ガタつきをゼロに
+- 幅: `width: 5ch`（Roboto Mono では `ch` = 全文字の幅と一致するため完全固定）
+
+**SCORE セクション**
+
+- 「SCORE」見出しラベルを追加（従来は数値のみ）
+- ラベル高さ（14px固定）を LIMIT BREAK・残り時間と統一し、見出し行を水平に揃える
+
+---
+
 ## AoEパターン追加・帯パターン修正
 
 **日付**: 2026-05-25

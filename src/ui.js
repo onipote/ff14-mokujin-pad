@@ -21,6 +21,7 @@ class UIManager {
     this._comboGaugeWrap = document.getElementById('combo-gauge-wrap');
     this._comboGaugeFill = document.getElementById('combo-gauge-fill');
     this._countdownEl    = document.getElementById('countdown-val');
+    this._countdownRowEl = document.getElementById('countdown-row');
     this._judgmentEl     = document.getElementById('judgment-float');
     this._enemyFlashId = null;
     this._enemyAnimId  = null;
@@ -69,8 +70,10 @@ class UIManager {
   }
 
   setCountdown(ms) {
-    this._countdownEl.textContent = Math.ceil(ms / 1000);
-    this._countdownEl.classList.toggle('countdown--urgent', ms < 10_000);
+    const total = Math.max(0, ms / 1000);
+    const [intPart, decPart] = total.toFixed(1).split('.');
+    this._countdownEl.textContent = intPart.padStart(2, '0') + '.' + decPart + 's';
+    this._countdownRowEl.classList.toggle('countdown--urgent', ms < 10_000);
   }
 
   setBurstState(active) {
