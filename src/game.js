@@ -368,7 +368,7 @@ class GameEngine {
     this.ui.setTimerFill(1);
     this.ui.updateAll(this);
     this.ui.flashEnemy('hit', this.combo);
-    this.ui.showJudgment(judgment);
+    this.ui.showJudgment(judgment, pts);
     this.sound.playHit(this.combo, judgment);
 
     this._feedbackId = setTimeout(() => {
@@ -380,8 +380,9 @@ class GameEngine {
     if (this.isBurst) return;
 
     if (this.gaugeLevel === LIMIT_GAUGE_COUNT) {
+      this.sound.playGaugeMax();
       this._startBurst();
-      this.sound.playCombo('burst');
+      setTimeout(() => this.sound.playBurstStart(), 350);
       return;
     }
 
@@ -447,7 +448,7 @@ class GameEngine {
     this.ui.setTimerFill(0);
     this.ui.updateAll(this);
     this.ui.flashEnemy('miss', 0);
-    this.ui.showJudgment('miss');
+    this.ui.showJudgment('miss', MISS_PENALTY_MS / 1000);
     this.sound.playMiss();
 
     this._feedbackId = setTimeout(() => {
@@ -464,7 +465,7 @@ class GameEngine {
     this._rearmCountdown();
     this.ui.updateAll(this);
     this.ui.flashEnemy('miss', 0);
-    this.ui.showJudgment('miss');
+    this.ui.showJudgment('miss', MISS_PENALTY_MS / 1000);
     this.sound.playMiss();
     if (this.remainingMs <= 0) {
       setTimeout(() => { if (this.state !== 'gameover') this._endGame('time_up'); }, 50);

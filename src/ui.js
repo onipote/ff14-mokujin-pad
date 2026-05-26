@@ -106,12 +106,15 @@ class UIManager {
     }
   }
 
-  showJudgment(type) {
-    const labels = { great: '◎ GREAT', good: '○ GOOD', miss: '✕ MISS', bonus1: '+1s', bonus2: '+2s' };
+  showJudgment(type, value) {
+    const base = { great: '◎ GREAT', good: '○ GOOD', miss: '✕ MISS', bonus1: '+1s', bonus2: '+2s' };
+    let text = base[type] || '';
+    if ((type === 'great' || type === 'good') && value != null) text += ` +${value}`;
+    if (type === 'miss' && value != null) text += ` -${Number(value).toFixed(1)}s`;
     const cssType = (type === 'bonus1' || type === 'bonus2') ? 'bonus' : type;
     const el = document.createElement('div');
     el.className = `judgment-float judgment-float--${cssType}`;
-    el.textContent = labels[type] || '';
+    el.textContent = text;
     this._judgmentEl.appendChild(el);
     setTimeout(() => el.remove(), 1000);
   }

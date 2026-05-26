@@ -61,6 +61,19 @@ class SoundManager {
     }
   }
 
+  playGaugeMax() {
+    const notes = [784, 1047, 1319, 1568];
+    notes.forEach((f, i) => this._beep(f, 'sine', 0.18, 0.22, i * 0.03));
+    this._beep(1568, 'sine', 0.28, 0.12, 0.14);
+  }
+
+  playBurstStart() {
+    this._beep(110, 'triangle', 0.15, 0.35, 0);
+    this._beep(220, 'triangle', 0.12, 0.25, 0.03);
+    const notes = [523, 784, 1047, 1568, 2093];
+    notes.forEach((f, i) => this._beep(f, 'sine', 0.12, 0.20, 0.07 + i * 0.04));
+  }
+
   playGameOver() {
     const notes = [392, 349, 330, 294]; // G4 F4 E4 D4 descending
     notes.forEach((f, i) => this._beep(f, 'triangle', 0.20, 0.14, i * 0.14));
