@@ -77,8 +77,19 @@ class AoeEngine {
   }
 
   _spawnGaze() {
-    this._gazeEyeX = (Math.random() * 2 - 1) * GAZE_EYE_RANGE;
-    this._gazeEyeY = (Math.random() * 2 - 1) * GAZE_EYE_RANGE;
+    const forceInside = Math.random() < 1 / 3;
+    let eyeX, eyeY;
+    do {
+      if (forceInside) {
+        eyeX = (Math.random() * 2 - 1) * GAZE_FRAME_HALF_W;
+        eyeY = (Math.random() * 2 - 1) * GAZE_FRAME_HALF_H;
+      } else {
+        eyeX = (Math.random() * 2 - 1) * GAZE_EYE_RANGE;
+        eyeY = (Math.random() * 2 - 1) * GAZE_EYE_RANGE;
+      }
+    } while (Math.abs(eyeX) < GAZE_CENTER_EXCLUDE_R && Math.abs(eyeY) < GAZE_CENTER_EXCLUDE_R);
+    this._gazeEyeX = eyeX;
+    this._gazeEyeY = eyeY;
     this.ui.showGazeWarning(this._gazeEyeX, this._gazeEyeY);
 
     this._fireId = setTimeout(() => {
