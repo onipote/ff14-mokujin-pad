@@ -70,8 +70,6 @@ class UIManager {
   }
 
   showPrompt(slotDef) {
-    const trigger = slotDef.side === 'L' ? 'L2' : 'R2';
-    this._timerLabel.textContent = `${trigger} + ${slotDef.sym}`;
   }
 
   setStartable(canStart) {
@@ -161,31 +159,33 @@ class UIManager {
     const bestLabel   = isNewRecord ? '前回ベスト' : 'ベストスコア';
 
     document.getElementById('gameover-stats').innerHTML = `
-      <div class="result-top">
-        <div class="rank-display">
-          <span class="rank-letter" style="color:${rankInfo.color};text-shadow:0 0 28px ${rankInfo.color},0 0 60px ${rankInfo.color}">${rankInfo.rank}</span>
-          <span class="rank-label">rank</span>
-        </div>
-        <div class="result-right">
-          <div class="rank-pct" style="color:${rankInfo.color}">DPS ${achievePct}%</div>
-          <div class="rank-divider"></div>
-          <div class="judgment-list">
-            <span class="judgment-lbl judgment-great">GREAT</span>
-            <span class="judgment-cnt judgment-great">${engine.greatCount}</span>
-            <span class="judgment-lbl judgment-good">GOOD</span>
-            <span class="judgment-cnt judgment-good">${engine.goodCount}</span>
-            <span class="judgment-lbl judgment-miss">MISS</span>
-            <span class="judgment-cnt judgment-miss">${engine.missCount}</span>
+      <div class="result-block">
+        <div class="result-top">
+          <div class="rank-display">
+            <span class="rank-letter" style="color:${rankInfo.color};text-shadow:0 0 28px ${rankInfo.color},0 0 60px ${rankInfo.color}">${rankInfo.rank}</span>
+            <span class="rank-label">rank</span>
+          </div>
+          <div class="result-right">
+            <div class="rank-pct" style="color:${rankInfo.color}">DPS ${achievePct}%</div>
+            <div class="rank-divider"></div>
+            <div class="judgment-list">
+              <span class="judgment-lbl judgment-great">GREAT</span>
+              <span class="judgment-cnt judgment-great">${engine.greatCount}</span>
+              <span class="judgment-lbl judgment-good">GOOD</span>
+              <span class="judgment-cnt judgment-good">${engine.goodCount}</span>
+              <span class="judgment-lbl judgment-miss">MISS</span>
+              <span class="judgment-cnt judgment-miss">${engine.missCount}</span>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="result-scores">
-        <div class="score-row">
-          <span class="score-lbl">スコア：</span>
-          <span class="score-val">${engine.score}</span>
-          <span class="score-sep"></span>
-          <span class="score-lbl">${bestLabel}：</span>
-          <span class="score-val score-val--sub">${displayBest}</span>
+        <div class="result-scores">
+          <div class="score-row">
+            <span class="score-lbl">スコア：</span>
+            <span class="score-val">${engine.score}</span>
+            <span class="score-sep"></span>
+            <span class="score-lbl">${bestLabel}：</span>
+            <span class="score-val score-val--sub">${displayBest}</span>
+          </div>
         </div>
       </div>
       ${this._buildHeatmapHtml(engine.slotStats)}

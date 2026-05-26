@@ -754,3 +754,57 @@ CSS 回転角は `atan2(sin θ × H/W, cos θ) = atan2(sin θ × 2/3, cos θ)` �
 - `#new-record-badge` を `#gameover-stats`（スコア表示）の下から上に移動（`index.html` の DOM 順変更のみ）
 
 ---
+
+## UI細部調整（7件）
+
+**日付**: 2026-05-26
+
+### 変更内容
+
+| ファイル | 変更 |
+|---------|------|
+| `index.html` | 「MENU」ボタンのテキストを「メニューに戻る」に変更 |
+| `src/ui.js` | `showPrompt()` を空にしてボタン名（「L2+○」など）の表示を削除 |
+| `src/ui.js` | `showGameOver()` の評価ブロック・スコアブロックを `<div class="result-block">` でラップ |
+| `styles/main.css` | `.result-block` を新規追加（金色枠線・青系背景・padding 16px 64px） |
+| `styles/main.css` | `.stick-side-label`（「L」「R」ラベル）を非表示化 |
+| `styles/main.css` | `#timer-label` を非表示化 |
+| `styles/main.css` | `.stick-panel` の `max-width: 290px → 220px`（LRパネルを中央寄り） |
+| `styles/main.css` | `#game-area` のパディングを `14px 16px 12px` → `36px 16px`（上下均等・余白拡大） |
+| `styles/main.css` | `.limit-segment` の幅を `72px → 96px`（ゲージ合計幅 296px） |
+| `styles/main.css` | `.rank-display` の `padding-top: 10px → 20px`（ランク文字を少し下げる） |
+| `styles/main.css` | `.gameover-heatmap` に `margin-top: 20px` 追加（弱点マップ上の余白確保） |
+
+### 各修正の詳細
+
+**1. 「メニューに戻る」ボタン**
+
+`index.html:47` の `MENU` テキストを日本語化。
+
+**2. ボタン名（「L2+○」）の表示削除**
+
+`showPrompt()` の本体を空にして `_timerLabel.textContent` への書き込みをなくした。`#timer-label` 要素は DOM に残したまま CSS で `display: none`。
+
+**3. 評価～スコアブロックに枠を追加**
+
+`showGameOver()` の innerHTML で `.result-top`（ランク＋判定数）と `.result-scores`（スコア）を `<div class="result-block">` で包んだ。
+- 枠線: `rgba(200, 164, 80, 0.45)`（金色）
+- 背景: `rgba(30, 60, 120, 0.18)`（暗い青）
+- サイズ: `width: fit-content; margin: 0 auto`（内容幅に合わせて中央配置）
+
+**4. LRスティックエリアのレイアウト調整**
+
+- 「L」「R」のサイドラベル（`.stick-side-label`）を非表示化
+- パネル `max-width: 290px → 220px` で中央の木人との距離を縮める
+- `#game-area` の上下パディングを `36px` に統一
+
+**5. リミットブレイクゲージ幅拡大**
+
+各セグメント `72px → 96px`。合計幅: 96×3 + 4×2 = **296px**（旧: 224px）。
+
+**6. リザルト画面 ランク表示・弱点マップ位置調整**
+
+- `.rank-display` の `padding-top: 10px → 20px`（ランク文字を下方向にずらす）
+- `.gameover-heatmap` に `margin-top: 20px` を追加
+
+---
