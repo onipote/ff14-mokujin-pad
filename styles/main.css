@@ -38,12 +38,10 @@
 
 /* ===== Body ===== */
 body {
-  background: #070e1c;
-  background-image: radial-gradient(
-    ellipse at 50% 40%,
-    #1a3d77 0%,
-    #070e1c 100%
-  );
+  background: #000208;
+  background-image:
+    radial-gradient(ellipse 60% 55% at 50% 52%, rgba(25,80,230,0.65) 0%, rgba(8,25,90,0.30) 40%, transparent 70%),
+    radial-gradient(ellipse at 50% 55%, #050a20 0%, #000208 100%);
   color: var(--text);
   font-family:
     "Segoe UI", "Yu Gothic UI", "Hiragino Kaku Gothic ProN", sans-serif;
@@ -219,7 +217,9 @@ body {
 
 /* ===== Start Screen logo ===== */
 #screen-start {
-  background: radial-gradient(ellipse at 50% 40%, #1a3d77 0%, #070e1c 100%);
+  background:
+    radial-gradient(ellipse 60% 55% at 50% 52%, rgba(25,80,230,0.65) 0%, rgba(8,25,90,0.30) 40%, transparent 70%),
+    radial-gradient(ellipse at 50% 55%, #050a20 0%, #000208 100%);
   backdrop-filter: none;
 }
 
