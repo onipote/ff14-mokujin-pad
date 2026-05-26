@@ -50,13 +50,12 @@ class SoundManager {
     this._beep(110, 'sawtooth', 0.22, 0.10, 0.10);
   }
 
-  playCombo(n) {
-    if (n === COMBO_BONUS_THRESHOLD) {
-      // コンボ10: タイムボーナスファンファーレ
+  // type: 'gauge' (ゲージ完成) | 'burst' (バースト発動)
+  playCombo(type) {
+    if (type === 'gauge') {
       const notes = [523, 659, 784, 1047];
       notes.forEach((f, i) => this._beep(f, 'sine', 0.12, 0.15, i * 0.07));
-    } else if (Object.values(BURST_THRESHOLDS).includes(n)) {
-      // コンボ20: バースト発動ファンファーレ
+    } else if (type === 'burst') {
       const notes = [523, 659, 784, 1047, 1319];
       notes.forEach((f, i) => this._beep(f, 'sine', 0.14, 0.18, i * 0.06));
     }

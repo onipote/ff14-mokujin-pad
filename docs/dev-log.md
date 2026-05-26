@@ -581,6 +581,57 @@ L/R押下時に対応サイドの各クラスタ（4ボタン単位の `.xhb-cro
 - フォント: Cinzel → **Roboto Mono**（全グリフ等幅）に変更し数字の幅ガタつきをゼロに
 - 幅: `width: 5ch`（Roboto Mono では `ch` = 全文字の幅と一致するため完全固定）
 
+---
+
+## フェーズ7: バースト3ゲージ化 & LIMITゲージUIリデザイン
+
+### 変更概要
+
+バーストシステムをFF14のリミットブレイク仕様に近い「3ゲージ蓄積型」に変更。
+ゲージUIも平行四辺形3分割デザインに刷新。
+
+### バーストルール（新）
+
+- LIMIT BREAKゲージが3分割。**GREAT** を連続で決めることで段階的に蓄積
+- 1ゲージを貯めるのに必要な大成功数: 遅い=3、普通=5、速い=6
+- ゲージ1個完成 → 残り時間 **+1秒**
+- ゲージ2個完成 → 残り時間 **+2秒**
+- ゲージ3個完成済みの状態でさらに **GREAT** → **バーストタイム**（10秒）発動
+- ミス時: 現ゲージの進捗（gaugeProgress）のみリセット、完成済みゲージ（gaugeLevel）は維持
+- バースト終了後: ゲージ全リセット（gaugeLevel=0、gaugeProgress=0）
+
+### LIMITゲージデザイン（新）
+
+- 3つの平行四辺形セグメントを横並び（gap: 4px）
+- 外枠: `clip-path: polygon(7px 0%, 100% 0%, calc(100%-7px) 100%, 0% 100%)` + 地味オレンジグラデ（`#d07030 → #904820`）
+- 内枠: `inset: 2px 9px`（水平方向はスキュー量7px＋2px確保）、dark背景、`border-radius: 3px`
+  - 水平インセットを9pxにしないと角の枠が0pxになる（内枠の端がclip-pathの斜辺の外に出るため）
+- 通常塗り: 青→白グラデ（`#1a5fc0 → #90d8f8 → #ffffff`）
+- 最大時（`.full`）: 中央明るい黄色グラデ（`#b08010 → #ffe878 → #b08010`）
+- バースト中（`.burst-active`）: 赤グラデ（`#800808 → #e03020`）+ `filter: brightness` アニメ 1.0s
+  - アニメを `.limit-segment-fill` でなく `.limit-segment-inner` に置く
+    （fill に filter を置くと overflow:hidden をブラウザが回避して1px上下にはみ出すため）
+- バースト中の残時間ドレイン: 右セグメントから左に向かって減少
+  - 式: `fill[i] = clamp(ratio*3 - i, 0, 1)`
+
+### レイアウト調整
+
+- ラベル「LIMIT BREAK」をゲージの上・左寄せに配置
+  - ラベル＋ゲージを `.limit-block` でラップし、`align-items: flex-start`
+  - `.info-col--limit` は `align-items: center`（デフォルト）でブロック全体を水平中央に
+  - `justify-content: center` + `.limit-block { margin-top: 6px }` で垂直方向やや下寄せ
+  - `margin-left: 1em` でラベルを1文字分右にインデント
+
+### 変更ファイル
+
+| ファイル | 変更内容 |
+|---------|---------|
+| `src/constants.js` | `BURST_THRESHOLDS` / `COMBO_BONUS_*` 削除 → `LIMIT_GAUGE_THRESHOLDS` / `LIMIT_GAUGE_COUNT` / `LIMIT_GAUGE_BONUS_MS` 追加 |
+| `src/game.js` | `gaugeLevel`/`gaugeProgress` 追加、`_checkComboMilestones` → `_checkGaugeProgress` 置換、miss/endBurst 更新 |
+| `src/ui.js` | `_updateLimitGauge` 追加、DOM参照・各メソッド更新、`showJudgment` に `bonus1`/`bonus2` 対応 |
+| `index.html` | 単一ゲージ → 3分割ゲージ HTML 差し替え |
+| `styles/main.css` | 旧 `.combo-gauge-*` 削除 → 新 `.limit-gauge-container` / `.limit-segment` CSS 追加 |
+
 **SCORE セクション**
 
 - 「SCORE」見出しラベルを追加（従来は数値のみ）

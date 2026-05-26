@@ -76,14 +76,26 @@
     <!-- ===== Info Bar ===== -->
     <div id="info-bar">
       <div class="info-col info-col--limit">
-        <div class="info-label limit-break-label">LIMIT BREAK</div>
-        <div class="info-value-wrap">
-          <div>
-            <div id="combo-gauge-wrap" class="combo-gauge-wrap">
-              <div id="combo-gauge-fill" class="combo-gauge-fill"></div>
+        <div class="limit-block">
+          <div class="info-label limit-break-label">LIMIT BREAK</div>
+          <div id="limit-gauge-container" class="limit-gauge-container">
+            <div class="limit-segment" id="limit-seg-0">
+              <div class="limit-segment-inner">
+                <div class="limit-segment-fill"></div>
+              </div>
             </div>
-            <div id="combo-val"></div>
+            <div class="limit-segment" id="limit-seg-1">
+              <div class="limit-segment-inner">
+                <div class="limit-segment-fill"></div>
+              </div>
+            </div>
+            <div class="limit-segment" id="limit-seg-2">
+              <div class="limit-segment-inner">
+                <div class="limit-segment-fill"></div>
+              </div>
+            </div>
           </div>
+          <div id="combo-val"></div>
         </div>
       </div>
 

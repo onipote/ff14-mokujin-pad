@@ -20,13 +20,15 @@ class GameEngine {
     this.difficulty = 'normal';
     this.state      = 'idle'; // 'idle' | 'showing' | 'feedback' | 'paused' | 'gameover'
 
-    this.remainingMs = GAME_DURATION_MS;
-    this.isBurst     = false;
-    this.score       = 0;
-    this.combo       = 0;
-    this.maxCombo    = 0;
-    this.hits        = 0;
-    this.total       = 0;
+    this.remainingMs  = GAME_DURATION_MS;
+    this.isBurst      = false;
+    this.gaugeLevel   = 0;
+    this.gaugeProgress = 0;
+    this.score        = 0;
+    this.combo        = 0;
+    this.maxCombo     = 0;
+    this.hits         = 0;
+    this.total        = 0;
 
     this.greatCount    = 0;
     this.goodCount     = 0;
@@ -73,14 +75,16 @@ class GameEngine {
     if (this._countdownRaf)   { cancelAnimationFrame(this._countdownRaf);    this._countdownRaf   = null; }
     this.input.stop();
 
-    this.difficulty  = difficulty;
-    this.remainingMs = GAME_DURATION_MS;
-    this.isBurst     = false;
-    this.score       = 0;
-    this.combo       = 0;
-    this.maxCombo    = 0;
-    this.hits        = 0;
-    this.total       = 0;
+    this.difficulty   = difficulty;
+    this.remainingMs  = GAME_DURATION_MS;
+    this.isBurst      = false;
+    this.gaugeLevel   = 0;
+    this.gaugeProgress = 0;
+    this.score        = 0;
+    this.combo        = 0;
+    this.maxCombo     = 0;
+    this.hits         = 0;
+    this.total        = 0;
     this.greatCount    = 0;
     this.goodCount     = 0;
     this.missCount     = 0;
@@ -354,7 +358,7 @@ class GameEngine {
     if (judgment === 'great') {
       this.combo++;
       if (this.combo > this.maxCombo) this.maxCombo = this.combo;
-      this._checkComboMilestones();
+      this._checkGaugeProgress();
     }
 
     this.state = 'feedback';
@@ -372,16 +376,27 @@ class GameEngine {
     }, FEEDBACK_SUCCESS_MS);
   }
 
-  _checkComboMilestones() {
-    if (this.combo === COMBO_BONUS_THRESHOLD) {
-      this.remainingMs = Math.min(GAME_DURATION_MS, this.remainingMs + COMBO_BONUS_MS);
-      this._rearmCountdown();
-      this.ui.showJudgment('bonus');
-      this.sound.playCombo(this.combo);
-    }
-    if (this.combo === BURST_THRESHOLDS[this.difficulty] && !this.isBurst) {
+  _checkGaugeProgress() {
+    if (this.isBurst) return;
+
+    if (this.gaugeLevel === LIMIT_GAUGE_COUNT) {
       this._startBurst();
-      this.sound.playCombo(this.combo);
+      this.sound.playCombo('burst');
+      return;
+    }
+
+    this.gaugeProgress++;
+    const threshold = LIMIT_GAUGE_THRESHOLDS[this.difficulty];
+    if (this.gaugeProgress >= threshold) {
+      this.gaugeLevel++;
+      this.gaugeProgress = 0;
+      if (this.gaugeLevel <= LIMIT_GAUGE_BONUS_MS.length) {
+        const bonusMs = LIMIT_GAUGE_BONUS_MS[this.gaugeLevel - 1];
+        this.remainingMs = Math.min(GAME_DURATION_MS, this.remainingMs + bonusMs);
+        this._rearmCountdown();
+        this.ui.showJudgment(this.gaugeLevel === 1 ? 'bonus1' : 'bonus2');
+      }
+      this.sound.playCombo('gauge');
     }
   }
 
@@ -408,15 +423,19 @@ class GameEngine {
   }
 
   _endBurst() {
-    this.isBurst = false;
-    this.combo   = 0;
+    this.isBurst       = false;
+    this.combo         = 0;
+    this.gaugeLevel    = 0;
+    this.gaugeProgress = 0;
     this.ui.setBurstState(false);
-    this.ui.setBurstGauge(0);
     this.ui.updateAll(this);
   }
 
   _processMiss() {
-    if (!this.isBurst) this.combo = 0;
+    if (!this.isBurst) {
+      this.combo        = 0;
+      this.gaugeProgress = 0;
+    }
     this.missCount++;
     this.pureStreak = 0;
     this.remainingMs = Math.max(0, this.remainingMs - MISS_PENALTY_MS);

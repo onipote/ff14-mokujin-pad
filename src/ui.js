@@ -18,8 +18,9 @@ class UIManager {
     this._timerLabel     = document.getElementById('timer-label');
     this._padStatusEl    = document.getElementById('pad-status');
     this._enemyEl        = document.getElementById('enemy-figure');
-    this._comboGaugeWrap = document.getElementById('combo-gauge-wrap');
-    this._comboGaugeFill = document.getElementById('combo-gauge-fill');
+    this._limitGaugeCont = document.getElementById('limit-gauge-container');
+    this._limitSegs      = [0, 1, 2].map(i => document.getElementById(`limit-seg-${i}`));
+    this._limitSegFills  = this._limitSegs.map(s => s.querySelector('.limit-segment-fill'));
     this._countdownEl    = document.getElementById('countdown-val');
     this._countdownRowEl = document.getElementById('countdown-row');
     this._judgmentEl     = document.getElementById('judgment-float');
@@ -46,9 +47,26 @@ class UIManager {
 
   updateAll(engine) {
     this._scoreEl.textContent = engine.score;
-    const gaugeRatio = Math.min(1, engine.combo / BURST_THRESHOLDS[engine.difficulty]);
-    this._comboGaugeFill.style.width = (gaugeRatio * 100) + '%';
+    const threshold = LIMIT_GAUGE_THRESHOLDS[engine.difficulty];
+    this._updateLimitGauge(engine.gaugeLevel, engine.gaugeProgress, threshold);
     this._comboEl.textContent = engine.combo >= 1 ? `COMBO ${engine.combo}` : '';
+  }
+
+  _updateLimitGauge(level, progress, threshold) {
+    for (let i = 0; i < 3; i++) {
+      const fill = this._limitSegFills[i];
+      if (i < level) {
+        fill.style.width = '100%';
+        this._limitSegs[i].classList.add('full');
+      } else if (i === level) {
+        const pct = level < LIMIT_GAUGE_COUNT ? (progress / threshold * 100) : 100;
+        fill.style.width = pct + '%';
+        this._limitSegs[i].classList.toggle('full', level === LIMIT_GAUGE_COUNT);
+      } else {
+        fill.style.width = '0%';
+        this._limitSegs[i].classList.remove('full');
+      }
+    }
   }
 
   showPrompt(slotDef) {
@@ -77,18 +95,25 @@ class UIManager {
   }
 
   setBurstState(active) {
-    this._comboGaugeWrap.classList.toggle('combo-gauge--burst', active);
+    this._limitGaugeCont.classList.toggle('burst-active', active);
+    if (active) {
+      this._limitSegs.forEach(s => s.classList.remove('full'));
+    }
   }
 
   setBurstGauge(ratio) {
-    this._comboGaugeFill.style.width = (ratio * 100) + '%';
+    for (let i = 0; i < 3; i++) {
+      const fill = Math.min(1, Math.max(0, ratio * 3 - i));
+      this._limitSegFills[i].style.width = (fill * 100) + '%';
+    }
   }
 
   showJudgment(type) {
-    const labels = { great: '◎ GREAT', good: '○ GOOD', miss: '✕ MISS' };
+    const labels = { great: '◎ GREAT', good: '○ GOOD', miss: '✕ MISS', bonus1: '+1s', bonus2: '+2s' };
+    const cssType = (type === 'bonus1' || type === 'bonus2') ? 'bonus' : type;
     const el = document.createElement('div');
-    el.className = `judgment-float judgment-float--${type}`;
-    el.textContent = type === 'bonus' ? '+2s' : (labels[type] || '');
+    el.className = `judgment-float judgment-float--${cssType}`;
+    el.textContent = labels[type] || '';
     this._judgmentEl.appendChild(el);
     setTimeout(() => el.remove(), 1000);
   }
@@ -103,7 +128,7 @@ class UIManager {
 
     if (type === 'hit') {
       this._enemyEl.classList.add('hit');
-      const anim = (combo === COMBO_BONUS_THRESHOLD || Object.values(BURST_THRESHOLDS).includes(combo)) ? 'enemy-bounce' : 'enemy-shake';
+      const anim = 'enemy-shake';
       this._enemyEl.classList.add(anim);
       this._enemyFlashId = setTimeout(() => this._enemyEl.classList.remove('hit'), 300);
       this._enemyAnimId  = setTimeout(() => this._enemyEl.classList.remove(anim), 400);
