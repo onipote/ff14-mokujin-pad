@@ -68,7 +68,7 @@ const GAZE_FRAME_H_PCT  = 48.875;   // フレーム高さ（フィールドheigh
 const GAZE_FRAME_HALF_W = 0.48875; // 正規化半幅 = (GAZE_FRAME_W_PCT/2) / 50
 const GAZE_FRAME_HALF_H = 0.48875; // 正規化半高 = (GAZE_FRAME_H_PCT/2) / 50
 const GAZE_EYE_RANGE    = 0.8;  // 目スポーン範囲 ±0.8（正規化）
-const GAZE_CENTER_EXCLUDE_R = GAZE_FRAME_HALF_W * 0.1; // 中央除外半径 ≈ 0.049（辺の1/10相当）
+const GAZE_CENTER_EXCLUDE_R = GAZE_FRAME_HALF_W * 0.25; // 中央除外半径 ≈ 0.122（辺の1/4相当）
 
 // AoE サイズランダム振れ幅（±15%）
 const AOE_SIZE_SCALE_BASE  = 0.85;

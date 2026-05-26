@@ -711,3 +711,46 @@ CSS 回転角は `atan2(sin θ × H/W, cos θ) = atan2(sin θ × 2/3, cos θ)` �
 - do-while ループで中央除外と枠内強制スポーンを組み合わせて適用
 
 ---
+
+## 細部表現の調整（4件）
+
+**日付**: 2026-05-26
+
+### 変更内容
+
+| ファイル | 変更 |
+|---------|------|
+| `src/sound.js` | `playMiss()` の音量を約35%低減（0.14→0.09、0.10→0.07） |
+| `src/constants.js` | `GAZE_CENTER_EXCLUDE_R` を `GAZE_FRAME_HALF_W * 0.1` → `* 0.25`（辺の1/4相当）に拡大 |
+| `src/ui.js` | fan AoE の放射線 div に専用クラス `aoe-fan-line` を追加 |
+| `styles/main.css` | fan AoE のスタイル改善（放射線・塗りつぶし濃度の統一） |
+| `index.html` | `#new-record-badge` をスコア表示の上に移動 |
+| `tests/verify-fan-aoe.mjs` | Playwright による fan AoE 検証スクリプト |
+| `tests/compare-aoe-types.mjs` | AoE タイプ間の外観比較スクリーンショット取得スクリプト |
+
+### 各修正の詳細
+
+**1. ミス音の音量低減**
+
+- `playMiss()` は sawtooth 波形を2音重ねて鳴らすため、他の sine 波音より体感音量が大きかった
+- `_beep(160, 'sawtooth', 0.18, 0.14)` → 第4引数 `0.09` に変更
+- `_beep(110, 'sawtooth', 0.22, 0.10, 0.10)` → 第4引数 `0.07` に変更
+
+**2. 視線ギミック中央除外ゾーン拡大**
+
+- 「外枠の1/4の辺の長さをもつ長方形」に変更
+- `GAZE_CENTER_EXCLUDE_R = GAZE_FRAME_HALF_W * 0.1` → `* 0.25`（≈ 0.122）
+- 除外範囲が4倍になり、目が真中に出にくくなった
+
+**3. 放射状 AoE の枠線・塗りつぶし修正**
+
+- fan の放射線 div は `width:2px` だが `.aoe-zone` クラスによる `border:2px solid` が重なり視覚幅が過大だった
+- 専用クラス `aoe-fan-line` を追加し、`border/box-shadow/filter` を `!important` で打ち消してbg色のみで表示
+- fan セクター形状の `box-shadow`（inset 含む）も `none` に打ち消し、`drop-shadow` blur を 10-14px → 3px に縮小
+  - 小さなウェッジ形状で `inset box-shadow` と大きな `drop-shadow` が過剰に広がり塗りが濃く見えていた問題を解消
+
+**4. リザルト画面 NEW RECORD 位置変更**
+
+- `#new-record-badge` を `#gameover-stats`（スコア表示）の下から上に移動（`index.html` の DOM 順変更のみ）
+
+---

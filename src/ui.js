@@ -374,10 +374,12 @@ class UIManager {
           for (const side of [-1, 1]) {
             const mathRad = (aoeData.baseAngle + i * 90 + side * aoeData.halfAngle) * Math.PI / 180;
             const scrDeg  = Math.atan2(Math.sin(mathRad) * (2 / 3), Math.cos(mathRad)) * 180 / Math.PI;
-            lines.push(mk(
+            const lineEl = document.createElement('div');
+            lineEl.className = 'aoe-zone aoe-fan-line';
+            lineEl.style.cssText =
               `position:absolute;left:calc(50% - 1px);top:50%;width:2px;height:100%;` +
-              `transform-origin:top center;transform:rotate(${(scrDeg - 90).toFixed(2)}deg);border-radius:0`
-            ));
+              `transform-origin:top center;transform:rotate(${(scrDeg - 90).toFixed(2)}deg);border-radius:0`;
+            lines.push(lineEl);
           }
         }
         return [...shapes, ...lines];

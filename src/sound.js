@@ -46,8 +46,8 @@ class SoundManager {
   }
 
   playMiss() {
-    this._beep(160, 'sawtooth', 0.18, 0.14);
-    this._beep(110, 'sawtooth', 0.22, 0.10, 0.10);
+    this._beep(160, 'sawtooth', 0.18, 0.09);
+    this._beep(110, 'sawtooth', 0.22, 0.07, 0.10);
   }
 
   // type: 'gauge' (ゲージ完成) | 'burst' (バースト発動)
