@@ -863,3 +863,26 @@ CSS 回転角は `atan2(sin θ × H/W, cos θ) = atan2(sin θ × 2/3, cos θ)` �
 - **星屑**: `radial-gradient` 14個、`background-size: 1100px 500px` でリピート
 
 ---
+
+## タイトル画面背景修正（星空オーバーレイ問題の解消）
+
+**日付**: 2026-05-26
+
+### 問題
+
+`.screen` オーバーレイ（`background: rgba(4,6,12,0.88)`）が `z-index: 100` で表示されるため、`body` の `.bg-particles`（`z-index: -1`）が完全に隠れていた。
+
+### 変更内容
+
+| ファイル | 内容 |
+|---------|------|
+| `index.html` | `#screen-start` 内に `.start-particles` div を再追加 |
+| `styles/main.css` | `#screen-start` に独立した空背景（`radial-gradient #0d2244 → #050a15`）を設定し `backdrop-filter` を無効化 |
+| `styles/main.css` | `.start-particles` スタイルを再追加（`position: absolute` で画面全体に星を散布） |
+
+### 設計
+
+- タイトル画面は「ゲームをぼかして暗くするオーバーレイ」ではなく独立した全画面背景として扱う
+- ポーズ・リザルト画面は引き続き `.screen` の暗いオーバーレイを使用
+
+---
