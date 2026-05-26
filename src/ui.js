@@ -74,9 +74,9 @@ class UIManager {
 
   setStartable(canStart) {
     const btn = document.getElementById('btn-start');
-    const msg = document.getElementById('pad-required-msg');
     btn.disabled = !canStart;
-    if (msg) msg.classList.toggle('hidden', canStart);
+    btn.textContent = canStart ? '▶ START' : 'コントローラーを接続してください';
+    btn.classList.toggle('btn--pad-required', !canStart);
   }
 
   setTimerFill(ratio) {

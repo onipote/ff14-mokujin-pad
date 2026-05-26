@@ -887,6 +887,36 @@ CSS 回転角は `atan2(sin θ × H/W, cos θ) = atan2(sin θ × 2/3, cos θ)` �
 
 ---
 
+## UI統一・タイトル画面レイアウト調整
+
+**日付**: 2026-05-27
+
+### 変更内容
+
+| ファイル | 内容 |
+|---------|------|
+| `styles/main.css` | `body` の `align-items: flex-start` → `center`（ページ縦中央寄せ） |
+| `styles/main.css` | `#screen-start .screen-panel` を新規追加：`width: 760px; max-width: calc(100% - 16px)`（ゲーム画面と幅を統一） |
+| `styles/main.css` | `#screen-gameover .screen-panel` の `min-width: 520px; max-width: 680px` → `width: 760px; max-width: calc(100% - 16px)`（同様に統一） |
+| `index.html` | `#btn-start` の初期テキストを「コントローラーを接続してください」に変更。`#pad-required-msg` 段落を削除 |
+| `src/ui.js` | `setStartable()` でボタンテキストを切り替え（未接続: メッセージ / 接続済: ▶ START）。`btn--pad-required` クラスの付与で色を制御 |
+| `styles/main.css` | `.btn--pad-required:disabled` スタイルを追加（ティール色 + `record-pulse` アニメーション） |
+| `styles/main.css` | `#btn-start { transition: none }` を追加（切り替え時の色フラッシュ防止） |
+| `styles/main.css` | `.game-title` の `margin-bottom: 84px` → `86px`（バーをタイトル文字下端に近づける） |
+| `styles/main.css` | `.glow-line` の `margin-top: 8px` → `0`（バーとタイトルの間隔をさらに詰める） |
+| `styles/main.css` | `.game-sub` に `margin-right: 22%` を追加（サブタイトル右端をタイトル右端より少し中央寄りに） |
+| `styles/main.css` | `.logo-seedling` に `padding-right: 180px` を追加（双葉の位置微調整） |
+
+### デザイン仕様
+
+- **画面幅の統一**: スタート・ゲームオーバー・ゲーム画面がすべて 760px 幅で揃う。ポーズ画面のみ `min-width: 360px` の小ウィンドウを維持
+- **縦中央寄せ**: `body` の `align-items: center` によりコンテンツがビューポート縦中央に配置される
+- **コントローラー未接続表示**: 独立した段落ではなくボタン自体のテキストをティール色でパルス表示。接続後はゴールドの「▶ START」に即時切替（`transition: none`）
+- **タイトルバー位置**: `scaleY(3)` の視覚的下端に合わせて `margin-bottom: 86px` + glow-line `margin-top: 0` で調整済み
+- **サブタイトル位置**: `margin-right: 22%` でタイトル文字右端より約 140px 内側に右端が来るよう調整
+
+---
+
 ## 星の増量・背景色調の調整（ethereal_space 参照）
 
 **日付**: 2026-05-26
