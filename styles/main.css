@@ -84,7 +84,7 @@ body {
   background: var(--panel);
   border: 1px solid rgba(200, 164, 80, 0.65);
   border-radius: 6px;
-  padding: 36px 52px;
+  padding: 64px 52px;
   min-width: 360px;
   display: flex;
   flex-direction: column;
@@ -1061,7 +1061,7 @@ body {
   width: 100%;
   position: relative;
   isolation: isolate;
-  padding: 64px 0 32px;
+  margin-bottom: 48px;
 }
 
 .logo-seedling {
