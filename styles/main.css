@@ -216,7 +216,8 @@ body {
 }
 
 /* ===== Start Screen logo ===== */
-#screen-start {
+#screen-start,
+#screen-gameover {
   background:
     radial-gradient(ellipse 85% 75% at 50% 52%, rgba(25,80,230,0.60) 0%, rgba(8,25,90,0.25) 50%, transparent 85%),
     radial-gradient(ellipse at 50% 55%, #050a20 0%, #000208 100%);

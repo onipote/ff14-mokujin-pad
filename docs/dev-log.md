@@ -886,3 +886,25 @@ CSS 回転角は `atan2(sin θ × H/W, cos θ) = atan2(sin θ × 2/3, cos θ)` �
 - ポーズ・リザルト画面は引き続き `.screen` の暗いオーバーレイを使用
 
 ---
+
+## 星の増量・背景色調の調整（ethereal_space 参照）
+
+**日付**: 2026-05-26
+
+### 変更内容
+
+| ファイル | 内容 |
+|---------|------|
+| `styles/main.css` | `.bg-particles` / `.start-particles` の星を 30 → 90 個に増量、輝度微増 |
+| `styles/main.css` | `body` / `#screen-start` の背景を `#000208` ベース＋中央電気ブルーグローに変更（`ethereal_space.png` 参照） |
+| `styles/main.css` | 中央グローの楕円半径を `60% 55%` → `85% 75%` に拡大（将来のウィンドウ拡張に備え） |
+
+### デザイン仕様
+
+- **星数**: 各レイヤー 90 個（`background-size: 1100px 500px` でタイル）
+- **背景ベース色**: `#000208`（ほぼ黒）+ `radial-gradient(ellipse at 55%, #050a20 → #000208)`
+- **中央グロー**: `radial-gradient(ellipse 85% 75%, rgba(25,80,230,0.60) → transparent 85%)` — 暗闇の中に集中する電気ブルー
+- **グロー半径の意図**: ウィンドウ拡大時にパネル周辺まで青みが届くよう広めに設定
+- **リザルト画面**: `#screen-gameover` にも同様の星空背景を適用（`.start-particles` div 追加 + CSS セレクタを `#screen-start, #screen-gameover` に拡張）
+
+---
