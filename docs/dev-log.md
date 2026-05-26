@@ -808,3 +808,32 @@ CSS 回転角は `atan2(sin θ × H/W, cos θ) = atan2(sin θ × 2/3, cos θ)` �
 - `.gameover-heatmap` に `margin-top: 20px` を追加
 
 ---
+
+## タイトル・ロゴ リデザイン
+
+**日付**: 2026-05-26  
+**設計ドキュメント**: [`docs/designs/plan_title-logo-redesign.md`](designs/plan_title-logo-redesign.md)
+
+### 変更内容
+
+| ファイル | 内容 |
+|---------|------|
+| `index.html` | タイトルを `PAD-MOKUJIN` → `PAD MASTERY` に変更（`<title>`・ヘッダー・スタート画面） |
+| `index.html` | サブタイトルを `XHB 操作練習ツール` → `覚醒のクロスホットバー` に変更 |
+| `index.html` | タイトル上下の `◆ ─────── ◆` オーナメントを削除 |
+| `index.html` | `.logo-container` / `.logo-seedling` / `.glow-line` / `.start-particles` を追加 |
+| `styles/main.css` | `.game-title` をメタリックグラデーション＋青白発光に刷新 |
+| `styles/main.css` | `.glow-line`（発光区切りライン）スタイル追加 |
+| `styles/main.css` | `.game-sub` を青みがかった白・発光テキストシャドウに変更 |
+| `styles/main.css` | `.logo-seedling`（双葉背景アイコン）スタイル追加 |
+| `styles/main.css` | `.start-particles`（星屑パーティクル背景）スタイル追加 |
+| `README.md` | タイトルを `PAD MASTERY ─ 覚醒のクロスホットバー` に更新 |
+
+### デザイン仕様
+
+- **メインタイトル**: Cinzel 42px、白→スチールブルー→明るいシルバーのメタリックグラデーション
+- **発光ライン**: タイトル〜サブタイトル間に青白く光る 2px ライン
+- **双葉アイコン**: Font Awesome `fa-seedling` を 160px・不透明度 0.18 でロゴ背後に配置（`z-index: -1`）
+- **星屑パーティクル**: `radial-gradient` 10個で全画面に星を散布
+
+---

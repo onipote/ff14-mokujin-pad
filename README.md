@@ -1,4 +1,4 @@
-# PAD-MOKUJIN
+# PAD MASTERY ─ 覚醒のクロスホットバー
 
 FF14のXHB（クロスホットバー）操作を練習するツールです。
 

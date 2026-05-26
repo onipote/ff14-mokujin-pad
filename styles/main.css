@@ -91,6 +91,7 @@ body {
     inset 0 0 0 1px rgba(200, 164, 80, 0.2),
     0 0 60px rgba(0, 0, 0, 0.8);
   position: relative;
+  z-index: 1;
 }
 .screen-panel::before {
   content: "◆";
@@ -115,19 +116,130 @@ body {
   letter-spacing: 0.05em;
 }
 
+/* ===== Start Screen logo ===== */
+.start-particles {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(
+      1.5px 1.5px at 60px 80px,
+      rgba(255, 255, 255, 0.6),
+      transparent
+    ),
+    radial-gradient(
+      1px 1px at 200px 140px,
+      rgba(255, 255, 255, 0.45),
+      transparent
+    ),
+    radial-gradient(
+      2px 2px at 120px 260px,
+      rgba(200, 230, 255, 0.7),
+      transparent
+    ),
+    radial-gradient(
+      1px 1px at 380px 100px,
+      rgba(255, 255, 255, 0.5),
+      transparent
+    ),
+    radial-gradient(
+      1.5px 1.5px at 500px 200px,
+      rgba(200, 220, 255, 0.4),
+      transparent
+    ),
+    radial-gradient(
+      1px 1px at 640px 320px,
+      rgba(255, 255, 255, 0.55),
+      transparent
+    ),
+    radial-gradient(
+      1px 1px at 760px 60px,
+      rgba(200, 240, 255, 0.5),
+      transparent
+    ),
+    radial-gradient(
+      2px 2px at 300px 380px,
+      rgba(180, 210, 255, 0.35),
+      transparent
+    ),
+    radial-gradient(
+      1px 1px at 900px 180px,
+      rgba(255, 255, 255, 0.4),
+      transparent
+    ),
+    radial-gradient(
+      1.5px 1.5px at 1050px 90px,
+      rgba(220, 240, 255, 0.5),
+      transparent
+    );
+  background-repeat: repeat;
+  background-size: 1100px 450px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.logo-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  position: relative;
+  isolation: isolate;
+  padding: 64px 0 32px;
+}
+
+.logo-seedling {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -55%);
+  font-size: 160px;
+  color: rgba(100, 160, 255, 0.18);
+  filter: drop-shadow(0 0 28px rgba(100, 160, 255, 0.5));
+  pointer-events: none;
+  z-index: -1;
+}
+
 .game-title {
-  font-size: 34px;
+  font-size: 42px;
   font-weight: 700;
   font-family: "Cinzel", serif;
-  color: var(--gold-bright);
   letter-spacing: 0.28em;
-  text-shadow: 0 0 24px rgba(220, 180, 70, 0.45);
+  margin: 0;
+  background: linear-gradient(
+    to bottom,
+    #ffffff 0%,
+    #b0c4e0 30%,
+    #506080 48%,
+    #8aa4c8 58%,
+    #e8f0ff 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.95))
+    drop-shadow(0 0 22px rgba(140, 190, 255, 0.35));
 }
+
+.glow-line {
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(120, 200, 255, 0.9),
+    transparent
+  );
+  box-shadow: 0 0 12px rgba(120, 200, 255, 0.8);
+  margin: 8px 0 10px;
+}
+
 .game-sub {
-  font-size: 11px;
-  color: var(--text-dim);
+  font-size: 13px;
+  color: #c8dfff;
   letter-spacing: 0.22em;
-  margin-top: -12px;
+  text-shadow:
+    1px 2px 4px rgba(0, 0, 0, 0.9),
+    0 0 10px rgba(100, 180, 255, 0.5);
 }
 
 .gameover-title {
