@@ -40,7 +40,7 @@
 body {
   background: #000208;
   background-image:
-    radial-gradient(ellipse 60% 55% at 50% 52%, rgba(25,80,230,0.65) 0%, rgba(8,25,90,0.30) 40%, transparent 70%),
+    radial-gradient(ellipse 85% 75% at 50% 52%, rgba(25,80,230,0.60) 0%, rgba(8,25,90,0.25) 50%, transparent 85%),
     radial-gradient(ellipse at 50% 55%, #050a20 0%, #000208 100%);
   color: var(--text);
   font-family:
@@ -218,7 +218,7 @@ body {
 /* ===== Start Screen logo ===== */
 #screen-start {
   background:
-    radial-gradient(ellipse 60% 55% at 50% 52%, rgba(25,80,230,0.65) 0%, rgba(8,25,90,0.30) 40%, transparent 70%),
+    radial-gradient(ellipse 85% 75% at 50% 52%, rgba(25,80,230,0.60) 0%, rgba(8,25,90,0.25) 50%, transparent 85%),
     radial-gradient(ellipse at 50% 55%, #050a20 0%, #000208 100%);
   backdrop-filter: none;
 }
