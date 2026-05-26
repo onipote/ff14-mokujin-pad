@@ -837,3 +837,29 @@ CSS 回転角は `atan2(sin θ × H/W, cos θ) = atan2(sin θ × 2/3, cos θ)` �
 - **星屑パーティクル**: `radial-gradient` 10個で全画面に星を散布
 
 ---
+
+## タイトルロゴ・背景リデザイン（星空・縦引き伸ばし）
+
+**日付**: 2026-05-26
+
+### 変更内容
+
+| ファイル | 内容 |
+|---------|------|
+| `index.html` | `<body>` 直下に `.bg-particles` div を追加（全画面固定の星屑レイヤー） |
+| `index.html` | `.start-particles` div を削除（`.bg-particles` に統合） |
+| `styles/main.css` | `body` 背景色を `#050a15` + `radial-gradient(ellipse, #0d2244 → #050a15)` に変更 |
+| `styles/main.css` | `.start-particles` スタイルを削除し `.bg-particles`（`position: fixed; z-index: -1`）に置換 |
+| `styles/main.css` | `.game-title` に `transform: scaleY(3)` + `letter-spacing: 0.16em` + `margin-bottom: 84px` を適用 |
+| `styles/main.css` | `.game-sub` に `align-self: flex-end` を追加（右寄せ） |
+| `styles/main.css` | `.header-title` の `letter-spacing` を `0.22em` → `0.06em` に変更 |
+
+### デザイン仕様
+
+- **全画面背景**: `body` の青みがかったグラデーション＋固定レイヤー `.bg-particles` で全画面どの画面でも星空が見える
+- **タイトル縦引き伸ばし**: `scaleY(3)`（FF14タイトル風）+ `transform-origin: top center` で上から下方向に伸張。`margin-bottom: 84px` で後続要素のレイアウトを補正
+- **字間**: `0.16em`（適度に開いた状態）
+- **サブタイトル右寄せ**: `align-self: flex-end` のみで対応
+- **星屑**: `radial-gradient` 14個、`background-size: 1100px 500px` でリピート
+
+---
