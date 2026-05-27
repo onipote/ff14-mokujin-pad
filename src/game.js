@@ -326,7 +326,7 @@ class GameEngine {
     if (this._timerRaf) { cancelAnimationFrame(this._timerRaf); this._timerRaf = null; }
 
     const judgment = elapsedRatio <= 1.0 ? 'great' : 'good';
-    this._processHit(judgment);
+    this._processHit(judgment, elapsedRatio);
   }
 
   _onTimeout() {
@@ -335,7 +335,7 @@ class GameEngine {
     this._processMiss();
   }
 
-  _processHit(judgment) {
+  _processHit(judgment, elapsedRatio) {
     clearTimeout(this._halfTimeId);
     this._halfTimeId = null;
     this.hits++;
@@ -350,8 +350,14 @@ class GameEngine {
       this.slotStats[this.activeSlotId].goods++;
     }
 
-    const baseTimeMs = DIFFICULTIES[this.difficulty].timeMs;
-    let pts = Math.round(baseTimeMs / 10);
+    const baseScore = DIFFICULTIES[this.difficulty].baseScore;
+    let pts;
+    if (judgment === 'great') {
+      pts = baseScore + 200;
+    } else {
+      const decayBonus = Math.max(0, Math.floor((2.0 - elapsedRatio) * 10) * 10);
+      pts = baseScore + decayBonus;
+    }
     if (this.isBurst) pts *= BURST_SCORE_MULTIPLIER;
     this.score += pts;
 

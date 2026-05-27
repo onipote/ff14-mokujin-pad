@@ -36,9 +36,9 @@ const KEY_TO_SLOT = Object.fromEntries(SLOT_DEFS.map((s) => [s.keyCode, s.id]));
 const SLOT_BY_ID  = Object.fromEntries(SLOT_DEFS.map((s) => [s.id, s]));
 
 const DIFFICULTIES = {
-  slow:   { timeMs: 3500, label: "遅い",  sublabel: "3.5秒" },
-  normal: { timeMs: 2500, label: "普通",  sublabel: "2.5秒" },
-  fast:   { timeMs: 1500, label: "速い",  sublabel: "1.5秒" },
+  slow:   { timeMs: 3500, label: "遅い",  sublabel: "3.5秒", baseScore: 150 },
+  normal: { timeMs: 2500, label: "普通",  sublabel: "2.5秒", baseScore: 250 },
+  fast:   { timeMs: 1500, label: "速い",  sublabel: "1.5秒", baseScore: 350 },
 };
 
 const FEEDBACK_SUCCESS_MS    = 350;
