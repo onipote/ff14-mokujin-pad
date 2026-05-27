@@ -9,12 +9,11 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
 </head>
 <body>
-  <div class="bg-particles"></div>
+  <canvas id="bg-canvas"></canvas>
   <div id="app">
 
     <!-- ===== Start Screen ===== -->
     <div id="screen-start" class="screen">
-      <div class="start-particles"></div>
       <div class="screen-panel">
         <div class="logo-container">
           <i class="fa-solid fa-seedling logo-seedling"></i>
@@ -39,7 +38,6 @@
 
     <!-- ===== Game Over Screen ===== -->
     <div id="screen-gameover" class="screen hidden">
-      <div class="start-particles"></div>
       <div class="screen-panel">
         <div class="ornament">◆ ─────── ◆</div>
         <h2 class="gameover-title" id="gameover-heading">GAME OVER</h2>
@@ -181,6 +179,7 @@
 
   </div><!-- /#app -->
 
+  <script src="src/background.js"></script>
   <script src="src/constants.js"></script>
   <script src="src/xhb.js"></script>
   <script src="src/sound.js"></script>

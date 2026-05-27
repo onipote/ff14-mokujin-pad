@@ -2,6 +2,62 @@
 
 ---
 
+## 背景ビジュアル刷新：キャンバスパーティクル＋グラデーションアニメーション
+
+**日付**: 2026-05-27
+
+### 変更内容
+
+| ファイル | 内容 |
+|---------|------|
+| `src/background.js` | 新規作成。キャンバスベースの浮遊パーティクルシステム（30fps上限・45粒子） |
+| `index.html` | `<div class="bg-particles">` → `<canvas id="bg-canvas">` に置換。`.start-particles` div 2箇所削除。`background.js` をスクリプト先頭に追加 |
+| `styles/main.css` | body グラデーション・アニメーション更新、`.screen` 透明化、`#screen-pause` に暗いオーバーレイ＋blur を追加、旧 SVG スター3ブロック削除、`#bg-canvas` CSS 追加 |
+
+### デザイン仕様
+
+**キャンバスパーティクル（`src/background.js`）**
+
+- 45粒子が画面下から上へゆっくり浮かぶ（0.2〜1.0 px/frame、30fps）
+- 色: `rgba(180,220,248, 0.08〜0.43)` ─ 水色系・控えめな透明度
+- サイズ: 半径 0.5〜2.5px のランダム
+- `fillStyle` 文字列はリセット時に一度だけ生成（毎フレームの GC 負荷を回避）
+- `will-change: transform` で GPU 合成レイヤーに昇格
+
+**body グラデーション**
+
+```css
+background: #000208;
+background-image:
+  radial-gradient(ellipse 85% 75% at 50% 52%,
+    rgba(25, 80, 230, 0.5) 0%, rgba(8, 25, 90, 0.22) 50%, transparent 85%),
+  radial-gradient(ellipse at 50% 55%, #050a20 0%, #000208 100%);
+background-size: 100% 200%;
+animation: bgDrift 15s ease-in-out infinite alternate;
+```
+
+`bgDrift` キーフレームで `background-position` を `50% 0%` ↔ `50% 100%` にアニメーション（グラデーションが静止しないことで宇宙感を演出）。
+
+**スクリーンオーバーレイの変更**
+
+| スクリーン | 変更前 | 変更後 |
+|-----------|------|------|
+| `.screen`（タイトル・リザルト） | `rgba(4,6,12,0.88)` + blur | `transparent`（canvas が透けて見える） |
+| `#screen-pause` | `rgba(4,6,12,0.55)` | `rgba(2,4,12,0.68)` + `backdrop-filter: blur(4px)` |
+
+タイトル・リザルト画面では `.screen` を透明にすることで canvas のパーティクルを全画面で表示。ポーズ画面はゲーム画面を薄く透かしながら暗くするため独自の半透明オーバーレイを維持。
+
+### パフォーマンス最適化
+
+| 項目 | 変更前 | 変更後 |
+|------|------|------|
+| 粒子数 | 80 | 45 |
+| フレームレート | 60fps（無制限） | 30fps キャップ |
+| `fillStyle` 生成 | 毎フレーム文字列結合 | `reset()` 時に1回だけ生成 |
+| GPU 合成 | なし | `will-change: transform` |
+
+---
+
 ## スコア体系の改修：難易度逆転・GREAT/GOOD得点差
 
 **日付**: 2026-05-27

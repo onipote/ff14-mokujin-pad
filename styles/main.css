@@ -42,11 +42,14 @@ body {
   background-image:
     radial-gradient(
       ellipse 85% 75% at 50% 52%,
-      rgba(25, 80, 230, 0.6) 0%,
-      rgba(8, 25, 90, 0.25) 50%,
+      rgba(25, 80, 230, 0.5) 0%,
+      rgba(8, 25, 90, 0.22) 50%,
       transparent 85%
     ),
     radial-gradient(ellipse at 50% 55%, #050a20 0%, #000208 100%);
+  background-size: 100% 200%;
+  background-position: 50% 0%;
+  animation: bgDrift 15s ease-in-out infinite alternate;
   color: var(--text);
   font-family:
     "Segoe UI", "Yu Gothic UI", "Hiragino Kaku Gothic ProN", sans-serif;
@@ -55,6 +58,11 @@ body {
   align-items: center;
   justify-content: center;
   padding: 16px 8px;
+}
+
+@keyframes bgDrift {
+  0%   { background-position: 50% 0%; }
+  100% { background-position: 50% 100%; }
 }
 
 #app {
@@ -69,15 +77,18 @@ body {
 .screen {
   position: fixed;
   inset: 0;
-  background: rgba(4, 6, 12, 0.88);
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 100;
-  backdrop-filter: blur(4px);
 }
 .screen.hidden {
   display: none;
+}
+#screen-pause {
+  background: rgba(2, 4, 12, 0.68);
+  backdrop-filter: blur(4px);
 }
 
 .screen-panel {
@@ -119,41 +130,16 @@ body {
   letter-spacing: 0.05em;
 }
 
-/* ===== Global Star Background ===== */
-.bg-particles {
+
+/* ===== Canvas Background ===== */
+#bg-canvas {
   position: fixed;
   inset: 0;
+  width: 100%;
+  height: 100%;
   z-index: -1;
   pointer-events: none;
   will-change: transform;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Ccircle cx='60' cy='80' r='.75' fill='rgba(255,255,255,.7)'/%3E%3Ccircle cx='200' cy='140' r='.5' fill='rgba(255,255,255,.5)'/%3E%3Ccircle cx='120' cy='260' r='1' fill='rgba(200,230,255,.75)'/%3E%3Ccircle cx='380' cy='100' r='.5' fill='rgba(255,255,255,.55)'/%3E%3Ccircle cx='30' cy='200' r='.75' fill='rgba(255,255,255,.45)'/%3E%3Ccircle cx='250' cy='50' r='.5' fill='rgba(255,255,255,.6)'/%3E%3Ccircle cx='310' cy='330' r='.5' fill='rgba(255,255,255,.45)'/%3E%3Ccircle cx='100' cy='350' r='.5' fill='rgba(255,255,255,.4)'/%3E%3Ccircle cx='330' cy='240' r='.75' fill='rgba(200,220,255,.5)'/%3E%3Ccircle cx='170' cy='120' r='1' fill='rgba(200,230,255,.6)'/%3E%3Ccircle cx='280' cy='180' r='.5' fill='rgba(255,255,255,.5)'/%3E%3Ccircle cx='40' cy='380' r='.5' fill='rgba(255,255,255,.4)'/%3E%3Ccircle cx='350' cy='70' r='.75' fill='rgba(200,230,255,.5)'/%3E%3Ccircle cx='150' cy='310' r='.5' fill='rgba(255,255,255,.45)'/%3E%3Ccircle cx='390' cy='200' r='.5' fill='rgba(255,255,255,.5)'/%3E%3Ccircle cx='100' cy='30' r='1' fill='rgba(200,230,255,.6)'/%3E%3Ccircle cx='220' cy='280' r='.5' fill='rgba(255,255,255,.5)'/%3E%3Ccircle cx='50' cy='150' r='.5' fill='rgba(255,255,255,.5)'/%3E%3Ccircle cx='290' cy='290' r='.5' fill='rgba(255,255,255,.45)'/%3E%3Ccircle cx='360' cy='370' r='.5' fill='rgba(255,255,255,.4)'/%3E%3Ccircle cx='75' cy='350' r='1' fill='rgba(180,210,255,.5)'/%3E%3Ccircle cx='230' cy='390' r='.5' fill='rgba(255,255,255,.5)'/%3E%3Ccircle cx='160' cy='390' r='1' fill='rgba(200,220,255,.45)'/%3E%3Ccircle cx='380' cy='380' r='.75' fill='rgba(180,210,255,.45)'/%3E%3Ccircle cx='270' cy='370' r='.75' fill='rgba(200,220,255,.45)'/%3E%3C/svg%3E");
-  background-repeat: repeat;
-  background-size: 400px 400px;
-}
-
-/* ===== Start Screen logo ===== */
-#screen-start,
-#screen-gameover {
-  background:
-    radial-gradient(
-      ellipse 85% 75% at 50% 52%,
-      rgba(25, 80, 230, 0.6) 0%,
-      rgba(8, 25, 90, 0.25) 50%,
-      transparent 85%
-    ),
-    radial-gradient(ellipse at 50% 55%, #050a20 0%, #000208 100%);
-  backdrop-filter: none;
-}
-
-.start-particles {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  will-change: transform;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Ccircle cx='60' cy='80' r='.75' fill='rgba(255,255,255,.7)'/%3E%3Ccircle cx='200' cy='140' r='.5' fill='rgba(255,255,255,.5)'/%3E%3Ccircle cx='120' cy='260' r='1' fill='rgba(200,230,255,.75)'/%3E%3Ccircle cx='380' cy='100' r='.5' fill='rgba(255,255,255,.55)'/%3E%3Ccircle cx='30' cy='200' r='.75' fill='rgba(255,255,255,.45)'/%3E%3Ccircle cx='250' cy='50' r='.5' fill='rgba(255,255,255,.6)'/%3E%3Ccircle cx='310' cy='330' r='.5' fill='rgba(255,255,255,.45)'/%3E%3Ccircle cx='100' cy='350' r='.5' fill='rgba(255,255,255,.4)'/%3E%3Ccircle cx='330' cy='240' r='.75' fill='rgba(200,220,255,.5)'/%3E%3Ccircle cx='170' cy='120' r='1' fill='rgba(200,230,255,.6)'/%3E%3Ccircle cx='280' cy='180' r='.5' fill='rgba(255,255,255,.5)'/%3E%3Ccircle cx='40' cy='380' r='.5' fill='rgba(255,255,255,.4)'/%3E%3Ccircle cx='350' cy='70' r='.75' fill='rgba(200,230,255,.5)'/%3E%3Ccircle cx='150' cy='310' r='.5' fill='rgba(255,255,255,.45)'/%3E%3Ccircle cx='390' cy='200' r='.5' fill='rgba(255,255,255,.5)'/%3E%3Ccircle cx='100' cy='30' r='1' fill='rgba(200,230,255,.6)'/%3E%3Ccircle cx='220' cy='280' r='.5' fill='rgba(255,255,255,.5)'/%3E%3Ccircle cx='50' cy='150' r='.5' fill='rgba(255,255,255,.5)'/%3E%3Ccircle cx='290' cy='290' r='.5' fill='rgba(255,255,255,.45)'/%3E%3Ccircle cx='360' cy='370' r='.5' fill='rgba(255,255,255,.4)'/%3E%3Ccircle cx='75' cy='350' r='1' fill='rgba(180,210,255,.5)'/%3E%3Ccircle cx='230' cy='390' r='.5' fill='rgba(255,255,255,.5)'/%3E%3Ccircle cx='160' cy='390' r='1' fill='rgba(200,220,255,.45)'/%3E%3Ccircle cx='380' cy='380' r='.75' fill='rgba(180,210,255,.45)'/%3E%3Ccircle cx='270' cy='370' r='.75' fill='rgba(200,220,255,.45)'/%3E%3C/svg%3E");
-  background-repeat: repeat;
-  background-size: 400px 400px;
 }
 
 .logo-container {
