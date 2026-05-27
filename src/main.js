@@ -191,13 +191,23 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('screen-start').classList.add('hidden');
     ui.hidePause();
     ui.hideGameOver();
-    appState = 'playing';
-    BackgroundParticles.pause();
-    engine.start(selectedDiff);
+
+    const overlay = document.getElementById('gate-joined-overlay');
+    overlay.classList.remove('hidden');
+    sound.playGateJoined();
+
+    // フェードアウト完了でGCD開始
+    overlay.addEventListener('animationend', () => {
+      overlay.classList.add('hidden');
+      appState = 'playing';
+      BackgroundParticles.pause();
+      engine.start(selectedDiff);
+    }, { once: true });
   }
 
   function pauseGame() {
     engine.pause();
+    document.body.classList.add('is-paused');
     ui.showPause();
     appState   = 'paused';
     menuSelIdx = 0;
@@ -211,6 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function resumeGame() {
     stopMenuLoop();
+    document.body.classList.remove('is-paused');
     ui.hidePause();
     appState = 'playing';
     engine.resume();
@@ -224,6 +235,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function showMenu() {
     engine.stop();
+    document.body.classList.remove('is-paused');
     ui.hideGameOver();
     document.getElementById('screen-start').classList.remove('hidden');
     BackgroundParticles.resume();

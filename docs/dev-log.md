@@ -2,6 +2,36 @@
 
 ---
 
+## G.A.T.E JOINED 演出・ポーズ中GCPアニメーション修正・難易度ラベル変更
+
+**日付**: 2026-05-27
+
+### 変更内容
+
+| ファイル | 内容 |
+|---------|------|
+| `src/constants.js` | `fast` 難易度ラベルを「零式」→「光の戦士」に変更 |
+| `index.html` | G.A.T.E JOINED オーバーレイdiv追加・難易度ボタンテキスト変更 |
+| `src/sound.js` | `playGateJoined()` メソッド追加（440Hz sine・三連符リズム） |
+| `src/main.js` | `startGame()` にオーバーレイ演出（`animationend` でGCD開始）を追加・`pauseGame/resumeGame/showMenu` に `is-paused` クラス制御追加 |
+| `styles/main.css` | G.A.T.E JOINED オーバーレイのスタイル・アニメーション追加、`body.is-paused` によるXHBアニメーション停止CSS追加 |
+
+### 変更詳細
+
+**G.A.T.E JOINED 演出**  
+ゲーム開始時（リトライ含む）に、画面中央に金色の大テキスト「G.A.T.E JOINED」をCinzelフォントで表示。  
+オーバーレイ全体（暗い背景含む）が2秒かけてフェードイン→ホールド→フェードアウトし、`animationend` で即座にGCDが開始する。  
+効果音は 440Hz sine の三連符リズム（1・2音目を鳴らし3音目は休符）× 3グループ。ボタン入力音と同程度の高さでまろやかな音色。
+
+**ポーズ中 GCP アニメーション停止**  
+ポーズ中に `.xhb-slot--active` の `slot-glow-pulse`（box-shadow脈動）と `march-ants`（破線ボーダー行進）のCSSアニメーションが継続していたバグを修正。  
+`pauseGame()` で `document.body.classList.add('is-paused')` を追加し、CSS側で `animation-play-state: paused` を適用する方式で対応。`resumeGame()` および `showMenu()` でクラスを除去。
+
+**難易度ラベル変更**  
+最高難易度の名称を「零式」から「光の戦士」に変更（constants.js・index.html）。
+
+---
+
 ## 得点評価の理論最高得点化・MISS時ゲージ全リセット
 
 **日付**: 2026-05-27

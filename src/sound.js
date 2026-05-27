@@ -83,4 +83,13 @@ class SoundManager {
     const notes = [523, 659, 784, 1047, 1319]; // C5 E5 G5 C6 E6
     notes.forEach((f, i) => this._beep(f, 'sine', 0.15, 0.16, i * 0.09));
   }
+
+  playGateJoined() {
+    // 三連符の1・2音目を鳴らし3音目は休符 × 3
+    [0, 0.45, 0.90].forEach(t => {
+      this._beep(440, 'sine', 0.13, 0.13, t);        // 1音目
+      this._beep(440, 'sine', 0.10, 0.10, t + 0.15); // 2音目（スタッカート）
+      // 3音目（t+0.30）は休符
+    });
+  }
 }
