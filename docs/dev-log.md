@@ -2,6 +2,62 @@
 
 ---
 
+## BGMリズム・TIMEUPジングル追加
+
+**日付**: 2026-05-27
+
+### 概要
+
+ゲームプレイ中の没入感向上を目的に、BGMリズムループとゲーム終了ジングルを追加した。
+
+### 変更内容
+
+| ファイル | 内容 |
+|---------|------|
+| `src/sound.js` | `startRhythm()` / `stopRhythm()` / `playTimeUpJingle()` を追加 |
+| `src/game.js` | ゲーム開始・終了・ポーズ・再開・バースト切り替え時にリズム制御を追加 |
+
+### 仕様詳細
+
+#### BGMリズム（`startRhythm(isBurst)`）
+
+8分音符単位の8ステップループ。`setInterval` で駆動する。
+
+| モード | テンポ | ステップ間隔 |
+|--------|--------|-------------|
+| 通常   | 140 BPM | 214ms |
+| LIMIT BREAK | 175 BPM | 171ms |
+
+**通常パターン**: C2+C3キック（1,3拍）+ triangle波アクセント（2,4拍）+ G3/F3/Bb3のウォーキングベース + ハイハット裏打ち
+
+**バーストパターン**: D2+D3キック（1,3拍）+ triangle波アクセント（2,4拍）+ C3/G3/A3ベース + A3フィル
+
+アクセント音には sawtooth（鋸波）でなく triangle（三角波）を採用し、トゲのない丸みのある音色とした。
+
+#### TIMEUPジングル（`playTimeUpJingle()`）
+
+ファンファーレ構成（約1.4秒）：
+
+1. タタタ — G4 × 3（短い連打）
+2. 上昇フレーズ — C5 → E5 → G5
+3. フィナーレ — C6（高音メロディ）＋ C5/E5/G5/C4 の全コード一斉
+
+既存の `playClear()` に替わり `_endGame()` から呼ばれる。
+
+#### リズム制御タイミング
+
+| タイミング | 処理 |
+|-----------|------|
+| `start()` | `startRhythm(false)` |
+| `stop()` | `stopRhythm()` |
+| `pause()` | `stopRhythm()` |
+| `resume()` | `startRhythm(this.isBurst)` |
+| `_startBurst()` | `startRhythm(true)` |
+| `_endBurst()` | `startRhythm(false)` |
+| `_endGame()` | `stop()` 内で停止 → `playTimeUpJingle()` |
+
+---
+
 ## メモリリーク修正・パフォーマンス改善
 
 **日付**: 2026-05-27

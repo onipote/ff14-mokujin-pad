@@ -115,6 +115,7 @@ class GameEngine {
     this._tickCountdown();
 
     this._nextSlot();
+    this.sound.startRhythm(false);
   }
 
   stop() {
@@ -139,6 +140,7 @@ class GameEngine {
     this.isBurst = false;
     this.xhb.clearAllStates();
     this.ui.clearEffects();
+    this.sound.stopRhythm();
   }
 
   pause() {
@@ -173,6 +175,7 @@ class GameEngine {
     this.input.stop();
     this.xhb.setHalfActive(null);
     this.aoe.stop();
+    this.sound.stopRhythm();
   }
 
   resume() {
@@ -186,6 +189,7 @@ class GameEngine {
     this.aoe.onHit   = () => this._onAoeHit();
     this.aoe.onDodge = null;
     this.aoe.start();
+    this.sound.startRhythm(this.isBurst);
 
     this.remainingMs = this._pausedCountdownMs;
     this._tickCountdown();
@@ -423,6 +427,7 @@ class GameEngine {
     this.isBurst = true;
     this._burstEndTime = Date.now() + BURST_DURATION_MS;
     this.ui.setBurstState(true);
+    this.sound.startRhythm(true);
     this._resumeBurstRaf();
   }
 
@@ -443,6 +448,7 @@ class GameEngine {
 
   _endBurst() {
     this.sound.playBurstEnd();
+    this.sound.startRhythm(false);
     this.isBurst       = false;
     this.combo         = 0;
     this.gaugeLevel    = 0;
@@ -500,7 +506,7 @@ class GameEngine {
     if (isNew) { hs[key] = this.score; hsSave(hs); }
 
     this.stop();
-    this.sound.playClear();
+    this.sound.playTimeUpJingle();
     this.ui.showGameOver(this, reason, prev, isNew);
     if (this.onGameOver) this.onGameOver(reason);
   }

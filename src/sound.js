@@ -2,6 +2,9 @@ class SoundManager {
   constructor() {
     this._ctx = null;
     this.muted = false;
+    this._rhythmId    = null;
+    this._rhythmBeat  = 0;
+    this._rhythmBurst = false;
   }
 
   _ctx_get() {
@@ -63,8 +66,8 @@ class SoundManager {
   }
 
   playMiss() {
-    this._beep(160, 'sawtooth', 0.18, 0.09);
-    this._beep(110, 'sawtooth', 0.22, 0.07, 0.10);
+    this._beep(160, 'triangle', 0.18, 0.09);
+    this._beep(110, 'triangle', 0.22, 0.07, 0.10);
   }
 
   // type: 'gauge' (ゲージ完成) | 'burst' (バースト発動)
@@ -104,6 +107,71 @@ class SoundManager {
   playClear() {
     const notes = [523, 659, 784, 1047, 1319]; // C5 E5 G5 C6 E6
     notes.forEach((f, i) => this._beep(f, 'sine', 0.15, 0.16, i * 0.09));
+  }
+
+  playTimeUpJingle() {
+    if (this.muted) return;
+    const v = 0.20;
+    // ファンファーレ: タタタ（G4×3）→ 上昇（C5-E5-G5）→ フィナーレ（C6+コード）
+    this._beep(392,  'sine', 0.07, v,        0.00); // G4
+    this._beep(392,  'sine', 0.07, v,        0.09); // G4
+    this._beep(392,  'sine', 0.07, v,        0.18); // G4
+    this._beep(523,  'sine', 0.11, v,        0.29); // C5
+    this._beep(659,  'sine', 0.11, v,        0.42); // E5
+    this._beep(784,  'sine', 0.14, v,        0.55); // G5
+    this._beep(1047, 'sine', 0.70, v + 0.04, 0.72); // C6 メロディ頂点
+    this._beep(784,  'sine', 0.65, v * 0.80, 0.72); // G5
+    this._beep(659,  'sine', 0.60, v * 0.72, 0.72); // E5
+    this._beep(523,  'sine', 0.58, v * 0.68, 0.72); // C5
+    this._beep(262,  'sine', 0.52, v * 0.65, 0.72); // C4 低音ルート
+  }
+
+  startRhythm(isBurst) {
+    this.stopRhythm();
+    // 8分音符単位: 通常 140BPM=214ms/step、バースト 175BPM=171ms/step
+    const stepMs = Math.round(60000 / ((isBurst ? 175 : 140) * 2));
+    this._rhythmBeat = 0;
+    this._rhythmBurst = isBurst;
+
+    // [freq, type, dur, vol] の配列 or null（休符）
+    // 通常: キック(1,3拍) + スネア風(2,4拍) + ウォーキングベース
+    const normPattern = [
+      [[65,'sine',0.18,0.072],[131,'sine',0.14,0.040]],          // 0: C2+C3 キック（1拍）
+      [[6400,'square',0.014,0.016]],                              // 1: ハイハット裏
+      [[196,'sine',0.14,0.055]],                                  // 2: G3 ベース
+      [[200,'triangle',0.06,0.058]],                              // 3: スネア風（2拍）
+      [[65,'sine',0.16,0.060],[174,'sine',0.14,0.048]],           // 4: キック+F3（3拍）
+      [[6400,'square',0.014,0.014]],                              // 5: ハイハット裏
+      [[233,'sine',0.14,0.050]],                                  // 6: Bb3 ベース
+      [[200,'triangle',0.06,0.058]],                              // 7: スネア風（4拍）
+    ];
+    // バースト: より速く高音・スネアも強め
+    const burstPattern = [
+      [[73,'sine',0.16,0.095],[147,'sine',0.12,0.052]],           // 0: D2+D3 キック（1拍）
+      [[220,'sine',0.09,0.042]],                                  // 1: A3 フィル
+      [[131,'sine',0.13,0.070]],                                  // 2: C3 ベース
+      [[220,'triangle',0.06,0.065]],                              // 3: スネア風（2拍）
+      [[73,'sine',0.14,0.068],[196,'sine',0.13,0.060]],           // 4: キック+G3（3拍）
+      [[220,'sine',0.09,0.040]],                                  // 5: A3 フィル
+      [[220,'sine',0.13,0.065]],                                  // 6: A3 ベース
+      [[220,'triangle',0.06,0.065]],                              // 7: スネア風（4拍）
+    ];
+    const pattern = isBurst ? burstPattern : normPattern;
+
+    const fire = () => {
+      const notes = pattern[this._rhythmBeat % 8];
+      if (notes) notes.forEach(([f, t, d, v]) => this._beep(f, t, d, v));
+      this._rhythmBeat++;
+    };
+    fire();
+    this._rhythmId = setInterval(fire, stepMs);
+  }
+
+  stopRhythm() {
+    if (this._rhythmId !== null) {
+      clearInterval(this._rhythmId);
+      this._rhythmId = null;
+    }
   }
 
   playGateJoined() {
