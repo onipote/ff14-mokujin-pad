@@ -2,6 +2,39 @@
 
 ---
 
+## バースト中効果音の強化・クリッピング防止
+
+**日付**: 2026-05-27
+
+### 変更内容
+
+| ファイル | 内容 |
+|---------|------|
+| `src/sound.js` | マスターリミッター（DynamicsCompressorNode）追加・バースト効果音を全面刷新 |
+| `src/game.js` | `playHit()` にバーストフラグを渡す・`_endBurst()` で終了音を再生 |
+| `CLAUDE.md` | ドキュメントに秘匿情報を含めないルールを追記 |
+| `README.md` | ゲーム概要・テーブル整形を更新 |
+
+### 変更詳細
+
+#### マスターリミッター追加（`src/sound.js`）
+
+複数オシレーターの同時再生による合計音量がクリッピングし、「ズザっ」というノイズが発生していた問題を修正。
+全音声を `DynamicsCompressorNode` 経由で出力するよう変更（threshold: -3dB, ratio: 20）。
+
+#### バースト効果音刷新（`src/sound.js`）
+
+- **`playHit(combo, judgment, burst)`**: バースト中は低音オクターブ・高音オクターブ・3倍音ハーモニクスを重ねてリッチな音に変更
+- **`playBurstStart()`**: ノイズ源だった低音インパクト（55/110/220Hz）・sawtoothコードを削除。sine波7音の上昇アルペジオのみに整理
+- **`playBurstEnd()`**: 新規追加。バースト終了時に2093→523Hz の下降ファンファーレを再生
+
+#### `src/game.js`
+
+- `playHit()` 呼び出しに `this.isBurst` を追加
+- `_endBurst()` の先頭で `this.sound.playBurstEnd()` を呼び出し
+
+---
+
 ## GitHub Pages 公開前チェック・著作権表示追加
 
 **日付**: 2026-05-27

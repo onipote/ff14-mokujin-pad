@@ -7,6 +7,14 @@ class SoundManager {
   _ctx_get() {
     if (!this._ctx) {
       this._ctx = new (window.AudioContext || window.webkitAudioContext)();
+      // Master limiter: prevents clipping when multiple oscillators overlap
+      this._limiter = this._ctx.createDynamicsCompressor();
+      this._limiter.threshold.value = -3;
+      this._limiter.knee.value      = 0;
+      this._limiter.ratio.value     = 20;
+      this._limiter.attack.value    = 0.001;
+      this._limiter.release.value   = 0.1;
+      this._limiter.connect(this._ctx.destination);
     }
     // Resume if suspended (browser autoplay policy)
     if (this._ctx.state === 'suspended') this._ctx.resume();
@@ -21,7 +29,7 @@ class SoundManager {
       const osc  = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(this._limiter);
 
       osc.type      = type;
       osc.frequency.setValueAtTime(freq, ctx.currentTime + delay);
@@ -34,14 +42,22 @@ class SoundManager {
     } catch (_) {}
   }
 
-  playHit(combo, judgment = 'great') {
+  playHit(combo, judgment = 'great', burst = false) {
     const base = 440 + Math.min(combo - 1, 9) * 40;
     if (judgment === 'great') {
-      this._beep(base,       'sine', 0.10, 0.20);
-      this._beep(base * 1.5, 'sine', 0.08, 0.10, 0.06);
+      const vol = burst ? 0.24 : 0.20;
+      this._beep(base,       'sine', 0.10, vol);
+      this._beep(base * 1.5, 'sine', 0.08, vol * 0.55, 0.05);
+      if (burst) {
+        this._beep(base * 0.5, 'sine', 0.07, 0.14, 0.01);  // bass octave
+        this._beep(base * 2,   'sine', 0.05, 0.12, 0.02);  // octave up
+        this._beep(base * 3,   'sine', 0.03, 0.07, 0.04);  // sparkle harmonic
+      }
     } else {
-      // GOOD: softer, slightly lower pitch
-      this._beep(base * 0.9, 'sine', 0.08, 0.14);
+      this._beep(base * 0.9, 'sine', 0.08, burst ? 0.17 : 0.14);
+      if (burst) {
+        this._beep(base * 1.35, 'sine', 0.07, 0.11, 0.04);
+      }
     }
   }
 
@@ -68,10 +84,15 @@ class SoundManager {
   }
 
   playBurstStart() {
-    this._beep(110, 'triangle', 0.15, 0.35, 0);
-    this._beep(220, 'triangle', 0.12, 0.25, 0.03);
-    const notes = [523, 784, 1047, 1568, 2093];
-    notes.forEach((f, i) => this._beep(f, 'sine', 0.12, 0.20, 0.07 + i * 0.04));
+    // Bright ascending arpeggio (extended)
+    const notes = [523, 659, 784, 1047, 1319, 1568, 2093];
+    notes.forEach((f, i) => this._beep(f, 'sine', 0.14, 0.22, 0.14 + i * 0.045));
+  }
+
+  playBurstEnd() {
+    // Descending resolution fanfare
+    const notes = [2093, 1568, 1047, 784, 523];
+    notes.forEach((f, i) => this._beep(f, 'sine', 0.12, 0.16, i * 0.06));
   }
 
   playGameOver() {

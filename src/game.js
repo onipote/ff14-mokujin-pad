@@ -376,7 +376,7 @@ class GameEngine {
     this.ui.updateAll(this);
     this.ui.flashEnemy('hit', this.combo);
     this.ui.showJudgment(judgment, pts);
-    this.sound.playHit(this.combo, judgment);
+    this.sound.playHit(this.combo, judgment, this.isBurst);
 
     this._feedbackId = setTimeout(() => {
       if (this.state !== 'gameover') this._nextSlot();
@@ -431,6 +431,7 @@ class GameEngine {
   }
 
   _endBurst() {
+    this.sound.playBurstEnd();
     this.isBurst       = false;
     this.combo         = 0;
     this.gaugeLevel    = 0;
