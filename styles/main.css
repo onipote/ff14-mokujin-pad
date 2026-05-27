@@ -1345,12 +1345,8 @@ body {
   }
 }
 @keyframes xhb-neon-pulse {
-  from {
-    box-shadow: 0 0 18px 4px rgba(255, 215, 50, 0.08);
-  }
-  to {
-    box-shadow: 0 0 24px 6px rgba(255, 215, 50, 0.12);
-  }
+  from { box-shadow: 0 0 18px 4px rgba(255, 215, 50, 0.08); }
+  to   { box-shadow: 0 0 24px 6px rgba(255, 215, 50, 0.12); }
 }
 @keyframes march-ants {
   to {

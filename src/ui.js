@@ -1,3 +1,5 @@
+function _fmtNum(n) { return Number(n).toLocaleString(); }
+
 function _buildFanClipPath(baseDeg, halfDeg) {
   const startDeg = baseDeg - halfDeg;
   const endDeg   = baseDeg + halfDeg;
@@ -46,7 +48,7 @@ class UIManager {
   }
 
   updateAll(engine) {
-    this._scoreEl.textContent = engine.score;
+    this._scoreEl.textContent = _fmtNum(engine.score);
     const threshold = LIMIT_GAUGE_THRESHOLDS[engine.difficulty];
     this._updateLimitGauge(engine.gaugeLevel, engine.gaugeProgress, threshold);
     this._comboEl.textContent = engine.combo >= 1 ? `COMBO ${engine.combo}` : '';
@@ -109,7 +111,7 @@ class UIManager {
   showJudgment(type, value) {
     const base = { great: '◎ GREAT', good: '○ GOOD', miss: '✕ MISS', bonus1: '+1s', bonus2: '+2s', bonus3: '+3s' };
     let text = base[type] || '';
-    if ((type === 'great' || type === 'good') && value != null) text += ` +${value}`;
+    if ((type === 'great' || type === 'good') && value != null) text += ` +${_fmtNum(value)}`;
     if (type === 'miss' && value != null) text += ` -${Number(value).toFixed(1)}s`;
     const cssType = type.startsWith('bonus') ? 'bonus' : type;
     const el = document.createElement('div');
@@ -184,10 +186,10 @@ class UIManager {
         <div class="result-scores">
           <div class="score-row">
             <span class="score-lbl">スコア：</span>
-            <span class="score-val">${engine.score}</span>
+            <span class="score-val">${_fmtNum(engine.score)}</span>
             <span class="score-sep"></span>
             <span class="score-lbl">${bestLabel}：</span>
-            <span class="score-val score-val--sub">${displayBest}</span>
+            <span class="score-val score-val--sub">${_fmtNum(displayBest)}</span>
           </div>
         </div>
       </div>

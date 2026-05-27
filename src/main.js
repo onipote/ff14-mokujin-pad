@@ -174,6 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ── Game over callback ──────────────────────────────────
   engine.onGameOver = () => {
+    BackgroundParticles.resume();
     appState  = 'gameover';
     menuSelIdx = 0;
     menuButtons = [
@@ -191,6 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ui.hidePause();
     ui.hideGameOver();
     appState = 'playing';
+    BackgroundParticles.pause();
     engine.start(selectedDiff);
   }
 
@@ -224,6 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
     engine.stop();
     ui.hideGameOver();
     document.getElementById('screen-start').classList.remove('hidden');
+    BackgroundParticles.resume();
     appState = 'start';
     startSectionIdx = 0;
     refreshPadState();

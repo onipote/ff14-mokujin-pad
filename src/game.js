@@ -252,6 +252,7 @@ class GameEngine {
 
     this.state = 'showing';
     this.xhb.clearAllStates();
+    this.xhb.setHalfActive(this.input.triggerSide);
     this.xhb.setSlotState(slotId, 'active');
     this.ui.showPrompt(SLOT_BY_ID[slotId]);
 

@@ -6,6 +6,7 @@
   var COUNT = 45;
   var lastTime = 0;
   var INTERVAL = 1000 / 30; // 30fps cap
+  var paused = false;
 
   function resize() {
     width = canvas.width = window.innerWidth;
@@ -38,6 +39,7 @@
 
   function tick(ts) {
     requestAnimationFrame(tick);
+    if (paused) return;
     if (ts - lastTime < INTERVAL) return;
     lastTime = ts;
 
@@ -53,4 +55,9 @@
   }
 
   init();
+
+  window.BackgroundParticles = {
+    pause:  function () { paused = true;  ctx.clearRect(0, 0, width, height); },
+    resume: function () { paused = false; lastTime = 0; },
+  };
 })();

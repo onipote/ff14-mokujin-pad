@@ -2,6 +2,102 @@
 
 ---
 
+## スコア数字にカンマ区切りを追加
+
+**日付**: 2026-05-27
+
+### 変更内容
+
+| ファイル | 内容 |
+|---------|------|
+| `src/ui.js` | `_fmtNum()` ヘルパーを追加し、スコア関連4箇所に適用 |
+
+### 適用箇所
+
+| 箇所 | 例 |
+|------|----|
+| ゲーム中 HUD スコア（`updateAll`） | `12,345` |
+| GREAT/GOOD 判定ポップアップ（`showJudgment`） | `+1,200` |
+| リザルト画面スコア（`showGameOver`） | `12,345` |
+| リザルト画面ベストスコア（`showGameOver`） | `12,345` |
+
+`Number(n).toLocaleString()` を使用。
+
+---
+
+## XHB L/R 長押し時のハーフ状態消失バグ修正
+
+**日付**: 2026-05-27
+
+### 問題
+
+L または R を押しっぱなしにしていると、数秒後（次のスロットが表示されるタイミング）にボタンのハイライトとクラスタ拡大が消えてしまう。
+
+### 原因
+
+`_nextSlot()` → `xhb.clearAllStates()` → `setHalfActive(null)` の順でハーフ状態がリセットされる。  
+`InputHandler` は「トリガーの状態が変化したとき」しか `onTriggerChange` を発火しないため、押しっぱなし中はコールバックが呼ばれず復元されなかった。
+
+### 変更内容
+
+| ファイル | 内容 |
+|---------|------|
+| `src/input.js` | `this.triggerSide = null` をコンストラクタと `stop()` に追加。ループ内で毎フレーム `this.triggerSide = triggerSide` を更新 |
+| `src/game.js` | `_nextSlot()` 内の `clearAllStates()` 直後に `this.xhb.setHalfActive(this.input.triggerSide)` を追加 |
+
+---
+
+## XHB ハーフハイライトのガタつき・重なり修正
+
+**日付**: 2026-05-27
+
+### 問題
+
+L/R を押したとき：
+1. XHB 上のテキストが上下に一瞬ガタつく
+2. ハイライト（黄色背景グロー）がボタンの上に重なって見える
+
+### 原因
+
+パフォーマンス改善の際に `xhb-neon-pulse` を `opacity` アニメーションに変更し `will-change: opacity` を設定したことで：  
+1. 親要素の `opacity` アニメーションが子のテキストレンダリングに波及し、サブピクセル単位のズレが発生
+2. `will-change: opacity` が新しい合成レイヤー兼スタッキングコンテキストを生成し、描画順が変わった
+
+### 変更内容
+
+| ファイル | 内容 |
+|---------|------|
+| `styles/main.css` | `.xhb-half--active` から `will-change: opacity` と静的 `box-shadow` を削除 |
+| `styles/main.css` | `@keyframes xhb-neon-pulse` を `opacity` → 元の `box-shadow` パルス（0.08→0.12）に戻した |
+
+---
+
+## パフォーマンス改善：ゲーム中のパーティクル停止・XHBアニメーション軽量化
+
+**日付**: 2026-05-27
+
+### 背景
+
+XHBボタンのアクリルパネル風デザイン強化 + 背景パーティクル追加後に動作が重くなった。  
+主なボトルネックはゲーム中も止まらない Canvas パーティクルループ（30fps × 45粒子の `clearRect` + `arc`）。
+
+### 変更内容
+
+| ファイル | 内容 |
+|---------|------|
+| `src/background.js` | `paused` フラグを追加。`window.BackgroundParticles = { pause, resume }` をグローバル公開 |
+| `src/main.js` | `startGame()` で `BackgroundParticles.pause()`、`onGameOver` と `showMenu()` で `BackgroundParticles.resume()` を呼び出し |
+| `styles/main.css` | `xhb-neon-pulse` を `box-shadow` 補間から `opacity`（0.82→1.0）アニメーションに変更し `will-change: opacity` を追加（※後の修正で `box-shadow` に戻す） |
+
+### `BackgroundParticles` API
+
+| メソッド | 動作 |
+|---------|------|
+| `pause()` | `paused = true` にセットし `clearRect` で残像を消去 |
+| `resume()` | `paused = false`、`lastTime = 0` でリセットしてスムーズに再開 |
+
+---
+
 ## UIテキスト・操作ガード改善（5件）
 
 **日付**: 2026-05-27

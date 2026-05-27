@@ -13,6 +13,7 @@ class InputHandler {
     this._padPrevBtns = {};
     this._padRaf      = null;
     this._keysHeld    = {};
+    this.triggerSide  = null;
 
     this._boundKeydown = this._onKeydown.bind(this);
     this._boundKeyup   = this._onKeyup.bind(this);
@@ -54,7 +55,8 @@ class InputHandler {
     window.removeEventListener('gamepadconnected',    this._boundPadOn);
     window.removeEventListener('gamepaddisconnected', this._boundPadOff);
     if (this._padRaf) { cancelAnimationFrame(this._padRaf); this._padRaf = null; }
-    this._keysHeld = {};
+    this._keysHeld   = {};
+    this.triggerSide = null;
   }
 
   _onKeydown(e) {
@@ -151,6 +153,7 @@ class InputHandler {
           const trigger = (l1 || l2) ? 6 : (r1 || r2) ? 7 : null;
 
           const triggerSide = trigger === 6 ? 'L' : trigger === 7 ? 'R' : null;
+          this.triggerSide = triggerSide;
           if (triggerSide !== prevTriggerSide) {
             prevTriggerSide = triggerSide;
             if (this.onTriggerChange) this.onTriggerChange(triggerSide);
