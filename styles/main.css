@@ -486,7 +486,7 @@ body {
   padding: 6px 14px;
 }
 .btn--primary {
-  background: rgba(200, 164, 80, 0.14);
+  background: rgba(255, 255, 255, 0.03);
   border-color: var(--gold);
   color: var(--gold-bright);
   font-size: 15px;
@@ -1535,10 +1535,10 @@ body {
 
 /* Controller-focused button (D-pad navigation) */
 .btn--focused {
-  background: rgba(200, 164, 80, 0.18);
+  background: rgba(200, 164, 80, 0.32);
   border-color: var(--gold-bright);
   color: var(--gold-bright);
-  box-shadow: 0 0 14px rgba(200, 164, 80, 0.35);
+  box-shadow: 0 0 18px rgba(200, 164, 80, 0.55);
 }
 
 .pause-title {

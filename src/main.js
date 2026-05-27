@@ -142,9 +142,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (optionsFresh) resumeGame();
 
       } else if (appState === 'gameover') {
+        const lrHeld = !!(
+          gp.buttons[4]?.pressed || gp.buttons[5]?.pressed ||
+          gp.buttons[6]?.pressed || gp.buttons[7]?.pressed
+        );
         if (navUp   && menuSelIdx > 0)                    { menuSelIdx--; updateMenuFocus(); }
         if (navDown && menuSelIdx < menuButtons.length - 1) { menuSelIdx++; updateMenuFocus(); }
-        if (crossFresh) menuButtons[menuSelIdx].action();
+        if (crossFresh && !lrHeld) menuButtons[menuSelIdx].action();
       }
 
       menuPrevBtns.up      = dUp;

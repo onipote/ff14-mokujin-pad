@@ -230,14 +230,11 @@ class UIManager {
     const buildHalf = (side) => {
       const dpad = SLOT_DEFS.filter(s => s.side === side && s.type === 'dpad');
       const face = SLOT_DEFS.filter(s => s.side === side && s.type === 'face');
-      const label = `<div class="xhb-label">${side}</div>`;
       return `<div class="heatmap-half">
-        ${side === 'L' ? label : ''}
         <div class="heatmap-groups">
           <div class="heatmap-cross">${buildSlots(dpad)}</div>
           <div class="heatmap-cross">${buildSlots(face)}</div>
         </div>
-        ${side === 'R' ? label : ''}
       </div>`;
     };
 
