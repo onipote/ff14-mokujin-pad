@@ -81,6 +81,12 @@ class SoundManager {
     }
   }
 
+  playGimmickSuccess() {
+    this._beep(523, 'sine', 0.15, 0.20, 0.00);
+    this._beep(659, 'sine', 0.15, 0.20, 0.08);
+    this._beep(784, 'sine', 0.20, 0.22, 0.16);
+  }
+
   playGaugeMax() {
     const notes = [784, 1047, 1319, 1568];
     notes.forEach((f, i) => this._beep(f, 'sine', 0.18, 0.22, i * 0.03));

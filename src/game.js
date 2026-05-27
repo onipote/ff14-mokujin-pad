@@ -106,7 +106,7 @@ class GameEngine {
     this.input.start();
 
     this.aoe.onHit   = () => this._onAoeHit();
-    this.aoe.onDodge = null;
+    this.aoe.onDodge = (side) => this._onAoeDodge(side);
     this.aoe.start();
 
     this.ui.updateAll(this);
@@ -187,7 +187,7 @@ class GameEngine {
     this.input.start();
 
     this.aoe.onHit   = () => this._onAoeHit();
-    this.aoe.onDodge = null;
+    this.aoe.onDodge = (side) => this._onAoeDodge(side);
     this.aoe.start();
     this.sound.startRhythm(this.isBurst);
 
@@ -483,6 +483,11 @@ class GameEngine {
       if (this.remainingMs <= 0) { this._endGame('time_up'); return; }
       this._nextSlot();
     }, FEEDBACK_FAIL_MS);
+  }
+
+  _onAoeDodge(side) {
+    this.sound.playGimmickSuccess();
+    this.ui.showGimmickSuccess(side);
   }
 
   _onAoeHit() {

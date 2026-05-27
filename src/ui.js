@@ -476,6 +476,19 @@ class UIManager {
     }
   }
 
+  showGimmickSuccess(side) {
+    const field = this._stickField[side];
+    if (!field) return;
+    const el = document.createElement('div');
+    el.className = 'gimmick-success';
+    el.innerHTML = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(0,255,130,1)" stroke-width="5"/>
+      <polyline points="25,52 42,68 75,32" fill="none" stroke="rgba(0,255,130,1)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>`;
+    field.appendChild(el);
+    setTimeout(() => { if (el.parentNode) el.parentNode.removeChild(el); }, 1500);
+  }
+
   clearGaze() {
     this._gazeActive = false;
     if (this._gazeEye)   this._gazeEye.className  = 'gaze-eye';

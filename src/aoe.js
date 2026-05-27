@@ -66,8 +66,8 @@ class AoeEngine {
       if (!this._active) return;
       const isHit = this._checkHit(this.input.stickL.x, this.input.stickL.y, this._aoeData);
       this.ui.showAoeResult(this._side, this._aoeData, isHit);
-      if (isHit) { if (this.onHit)   this.onHit();   }
-      else        { if (this.onDodge) this.onDodge(); }
+      if (isHit) { if (this.onHit)   this.onHit();      }
+      else        { if (this.onDodge) this.onDodge('L'); }
       this._clearId = setTimeout(() => {
         if (!this._active) return;
         this.ui.clearAoe(this._side);
@@ -100,8 +100,8 @@ class AoeEngine {
         this._gazeEyeX, this._gazeEyeY
       );
       this.ui.showGazeResult(isHit);
-      if (isHit) { if (this.onHit)   this.onHit();   }
-      else        { if (this.onDodge) this.onDodge(); }
+      if (isHit) { if (this.onHit)   this.onHit();      }
+      else        { if (this.onDodge) this.onDodge('R'); }
       this._clearId = setTimeout(() => {
         if (!this._active) return;
         this.ui.clearGaze();
