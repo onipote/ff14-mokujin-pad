@@ -395,7 +395,7 @@ class GameEngine {
         const bonusMs = LIMIT_GAUGE_BONUS_MS[this.gaugeLevel - 1];
         this.remainingMs = Math.min(GAME_DURATION_MS, this.remainingMs + bonusMs);
         this._rearmCountdown();
-        this.ui.showJudgment(this.gaugeLevel === 1 ? 'bonus1' : 'bonus2');
+        this.ui.showJudgment(`bonus${this.gaugeLevel}`);
       }
       this.sound.playCombo('gauge');
     }
