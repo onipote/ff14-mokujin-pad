@@ -785,6 +785,7 @@ body {
   background: rgba(45, 120, 185, 0.15);
   border: 2px solid #3590cc;
   box-shadow: 0 0 18px rgba(53, 145, 205, 0.6);
+  animation: slot-hit-punch 0.22s ease-out forwards;
 }
 .xhb-slot--success-good .slot-sym {
   color: #70c8e8;
@@ -1295,6 +1296,7 @@ body {
   background: var(--success-bg);
   border: 2px solid var(--success-bdr);
   box-shadow: 0 0 18px var(--success-glow);
+  animation: slot-hit-punch 0.22s ease-out forwards;
 }
 .xhb-slot--success .slot-sym {
   color: #70e890;
@@ -1329,6 +1331,37 @@ body {
     background: transparent;
     box-shadow: none;
   }
+}
+
+/* ── Hit Punch ── */
+@keyframes slot-hit-punch {
+  0%   { transform: scale(1.0); }
+  35%  { transform: scale(1.14); }
+  100% { transform: scale(1.0); }
+}
+
+/* ── Burst Ring ── */
+@keyframes slot-burst-ring {
+  0%   { transform: scale(1.0); opacity: 1; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+.slot-burst-ring {
+  position: absolute;
+  width: var(--slot-sz);
+  height: var(--slot-sz);
+  border-radius: 4px;
+  border: 2px solid;
+  pointer-events: none;
+  z-index: 30;
+  animation: slot-burst-ring 0.42s ease-out forwards;
+}
+.slot-burst-ring--great {
+  border-color: rgba(255, 215, 0, 0.9);
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.6), inset 0 0 6px rgba(255, 215, 0, 0.3);
+}
+.slot-burst-ring--good {
+  border-color: rgba(74, 232, 255, 0.9);
+  box-shadow: 0 0 10px rgba(74, 232, 255, 0.6), inset 0 0 6px rgba(74, 232, 255, 0.3);
 }
 
 @keyframes slot-glow-pulse {
@@ -1688,7 +1721,8 @@ body {
 /* ===== Pause: XHB CSS アニメーション停止 ===== */
 body.is-paused .xhb-slot--active,
 body.is-paused .xhb-slot--active::before,
-body.is-paused .xhb-half--active {
+body.is-paused .xhb-half--active,
+body.is-paused .slot-burst-ring {
   animation-play-state: paused;
 }
 

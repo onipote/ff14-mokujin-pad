@@ -116,6 +116,24 @@ class XHBRenderer {
     this._flashTimers[slotId] = setTimeout(() => el.classList.remove('xhb-slot--flash'), 300);
   }
 
+  // 成功時バーストリング（GREAT: ゴールド2重波紋、GOOD: シアン単発）
+  // スロットの兄弟要素として .xhb-cross に追加することでボタンの上に表示
+  setSlotBurst(slotId, type) {
+    const el = this.slots[slotId];
+    if (!el) return;
+    const addRing = delay => {
+      const ring = document.createElement('div');
+      ring.className = `slot-burst-ring slot-burst-ring--${type}`;
+      ring.style.left = el.style.left;
+      ring.style.top  = el.style.top;
+      if (delay) ring.style.animationDelay = `${delay}ms`;
+      el.parentNode.appendChild(ring);
+      ring.addEventListener('animationend', () => ring.remove(), { once: true });
+    };
+    addRing(0);
+    if (type === 'great') addRing(90);
+  }
+
   clearAllStates() {
     Object.values(this.slots).forEach(el => {
       el.className = 'xhb-slot';
@@ -123,6 +141,7 @@ class XHBRenderer {
       const numEl = el.querySelector('.slot-recast-num');
       if (numEl) numEl.textContent = '';
       el.querySelector('.recast-sector-path')?.setAttribute('d', '');
+      el.parentNode?.querySelectorAll('.slot-burst-ring').forEach(r => r.remove());
     });
     this.setHalfActive(null);
   }

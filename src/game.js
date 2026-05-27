@@ -386,6 +386,7 @@ class GameEngine {
     this.state = 'feedback';
     const slotState = judgment === 'great' ? 'success' : 'success-good';
     this.xhb.setSlotState(this.activeSlotId, slotState);
+    this.xhb.setSlotBurst(this.activeSlotId, judgment);
     this.xhb.setSlotRecast(this.activeSlotId, 1.0, 0);
     this.ui.setTimerFill(1);
     this.ui.updateAll(this);
