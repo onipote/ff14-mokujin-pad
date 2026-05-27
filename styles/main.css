@@ -9,9 +9,9 @@
   --text: #cfc0a0;
   --text-dim: #5a5040;
   --teal: #35afc0;
-  --slot-bg: #0e1118;
-  --slot-border: #252a3a;
-  --slot-text: #3a4060;
+  --slot-bg: #1a2035;
+  --slot-border: #3a4568;
+  --slot-text: #6878a8;
   --active-bg: rgba(200, 160, 70, 0.12);
   --active-border: #c8a450;
   --active-glow: rgba(200, 160, 80, 0.55);
@@ -1178,8 +1178,8 @@ body {
   position: absolute;
   width: var(--slot-sz);
   height: var(--slot-sz);
-  background: var(--slot-bg);
-  border: 1px solid var(--slot-border);
+  background: #1c2040;
+  border: 1px solid #3a4568;
   border-radius: 4px;
   display: flex;
   flex-direction: column;
@@ -1187,10 +1187,27 @@ body {
   justify-content: center;
   gap: 2px;
   user-select: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.45);
   transition:
     background 0.12s,
     border-color 0.12s,
     box-shadow 0.12s;
+}
+.xhb-slot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 4px;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.22) 0%,
+    rgba(255, 255, 255, 0.08) 22%,
+    rgba(255, 255, 255, 0.00) 45%,
+    rgba(0, 0, 0, 0.00) 55%,
+    rgba(0, 0, 0, 0.18) 100%
+  );
+  pointer-events: none;
+  z-index: 1;
 }
 .slot-sym {
   font-size: 17px;
