@@ -1691,3 +1691,15 @@ body.is-paused .xhb-slot--active::before,
 body.is-paused .xhb-half--active {
   animation-play-state: paused;
 }
+
+/* ===== Copyright Notice ===== */
+.copyright-notice {
+  position: absolute;
+  bottom: 10px;
+  right: 14px;
+  font-size: 10px;
+  color: rgba(150, 130, 100, 0.45);
+  letter-spacing: 0.04em;
+  pointer-events: none;
+  user-select: none;
+}

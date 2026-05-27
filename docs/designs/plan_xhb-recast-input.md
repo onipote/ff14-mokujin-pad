@@ -127,9 +127,9 @@ _onInput(slotId) {
 
 ## 変更ファイル一覧
 
-- `c:\dev\projects\ff14-pad-mokujin\styles\main.css` — `.xhb-slot--flash` + `@keyframes slot-flash` 追加
-- `c:\dev\projects\ff14-pad-mokujin\src\xhb.js` — `setSlotFlash()` 追加
-- `c:\dev\projects\ff14-pad-mokujin\src\game.js` — `RECAST_GRACE_MS` 削除、`_onInput` 改修、pause/resume 簡略化
+- `styles/main.css` — `.xhb-slot--flash` + `@keyframes slot-flash` 追加
+- `src/xhb.js` — `setSlotFlash()` 追加
+- `src/game.js` — `RECAST_GRACE_MS` 削除、`_onInput` 改修、pause/resume 簡略化
 
 ## 検証
 

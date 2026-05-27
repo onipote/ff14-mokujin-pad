@@ -2,6 +2,26 @@
 
 ---
 
+## GitHub Pages 公開前チェック・著作権表示追加
+
+**日付**: 2026-05-27
+
+### 変更内容
+
+| ファイル | 内容 |
+|---------|------|
+| `docs/designs/plan_xhb-recast-input.md` | 「変更ファイル一覧」のWindowsローカルパス（`c:\dev\projects\...`）を相対パスに修正 |
+| `README.md` | 末尾に著作権セクションを追記（All Rights Reserved・無断転載/改変/再配布/商業利用禁止） |
+| `index.html` | タイトル画面（`#screen-start`）右下に著作権表示要素を追加 |
+| `styles/main.css` | `.copyright-notice` スタイルを追加（絶対配置・右下・10px・透過ゴールド・操作不可） |
+
+### セキュリティ／ライセンス確認結果
+
+- **秘匿情報**: `docs/designs/plan_xhb-recast-input.md` のローカルパスのみ修正。その他ファイルはクリーン
+- **フォント**: Cinzel・Share Tech Mono（OFL）、Font Awesome Free（CC BY 4.0 / OFL）― 公開リポジトリで問題なし
+
+---
+
 ## G.A.T.E JOINED 演出・ポーズ中GCPアニメーション修正・難易度ラベル変更
 
 **日付**: 2026-05-27
