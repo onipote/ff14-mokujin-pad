@@ -2,6 +2,50 @@
 
 ---
 
+## UI軽微調整（4件）
+
+**日付**: 2026-05-27
+
+### 変更内容
+
+| ファイル | 変更 |
+|---------|------|
+| `index.html` | タイトルを `PAD MASTERY` → `MOKUJIN PAD` に変更（`<title>`・ゲームタイトル・ヘッダー） |
+| `index.html` | 「メニューに戻る」（ゲームオーバー画面）→「タイトルに戻る」に変更 |
+| `index.html` | 「メニューへ戻る」（ポーズ画面）→「タイトルに戻る」に変更 |
+| `styles/main.css` | `.limit-segment` 枠色をオレンジ（`#d07030 / #904820`）→ 濁った黄色（`#b09a38 / #7a6820`）に変更 |
+| `styles/main.css` | `.judgment-float-container` を `info-col--score` 基準の絶対配置に変更（エフェクト表示位置をスコア数字の中心に揃え） |
+
+### 各修正の詳細
+
+**1. タイトル変更**
+
+ゲームタイトルを `PAD MASTERY` から `MOKUJIN PAD` に変更。
+
+**2. 「タイトルに戻る」ボタン**
+
+ゲームオーバー・ポーズ両画面のボタンテキストを「タイトルに戻る」に統一。
+
+**3. リミットゲージ枠色**
+
+`.limit-segment` の `background` グラデーションをオレンジ系から濁った黄色系に変更：
+
+```css
+/* 変更前 */
+background: linear-gradient(180deg, #d07030 0%, #904820 100%);
+
+/* 変更後 */
+background: linear-gradient(180deg, #b09a38 0%, #7a6820 100%);
+```
+
+**4. GREAT/GOODエフェクト位置修正**
+
+`.judgment-float-container` を `position: relative; height: 0` から `position: absolute; left: 0; right: 0; top: 50%; height: 0` に変更。  
+`.info-col--score` に `position: relative` を追加して基準点とすることで、  
+`left: 50%` のジャッジメントフロートがスコア数字の水平中心に揃う。
+
+---
+
 ## 背景ビジュアル刷新：キャンバスパーティクル＋グラデーションアニメーション
 
 **日付**: 2026-05-27
