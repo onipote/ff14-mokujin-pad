@@ -153,8 +153,7 @@ class UIManager {
     heading.textContent = 'TIME UP!';
     heading.className = 'gameover-title clear';
 
-    const basePoints = DIFFICULTIES[engine.difficulty].baseScore + 200;
-    const maxScore   = engine.total * basePoints;
+    const maxScore   = THEORETICAL_MAX_SCORE[engine.difficulty];
     const achievePct = maxScore > 0
       ? Math.min(100, Math.round(engine.score / maxScore * 100))
       : 0;

@@ -441,7 +441,8 @@ class GameEngine {
 
   _processMiss() {
     if (!this.isBurst) {
-      this.combo        = 0;
+      this.combo         = 0;
+      this.gaugeLevel    = 0;
       this.gaugeProgress = 0;
     }
     this.missCount++;

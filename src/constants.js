@@ -53,6 +53,14 @@ const BURST_GCD_MULTIPLIER   = 1.4;
 const BURST_SCORE_MULTIPLIER = 2;
 const GREAT_RATIO_MIN        = 0.75;
 
+// 各難易度の理論最高得点（全GREAT・全リミット時間ボーナス・全バースト得点ボーナス取得時）
+// 計算方法は docs/designs/plan_score_rating.md を参照
+const THEORETICAL_MAX_SCORE = {
+  slow:   10_500,
+  normal: 16_650,
+  fast:   35_200,
+};
+
 // AOE dodge mechanic
 const AOE_WARNING_MS   = 3000;
 const AOE_FIRE_MS      = 500;
