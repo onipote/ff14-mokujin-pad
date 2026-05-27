@@ -39,6 +39,7 @@ class SoundManager {
 
       osc.start(ctx.currentTime + delay);
       osc.stop(ctx.currentTime + delay + dur);
+      osc.onended = () => { osc.disconnect(); gain.disconnect(); };
     } catch (_) {}
   }
 

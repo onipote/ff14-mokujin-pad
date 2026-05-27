@@ -2,6 +2,57 @@
 
 ---
 
+## メモリリーク修正・パフォーマンス改善
+
+**日付**: 2026-05-27
+
+### 概要
+
+プレイやリトライを繰り返すと徐々に動作が重くなる現象の原因を調査し、5ファイルのメモリリーク・孤立タイマーを修正した。
+
+### 変更内容
+
+| ファイル | 内容 |
+|---------|------|
+| `src/sound.js` | `_beep()` で生成したオシレータ・ゲインノードを `onended` で `disconnect()` |
+| `src/aoe.js` | `start()` 冒頭で `stop()` を呼び、先行タイマーを必ずクリア |
+| `src/game.js` | `_burstSoundId` / `_aoeEndId` を追加してトラッキング・`stop()` / `start()` / `pause()` でクリア |
+| `src/ui.js` | `_judgmentTimers` 配列を追加・`clearEffects()` メソッドを新設 |
+| `src/xhb.js` | `_flashTimers` マップを追加し、同スロットの旧タイマーをキャンセルしてから再登録 |
+
+### 修正内容の詳細
+
+#### `src/sound.js` — AudioNode リーク（CRITICAL）
+
+`_beep()` は呼ばれるたびに `OscillatorNode` と `GainNode` を生成し Audio Graph に接続していたが、`osc.stop()` 後も `disconnect()` しておらず、ノードが永続参照され続けていた。難易度「チョコボ」で60秒プレイすると100個超のノードが蓄積しうる状態だった。
+
+`osc.stop()` の直後に `osc.onended` ハンドラを追加し、再生終了後に両ノードを切断するよう修正した。
+
+#### `src/aoe.js` — ゴーストAoEスポーン（CRITICAL）
+
+`start()` が `_schedId` / `_fireId` / `_clearId` をクリアせず再入していたため、直前ゲームのタイマーが残存した状態で新ゲームの `_active = true` が設定され、旧タイマーのコールバックがそのまま発火してゴーストAoEが出現することがあった。
+
+`start()` の先頭で `this.stop()` を呼ぶ1行を追加した。
+
+#### `src/game.js` — 3つの未追跡 setTimeout（HIGH）
+
+- `_checkGaugeProgress()` の `setTimeout(() => this.sound.playBurstStart(), 350)` が変数に格納されておらず、ゲームオーバー後にも発火していた。`this._burstSoundId` に格納し、`start()` / `stop()` / `pause()` でクリアするよう修正。
+- `_onAoeHit()` の残時間ゼロ判定の `setTimeout` も同様に `this._aoeEndId` に格納してクリアするよう修正。
+- `pause()` で `_feedbackId` がクリアされておらず、ポーズ中にフィードバック遅延が発火して `_nextSlot()` が呼ばれることがあった。`pause()` の clearTimeout ブロックに追加。
+- `stop()` の末尾に `this.ui.clearEffects()` を追加。
+
+#### `src/ui.js` — 判定テキスト残留（MEDIUM）
+
+`showJudgment()` が毎回 `setTimeout(() => el.remove(), 1000)` を発行しタイマーIDを捨てていたため、ゲーム終了時に一括キャンセルできなかった。
+
+`_judgmentTimers` 配列でIDを管理し、新設した `clearEffects()` で全タイマーのキャンセルと `innerHTML` の一括クリアを行うよう変更。
+
+#### `src/xhb.js` — フラッシュタイマー積み重なり（LOW）
+
+`setSlotFlash()` が同スロットへの連打で複数の `classList.remove` タイマーを蓄積していた。`_flashTimers` マップで同スロットの旧タイマーをキャンセル後に再登録するよう修正。
+
+---
+
 ## バースト中効果音の強化・クリッピング防止
 
 **日付**: 2026-05-27

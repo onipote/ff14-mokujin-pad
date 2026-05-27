@@ -26,8 +26,9 @@ class UIManager {
     this._countdownEl    = document.getElementById('countdown-val');
     this._countdownRowEl = document.getElementById('countdown-row');
     this._judgmentEl     = document.getElementById('judgment-float');
-    this._enemyFlashId = null;
-    this._enemyAnimId  = null;
+    this._enemyFlashId   = null;
+    this._enemyAnimId    = null;
+    this._judgmentTimers = [];
 
     this._pauseEl    = document.getElementById('screen-pause');
 
@@ -118,7 +119,17 @@ class UIManager {
     el.className = `judgment-float judgment-float--${cssType}`;
     el.textContent = text;
     this._judgmentEl.appendChild(el);
-    setTimeout(() => el.remove(), 1000);
+    const tid = setTimeout(() => el.remove(), 1000);
+    this._judgmentTimers.push(tid);
+  }
+
+  clearEffects() {
+    this._judgmentTimers.forEach(id => clearTimeout(id));
+    this._judgmentTimers = [];
+    if (this._judgmentEl) this._judgmentEl.innerHTML = '';
+    if (this._enemyFlashId) { clearTimeout(this._enemyFlashId); this._enemyFlashId = null; }
+    if (this._enemyAnimId)  { clearTimeout(this._enemyAnimId);  this._enemyAnimId  = null; }
+    this._enemyEl.classList.remove('hit', 'miss', 'enemy-shake', 'enemy-bounce');
   }
 
   // type: 'hit' | 'miss', combo: number

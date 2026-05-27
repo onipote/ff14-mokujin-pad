@@ -19,6 +19,7 @@ class AoeEngine {
   }
 
   start() {
+    this.stop();
     this._active = true;
     this._scheduleNext();
   }

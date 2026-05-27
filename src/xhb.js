@@ -1,7 +1,8 @@
 class XHBRenderer {
   constructor() {
-    this.slots  = {};
-    this.halves = {};
+    this.slots       = {};
+    this.halves      = {};
+    this._flashTimers = {};
   }
 
   build() {
@@ -110,8 +111,9 @@ class XHBRenderer {
   setSlotFlash(slotId) {
     const el = this.slots[slotId];
     if (!el) return;
+    clearTimeout(this._flashTimers[slotId]);
     el.classList.add('xhb-slot--flash');
-    setTimeout(() => el.classList.remove('xhb-slot--flash'), 300);
+    this._flashTimers[slotId] = setTimeout(() => el.classList.remove('xhb-slot--flash'), 300);
   }
 
   clearAllStates() {

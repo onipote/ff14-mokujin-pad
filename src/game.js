@@ -58,6 +58,8 @@ class GameEngine {
     this._pendingTimerStart = 0;
     this._pendingTimerRaf   = null;
     this._halfTimeId        = null;
+    this._burstSoundId      = null;
+    this._aoeEndId          = null;
   }
 
   getBestScore(difficulty) {
@@ -69,6 +71,8 @@ class GameEngine {
     clearTimeout(this._timeoutId);
     clearTimeout(this._feedbackId);
     clearTimeout(this._halfTimeId);
+    clearTimeout(this._burstSoundId);
+    clearTimeout(this._aoeEndId);
     if (this._timerRaf)       { cancelAnimationFrame(this._timerRaf);       this._timerRaf       = null; }
     if (this._pendingTimerRaf){ cancelAnimationFrame(this._pendingTimerRaf); this._pendingTimerRaf = null; }
     if (this._burstRaf)       { cancelAnimationFrame(this._burstRaf);        this._burstRaf       = null; }
@@ -122,7 +126,11 @@ class GameEngine {
     clearTimeout(this._timeoutId);
     clearTimeout(this._feedbackId);
     clearTimeout(this._halfTimeId);
-    this._halfTimeId = null;
+    clearTimeout(this._burstSoundId);
+    clearTimeout(this._aoeEndId);
+    this._halfTimeId   = null;
+    this._burstSoundId = null;
+    this._aoeEndId     = null;
     if (this._timerRaf)       { cancelAnimationFrame(this._timerRaf);       this._timerRaf       = null; }
     if (this._pendingTimerRaf){ cancelAnimationFrame(this._pendingTimerRaf); this._pendingTimerRaf = null; }
     if (this._burstRaf)       { cancelAnimationFrame(this._burstRaf);        this._burstRaf       = null; }
@@ -130,6 +138,7 @@ class GameEngine {
     this._pendingSlotId = null;
     this.isBurst = false;
     this.xhb.clearAllStates();
+    this.ui.clearEffects();
   }
 
   pause() {
@@ -141,7 +150,9 @@ class GameEngine {
     clearTimeout(this._timeoutId);
     clearTimeout(this._feedbackId);
     clearTimeout(this._halfTimeId);
-    this._halfTimeId = null;
+    clearTimeout(this._burstSoundId);
+    this._halfTimeId   = null;
+    this._burstSoundId = null;
     if (this._timerRaf)       { cancelAnimationFrame(this._timerRaf);       this._timerRaf       = null; }
     if (this._pendingTimerRaf){ cancelAnimationFrame(this._pendingTimerRaf); this._pendingTimerRaf = null; }
     this._pendingSlotId = null;
@@ -389,7 +400,7 @@ class GameEngine {
     if (this.gaugeLevel === LIMIT_GAUGE_COUNT) {
       this.sound.playGaugeMax();
       this._startBurst();
-      setTimeout(() => this.sound.playBurstStart(), 350);
+      this._burstSoundId = setTimeout(() => this.sound.playBurstStart(), 350);
       return;
     }
 
@@ -477,7 +488,7 @@ class GameEngine {
     this.ui.showJudgment('miss', MISS_PENALTY_MS / 1000);
     this.sound.playMiss();
     if (this.remainingMs <= 0) {
-      setTimeout(() => { if (this.state !== 'gameover') this._endGame('time_up'); }, 50);
+      this._aoeEndId = setTimeout(() => { if (this.state !== 'gameover') this._endGame('time_up'); }, 50);
     }
   }
 
