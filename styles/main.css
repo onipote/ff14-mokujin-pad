@@ -5,9 +5,9 @@
   --panel-border: rgba(200, 164, 80, 0.55);
   --gold: #c8a450;
   --gold-bright: #e0c060;
-  --gold-dim: #6a5525;
+  --gold-dim: #967840;
   --text: #cfc0a0;
-  --text-dim: #5a5040;
+  --text-dim: #9a8868;
   --teal: #35afc0;
   --slot-bg: #1a2035;
   --slot-border: #3a4568;
@@ -126,7 +126,7 @@ body {
 
 .ornament {
   color: var(--gold-dim);
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.05em;
 }
 
@@ -269,7 +269,7 @@ body {
   padding-top: 20px;
 }
 .rank-label {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   font-family: "Cinzel", serif;
   color: var(--gold-dim);
@@ -383,7 +383,7 @@ body {
 }
 .heatmap-title {
   text-align: center;
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.22em;
   color: var(--gold-dim);
   margin-bottom: 6px;
@@ -485,6 +485,10 @@ body {
   font-size: 12px;
   padding: 6px 14px;
 }
+#diff-btns .btn {
+  flex: 1;
+  min-width: 100px;
+}
 .btn--primary {
   background: rgba(255, 255, 255, 0.03);
   border-color: var(--gold);
@@ -508,7 +512,7 @@ body {
   width: 100%;
 }
 .setting-label {
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.22em;
   color: var(--text-dim);
 }
@@ -594,11 +598,11 @@ body {
 }
 
 .info-label {
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.16em;
   color: var(--text-dim);
-  height: 14px;
-  line-height: 14px;
+  height: 15px;
+  line-height: 15px;
   white-space: nowrap;
   margin-bottom: 4px;
 }
@@ -622,7 +626,7 @@ body {
   flex-shrink: 0;
 }
 .label-sm {
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.16em;
   color: var(--text-dim);
 }
@@ -1220,8 +1224,8 @@ body {
   transition: color 0.12s;
 }
 .slot-key {
-  font-size: 9px;
-  color: #22253a;
+  font-size: 10px;
+  color: #5c6282;
   letter-spacing: 0.05em;
   line-height: 1;
   transition: color 0.12s;
@@ -1583,7 +1587,7 @@ body {
 }
 
 .pad-hint {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--text-dim);
   letter-spacing: 0.1em;
   text-align: center;
