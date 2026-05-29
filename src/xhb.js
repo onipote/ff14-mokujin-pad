@@ -65,7 +65,9 @@ class XHBRenderer {
   setSlotState(slotId, state) {
     const el = this.slots[slotId];
     if (!el) return;
-    el.className = 'xhb-slot' + (state && state !== 'default' ? ` xhb-slot--${state}` : '');
+    el.className = 'xhb-slot';
+    void el.offsetWidth; // force reflow so animation restarts even on same-state re-entry
+    if (state && state !== 'default') el.classList.add(`xhb-slot--${state}`);
     el.querySelector('.slot-recast')?.style.setProperty('--recast-pct', '0');
     const numEl = el.querySelector('.slot-recast-num');
     if (numEl) numEl.textContent = '';
@@ -112,6 +114,8 @@ class XHBRenderer {
     const el = this.slots[slotId];
     if (!el) return;
     clearTimeout(this._flashTimers[slotId]);
+    el.classList.remove('xhb-slot--flash');
+    void el.offsetWidth; // force reflow so animation restarts on rapid repeated presses
     el.classList.add('xhb-slot--flash');
     this._flashTimers[slotId] = setTimeout(() => el.classList.remove('xhb-slot--flash'), 300);
   }

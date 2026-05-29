@@ -2,6 +2,32 @@
 
 ---
 
+## XHBボタン発光の連打追従改善
+
+**日付**: 2026-05-29
+
+### 概要
+
+ボタンを連打したとき、XHBの発光エフェクト（白フラッシュ・アクティブグロー）が視覚的に追いつかない問題を修正した。
+
+### 原因
+
+CSSアニメーションは「すでにクラスが付いている要素に同じクラスを再度 add しても再起動しない」という仕様がある。
+
+- **setSlotFlash**: 連打時に `xhb-slot--flash` が既に付いた状態で `classList.add` しても効果なし → フラッシュが発火しているように見えない
+- **setSlotState**: `el.className = 'xhb-slot xhb-slot--active'` の再代入は DOM 変化なしとみなされ、`slot-glow-pulse` が再起動しない（pending スロットが `_onGaugeFull` と `_nextSlot` で二重に active 化される場合など）
+
+### 修正内容
+
+| ファイル | 内容 |
+|---------|------|
+| `src/xhb.js` | `setSlotFlash`: `classList.remove` → `void el.offsetWidth`（reflow強制）→ `classList.add` の順に変更 |
+| `src/xhb.js` | `setSlotState`: `el.className` 一括代入を、ベースクラスリセット → `void el.offsetWidth` → `classList.add` に変更 |
+
+`void el.offsetWidth` はブラウザに同期レイアウト計算を強制し、クラスの除去と追加の「間」を確実に分離することでアニメーションを毎回最初から再起動させる標準的な手法。
+
+---
+
 ## UI文字の視認性改善・難易度ボタン表示変更
 
 **日付**: 2026-05-29
