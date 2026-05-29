@@ -2,6 +2,32 @@
 
 ---
 
+## ゲーム開始時のリミットゲージ残留表示を修正
+
+**日付**: 2026-05-30
+
+### 概要
+
+ゲーム開始時（「GATE JOINED」表示中および開始直後）に、前のゲームのリミットゲージ残量が見えていた問題を修正した。
+
+### 原因
+
+2つのタイミング問題が重なっていた。
+
+1. **CSSトランジションによるアニメーション**: `engine.start()` 内で `updateAll()` がゲージ幅を0%にセットする際、`.limit-segment-fill` の `transition: width 0.1s ease` が働き、前の値から0%へのフェードアウトアニメーションが発生していた。
+2. **表示タイミングのずれ**: `engine.start()` の呼び出しは「GATE JOINED」アニメーション終了後のため、オーバーレイ表示中はゲージリセットが行われていなかった。
+
+### 修正内容
+
+| ファイル | 内容 |
+|---------|------|
+| `src/ui.js` | `resetLimitGaugeInstant()` を追加。`transition: none` で幅を即座に0%にリセット後、`getBoundingClientRect()` でリフローを強制してからトランジションを復元 |
+| `src/ui.js` | `resetHUDForStart()` を追加。スコア・コンボ・GCDタイマーバー・カウントダウン数値・リミットゲージをまとめてリセット |
+| `src/game.js` | `start()` 内の `updateAll()` 呼び出し前に `resetLimitGaugeInstant()` を追加 |
+| `src/main.js` | `startGame()` の「GATE JOINED」オーバーレイ表示直前に `resetHUDForStart()` を呼び出し、オーバーレイ表示中のHUD残留を全て解消 |
+
+---
+
 ## XHBボタン発光の連打追従改善
 
 **日付**: 2026-05-29

@@ -192,6 +192,8 @@ document.addEventListener('DOMContentLoaded', () => {
     ui.hidePause();
     ui.hideGameOver();
 
+    ui.resetHUDForStart();
+
     const overlay = document.getElementById('gate-joined-overlay');
     overlay.classList.remove('hidden');
     sound.playGateJoined();

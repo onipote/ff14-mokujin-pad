@@ -97,6 +97,25 @@ class UIManager {
     this._countdownRowEl.classList.toggle('countdown--urgent', ms < 10_000);
   }
 
+  resetLimitGaugeInstant() {
+    this._limitGaugeCont.classList.remove('burst-active');
+    this._limitSegFills.forEach((f, i) => {
+      f.style.transition = 'none';
+      f.style.width = '0%';
+      this._limitSegs[i].classList.remove('full');
+    });
+    this._limitSegFills[0].getBoundingClientRect(); // force reflow to commit styles before restoring transition
+    this._limitSegFills.forEach(f => { f.style.transition = ''; });
+  }
+
+  resetHUDForStart() {
+    this._scoreEl.textContent = '0';
+    this._comboEl.textContent = '';
+    this.setTimerFill(0);
+    this.setCountdown(GAME_DURATION_MS);
+    this.resetLimitGaugeInstant();
+  }
+
   setBurstState(active) {
     this._limitGaugeCont.classList.toggle('burst-active', active);
     if (active) {

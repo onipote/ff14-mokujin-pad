@@ -109,6 +109,7 @@ class GameEngine {
     this.aoe.onDodge = (side) => this._onAoeDodge(side);
     this.aoe.start();
 
+    this.ui.resetLimitGaugeInstant();
     this.ui.updateAll(this);
     this.ui.setTimerFill(0);
     this.ui.setBurstState(false);
