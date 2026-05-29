@@ -134,7 +134,9 @@ class AoeEngine {
       case 'fan': {
         const halfAngle = 15 + Math.random() * 15;
         const baseAngle = Math.random() * 360;
-        return { type, halfAngle, baseAngle };
+        const cx = (Math.random() * 2 - 1) * 0.5;
+        const cy = (Math.random() * 2 - 1) * 0.5;
+        return { type, halfAngle, baseAngle, cx, cy };
       }
       case 'band': {
         const halfThick = 0.20 * sizeScale;
@@ -171,8 +173,10 @@ class AoeEngine {
       case 'large-circle': { const dx=x-d.cx, dy=y-d.cy; return dx*dx + dy*dy/2.25 < d.r*d.r; }
       case 'small-circles':return d.circles.some(c => { const dx=x-c.cx, dy=y-c.cy; return dx*dx + dy*dy/2.25 < d.r*d.r; });
       case 'fan': {
-        if (x === 0 && y === 0) return true;
-        const deg = Math.atan2(y, x) * 180 / Math.PI;
+        const dx = x - d.cx;
+        const dy = y - d.cy;
+        if (dx === 0 && dy === 0) return true;
+        const deg = Math.atan2(dy, dx) * 180 / Math.PI;
         for (let i = 0; i < 4; i++) {
           const base = d.baseAngle + i * 90;
           let diff = ((deg - base) % 360 + 360) % 360;

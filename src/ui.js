@@ -1,13 +1,15 @@
 function _fmtNum(n) { return Number(n).toLocaleString(); }
 
-function _buildFanClipPath(baseDeg, halfDeg) {
+function _buildFanClipPath(baseDeg, halfDeg, cx = 0, cy = 0) {
   const startDeg = baseDeg - halfDeg;
   const endDeg   = baseDeg + halfDeg;
   const steps    = Math.max(6, Math.ceil(halfDeg * 2 / 5));
-  const pts      = ['50% 50%'];
+  const cxPct    = (cx + 1) / 2 * 100;
+  const cyPct    = (cy + 1) / 2 * 100;
+  const pts      = [`${cxPct.toFixed(1)}% ${cyPct.toFixed(1)}%`];
   for (let i = 0; i <= steps; i++) {
     const a = (startDeg + (endDeg - startDeg) * i / steps) * Math.PI / 180;
-    pts.push(`${(50 + 150 * Math.cos(a)).toFixed(1)}% ${(50 + 150 * Math.sin(a)).toFixed(1)}%`);
+    pts.push(`${(cxPct + 150 * Math.cos(a)).toFixed(1)}% ${(cyPct + 150 * Math.sin(a)).toFixed(1)}%`);
   }
   return `polygon(${pts.join(', ')})`;
 }
@@ -376,11 +378,13 @@ class UIManager {
         });
       case 'fan': {
         const shapes = Array.from({ length: 4 }, (_, i) => {
-          const clip = _buildFanClipPath(aoeData.baseAngle + i * 90, aoeData.halfAngle);
+          const clip = _buildFanClipPath(aoeData.baseAngle + i * 90, aoeData.halfAngle, aoeData.cx, aoeData.cy);
           return mk(`position:absolute;left:0;top:0;width:100%;height:100%;clip-path:${clip};border-radius:0`);
         });
         // 放射線（中心→外縁）: 各扇の両辺を細い div で描く
         // stick-field は aspect-ratio 3:2 のため、角度を補正する
+        const cxPct = (aoeData.cx + 1) / 2 * 100;
+        const cyPct = (aoeData.cy + 1) / 2 * 100;
         const lines = [];
         for (let i = 0; i < 4; i++) {
           for (const side of [-1, 1]) {
@@ -389,7 +393,7 @@ class UIManager {
             const lineEl = document.createElement('div');
             lineEl.className = 'aoe-zone aoe-fan-line';
             lineEl.style.cssText =
-              `position:absolute;left:calc(50% - 1px);top:50%;width:2px;height:100%;` +
+              `position:absolute;left:calc(${cxPct}% - 1px);top:${cyPct}%;width:2px;height:200%;` +
               `transform-origin:top center;transform:rotate(${(scrDeg - 90).toFixed(2)}deg);border-radius:0`;
             lines.push(lineEl);
           }
@@ -428,8 +432,10 @@ class UIManager {
       case 'large-circle': { const dx=x-d.cx, dy=y-d.cy; return dx*dx + dy*dy/2.25 < d.r*d.r; }
       case 'small-circles':return d.circles.some(c => { const dx=x-c.cx, dy=y-c.cy; return dx*dx + dy*dy/2.25 < d.r*d.r; });
       case 'fan': {
-        if (x === 0 && y === 0) return true;
-        const deg = Math.atan2(y, x) * 180 / Math.PI;
+        const dx = x - d.cx;
+        const dy = y - d.cy;
+        if (dx === 0 && dy === 0) return true;
+        const deg = Math.atan2(dy, dx) * 180 / Math.PI;
         for (let i = 0; i < 4; i++) {
           const base = d.baseAngle + i * 90;
           let diff = ((deg - base) % 360 + 360) % 360;
