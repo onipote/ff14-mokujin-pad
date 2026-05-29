@@ -358,6 +358,10 @@ class UIManager {
       const inside = Math.abs(this._gazeEyeX - cx) <= GAZE_FRAME_HALF_W &&
                      Math.abs(this._gazeEyeY - cy) <= GAZE_FRAME_HALF_H;
       this._gazeFrame.className = 'gaze-frame ' + (inside ? 'gaze-frame--in' : 'gaze-frame--out');
+      if (this._gazeEye) {
+        this._gazeEye.className = 'gaze-eye gaze-eye--visible ' +
+                                  (inside ? 'gaze-eye--captured' : 'gaze-eye--danger');
+      }
     }
   }
 
@@ -479,7 +483,7 @@ class UIManager {
     if (this._gazeEye) {
       this._gazeEye.style.left = ((eyeX + 1) / 2 * 100) + '%';
       this._gazeEye.style.top  = ((eyeY + 1) / 2 * 100) + '%';
-      this._gazeEye.className  = 'gaze-eye gaze-eye--visible';
+      this._gazeEye.className  = 'gaze-eye gaze-eye--visible gaze-eye--danger';
     }
     if (this._stickField.R) {
       this._stickField.R.classList.add('stick-field--active');

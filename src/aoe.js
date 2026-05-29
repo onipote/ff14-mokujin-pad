@@ -78,17 +78,11 @@ class AoeEngine {
   }
 
   _spawnGaze() {
-    const forceInside = Math.random() < 1 / 3;
     let eyeX, eyeY;
     do {
-      if (forceInside) {
-        eyeX = (Math.random() * 2 - 1) * GAZE_FRAME_HALF_W;
-        eyeY = (Math.random() * 2 - 1) * GAZE_FRAME_HALF_H;
-      } else {
-        eyeX = (Math.random() * 2 - 1) * GAZE_EYE_RANGE;
-        eyeY = (Math.random() * 2 - 1) * GAZE_EYE_RANGE;
-      }
-    } while (Math.abs(eyeX) < GAZE_CENTER_EXCLUDE_R && Math.abs(eyeY) < GAZE_CENTER_EXCLUDE_R);
+      eyeX = (Math.random() * 2 - 1) * GAZE_EYE_RANGE;
+      eyeY = (Math.random() * 2 - 1) * GAZE_EYE_RANGE;
+    } while (Math.abs(eyeX) <= GAZE_FRAME_HALF_W && Math.abs(eyeY) <= GAZE_FRAME_HALF_H);
     this._gazeEyeX = eyeX;
     this._gazeEyeY = eyeY;
     this.ui.showGazeWarning(this._gazeEyeX, this._gazeEyeY);
@@ -194,11 +188,12 @@ class AoeEngine {
     return false;
   }
 
-  // フレーム内に目の中心が入っているか判定（右パネル用）
+  // 探検アイコンがキャプチャできたか判定（右パネル用）。ヒット = キャプチャ失敗
   _checkGazeHit(rx, ry, eyeX, eyeY) {
     const cx = Math.max(-(1 - GAZE_FRAME_HALF_W), Math.min(1 - GAZE_FRAME_HALF_W, rx));
     const cy = Math.max(-(1 - GAZE_FRAME_HALF_H), Math.min(1 - GAZE_FRAME_HALF_H, ry));
-    return Math.abs(eyeX - cx) <= GAZE_FRAME_HALF_W &&
-           Math.abs(eyeY - cy) <= GAZE_FRAME_HALF_H;
+    const captured = Math.abs(eyeX - cx) <= GAZE_FRAME_HALF_W &&
+                     Math.abs(eyeY - cy) <= GAZE_FRAME_HALF_H;
+    return !captured;
   }
 }
