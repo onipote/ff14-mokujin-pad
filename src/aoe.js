@@ -173,13 +173,10 @@ class AoeEngine {
     this.input.stickR.x = 0;
     this.input.stickR.y = 0;
 
-    // 50% の確率でミニマップ外（方向インジケーター必要）にスポーン
-    const offscreen = Math.random() < 0.5;
-    const maxRange  = offscreen ? STK_CHEST_SPAWN_OFFSCREEN_MAX : STK_CHEST_SPAWN_ONSCREEN_MAX;
     let markerX, markerY;
     do {
-      markerX = (Math.random() * 2 - 1) * maxRange;
-      markerY = (Math.random() * 2 - 1) * maxRange;
+      markerX = (Math.random() * 2 - 1) * STK_CHEST_SPAWN_ONSCREEN_MAX;
+      markerY = (Math.random() * 2 - 1) * STK_CHEST_SPAWN_ONSCREEN_MAX;
     } while (Math.abs(markerX) <= STK_FRAME_HALF_W && Math.abs(markerY) <= STK_FRAME_HALF_H);
     this._stkMarkerX = markerX;
     this._stkMarkerY = markerY;

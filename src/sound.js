@@ -81,6 +81,11 @@ class SoundManager {
     }
   }
 
+  playChestOpen() {
+    this._beep(880,  'sine', 0.18, 0.10, 0.00);
+    this._beep(1318, 'sine', 0.14, 0.08, 0.05);
+  }
+
   playGimmickSuccess() {
     this._beep(523, 'sine', 0.15, 0.20, 0.00);
     this._beep(659, 'sine', 0.15, 0.20, 0.08);

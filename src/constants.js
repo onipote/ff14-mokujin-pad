@@ -71,10 +71,10 @@ const STICK_SPEED_L    = STICK_SPEED * 0.85; // 左スティックのみ15%減�
 const STICK_DEADZONE   = 0.15;
 
 // 宝箱ギミック（右パネル）— フレーム固定・背景スクロール方式
-const STK_FRAME_W_PCT  = 48.875;   // フレーム幅（フィールドwidth比%）
-const STK_FRAME_H_PCT  = 48.875;   // フレーム高さ（フィールドheight比%）= W_PCTと同値→3:2比率
-const STK_FRAME_HALF_W = 0.48875; // 正規化半幅 = (STK_FRAME_W_PCT/2) / 50
-const STK_FRAME_HALF_H = 0.48875; // 正規化半高 = (STK_FRAME_H_PCT/2) / 50
+const STK_FRAME_W_PCT  = 36.656;   // フレーム幅（フィールドwidth比%）
+const STK_FRAME_H_PCT  = 36.656;   // フレーム高さ（フィールドheight比%）= W_PCTと同値→3:2比率
+const STK_FRAME_HALF_W = 0.36656; // 正規化半幅 = (STK_FRAME_W_PCT/2) / 50
+const STK_FRAME_HALF_H = 0.36656; // 正規化半高 = (STK_FRAME_H_PCT/2) / 50
 // スポーン範囲: stickR.x/y は ±1 にクランプされるため上限 1.0 + HALF_W(0.48875) - マージン ≈ 1.4 が到達可能最大値
 const STK_CHEST_SPAWN_ONSCREEN_MAX  = 0.85; // ミニマップ内スポーン（方向インジケーター不要）
 const STK_CHEST_SPAWN_OFFSCREEN_MAX = 1.4;  // ミニマップ外スポーン（方向インジケーター表示）

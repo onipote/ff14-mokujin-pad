@@ -1,5 +1,5 @@
 // 宝箱SVG（閉じた状態：teal/cyan色系、ぼんやり発光）
-const _STK_CHEST_CLOSED_SVG = `<svg viewBox="-20 -20 40 40" width="60" height="60" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 0 6px rgba(160,220,255,0.7)) drop-shadow(0 0 14px rgba(100,180,255,0.4))">
+const _STK_CHEST_CLOSED_SVG = `<svg viewBox="-20 -20 40 40" width="30" height="30" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 0 6px rgba(160,220,255,0.7)) drop-shadow(0 0 14px rgba(100,180,255,0.4))">
   <rect x="-14" y="-4" width="28" height="14" rx="1.5" fill="rgba(100,180,255,0.08)" stroke="#a0e8f8" stroke-width="1.8"/>
   <rect x="-14" y="-14" width="28" height="11" rx="1.5" fill="rgba(100,180,255,0.06)" stroke="#a0e8f8" stroke-width="1.8"/>
   <rect x="-3.5" y="-6.5" width="7" height="5.5" rx="1" fill="none" stroke="#a0e8f8" stroke-width="1.6"/>
@@ -7,7 +7,7 @@ const _STK_CHEST_CLOSED_SVG = `<svg viewBox="-20 -20 40 40" width="60" height="6
 </svg>`;
 
 // 宝箱SVG（開いた状態：黄金色、輝き演出）
-const _STK_CHEST_OPEN_SVG = `<svg viewBox="-20 -20 40 40" width="60" height="60" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 0 8px rgba(255,215,0,0.9)) drop-shadow(0 0 18px rgba(255,180,0,0.6))">
+const _STK_CHEST_OPEN_SVG = `<svg viewBox="-20 -20 40 40" width="30" height="30" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 0 8px rgba(255,215,0,0.9)) drop-shadow(0 0 18px rgba(255,180,0,0.6))">
   <rect x="-14" y="0" width="28" height="14" rx="1.5" fill="rgba(255,210,0,0.12)" stroke="#ffe080" stroke-width="1.8"/>
   <rect x="-14" y="-14" width="28" height="11" rx="1.5" fill="rgba(255,210,0,0.08)" stroke="#ffe080" stroke-width="1.8" transform="rotate(-45 -14 -3.5)"/>
   <circle cx="0" cy="6" r="4.5" fill="rgba(255,220,80,0.35)" stroke="none"/>
@@ -66,6 +66,7 @@ class UIManager {
     this._stkMarkerX    = 0;
     this._stkMarkerY    = 0;
     this._stkChestOpened = false;
+    this.onChestOpen    = null;
     this._worldOffsetX  = 0;
     this._worldOffsetY  = 0;
     this._stkOverlay    = null;
@@ -151,6 +152,7 @@ class UIManager {
       this._stkFrame.style.top  = '50%';
       this._stkFrame.className  = 'stk-frame';
     }
+    this._moveWorldCursor(0, 0);
   }
 
   setBurstState(active) {
@@ -412,6 +414,7 @@ class UIManager {
                        Math.abs(sy) <= STK_FRAME_HALF_H;
       if (captured) {
         this._stkChestOpened = true;
+        if (this.onChestOpen) this.onChestOpen();
         if (this._stkChest) {
           this._stkChest.innerHTML = _STK_CHEST_OPEN_SVG;
           this._stkChest.classList.add('stk-chest--opened');
@@ -444,10 +447,10 @@ class UIManager {
     const angleDeg = Math.atan2(sy, sx) * 180 / Math.PI + 90;
     el.style.transform = `translate(-50%, -50%) rotate(${angleDeg}deg)`;
     if (!el.innerHTML) {
-      el.innerHTML = `<svg width="14" height="14" viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg">
-        <polygon points="7,0 14,14 0,14" fill="rgba(255,215,0,0.9)"
+      el.innerHTML = `<svg width="22" height="13" viewBox="0 0 24 14" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="12,0 24,14 18,14 12,5 6,14 0,14" fill="rgba(255,215,0,0.9)"
           filter="url(#dir-glow)"/>
-        <defs><filter id="dir-glow" x="-50%" y="-50%" width="200%" height="200%">
+        <defs><filter id="dir-glow" x="-60%" y="-60%" width="220%" height="220%">
           <feGaussianBlur stdDeviation="1.5" result="blur"/>
           <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
         </filter></defs>
