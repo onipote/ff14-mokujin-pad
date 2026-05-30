@@ -866,6 +866,12 @@ body {
 }
 #stick-panel-R .stick-field {
   border: 1px solid rgba(72, 120, 200, 0.3);
+  background-image:
+    linear-gradient(rgba(100, 180, 255, 0.22) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(100, 180, 255, 0.22) 1px, transparent 1px);
+  background-size: 20% 30%;
+  background-position: 0 0;
+  overflow: hidden;
 }
 
 .stick-field--active {
@@ -1596,8 +1602,8 @@ body {
 /* ===== 頭割りギミック・フレーム（右パネル）===== */
 .stk-frame {
   position: absolute;
-  width: 48.875%;
-  height: 48.875%;
+  width: 36.656%;
+  height: 36.656%;
   transform: translate(-50%, -50%);
   left: 50%;
   top: 50%;
@@ -1684,53 +1690,37 @@ body {
   50%       { transform: translate(-50%, -50%) scale(1.08); }
 }
 
-/* ===== STACK MARKER (頭割り) ===== */
-.stk-marker {
+/* ===== 宝箱ギミック（右パネル）===== */
+.stk-chest {
   position: absolute;
-  width: 100px;
-  height: 100px;
+  width: 30px;
+  height: 30px;
   transform: translate(-50%, -50%);
   pointer-events: none;
-  z-index: 3;
+  z-index: 2;
   display: none;
 }
-.stk-marker--active { display: block; }
-
-.stk-svg { width: 100%; height: 100%; overflow: visible; }
-
-.stk-shape {
-  fill: none;
-  stroke-width: 3.5;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-.stk-dim    { stroke: #FFB844; opacity: 0.30; filter: drop-shadow(0 0 3px #FF9900); }
-.stk-mid    { stroke: #FF9900; opacity: 0.65; filter: drop-shadow(0 0 4px #FF8800) drop-shadow(0 0 8px #FF6600); }
-.stk-bright { stroke: #FFFAE8; opacity: 1.0;  filter: drop-shadow(0 0 5px #FFFDE0) drop-shadow(0 0 12px #FFE000) drop-shadow(0 0 22px #FFC000); }
-
-.stk-center-disc {
-  fill: #FFFAE8;
-  stroke: #FF9900;
-  stroke-width: 1.5;
-  opacity: 0.3;
-  filter: drop-shadow(0 0 5px #FFFDE0) drop-shadow(0 0 12px #FFE000) drop-shadow(0 0 22px #FFC000);
-}
-.stk-grp-center { animation: stk-bob 1.6s ease-in-out infinite; }
-@keyframes stk-bob {
-  0%, 100% { transform: translateY(0px); }
-  50%       { transform: translateY(-2.5px); }
+.stk-chest--active { display: block; }
+.stk-chest--opened {
+  filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.9)) drop-shadow(0 0 16px rgba(255, 180, 0, 0.5));
 }
 
-.stk-grp-n { animation: stk-pulse-n 1.6s ease-in-out infinite; }
-.stk-grp-s { animation: stk-pulse-s 1.6s ease-in-out infinite; }
-.stk-grp-w { animation: stk-pulse-w 1.6s ease-in-out infinite; }
-.stk-grp-e { animation: stk-pulse-e 1.6s ease-in-out infinite; }
-@keyframes stk-pulse-n { 0%,100%{transform:translateY(0px)}  50%{transform:translateY(-8px)} }
-@keyframes stk-pulse-s { 0%,100%{transform:translateY(0px)}  50%{transform:translateY(8px)}  }
-@keyframes stk-pulse-w { 0%,100%{transform:translateX(0px)}  50%{transform:translateX(-8px)} }
-@keyframes stk-pulse-e { 0%,100%{transform:translateX(0px)}  50%{transform:translateX(8px)}  }
+@keyframes stk-direction-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.15; }
+}
 
-#stick-panel-R .stick-field { overflow: visible; }
+.stk-direction {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 4;
+  display: none;
+}
+.stk-direction--active {
+  display: block;
+  animation: stk-direction-blink 1.4s ease-in-out infinite;
+}
 
 /* ===== G.A.T.E JOINED Overlay ===== */
 #gate-joined-overlay {

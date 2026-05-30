@@ -194,9 +194,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     ui.resetHUDForStart();
 
+    ui.resetStickCursors();
     const overlay = document.getElementById('gate-joined-overlay');
     overlay.classList.remove('hidden');
-    ui.resetStickCursors();
     sound.playGateJoined();
 
     // フェードアウト完了でGCD開始

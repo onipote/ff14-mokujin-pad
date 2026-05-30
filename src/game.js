@@ -118,6 +118,7 @@ class GameEngine {
 
     this.aoe.onHit   = () => this._onAoeHit();
     this.aoe.onDodge = (side) => this._onAoeDodge(side);
+    this.ui.onChestOpen = () => this._onChestOpen();
     this.aoe.start();
 
     this.ui.resetLimitGaugeInstant();
@@ -200,6 +201,7 @@ class GameEngine {
 
     this.aoe.onHit   = () => this._onAoeHit();
     this.aoe.onDodge = (side) => this._onAoeDodge(side);
+    this.ui.onChestOpen = () => this._onChestOpen();
     this.aoe.resumeTimers();
     this.sound.startRhythm(this.isBurst);
 
@@ -505,6 +507,10 @@ class GameEngine {
       if (this.remainingMs <= 0) { this._endGame('time_up'); return; }
       this._nextSlot();
     }, FEEDBACK_FAIL_MS);
+  }
+
+  _onChestOpen() {
+    this.sound.playChestOpen();
   }
 
   _onAoeDodge(side) {

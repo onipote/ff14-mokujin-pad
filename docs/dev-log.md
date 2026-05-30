@@ -2,6 +2,68 @@
 
 ---
 
+## refine: 宝探しギミック調整（外観・サウンド・スポーン）
+
+**日付**: 2026-05-30
+
+### 変更内容
+
+| ファイル | 内容 |
+|---------|------|
+| `src/ui.js` | 宝箱SVGサイズを 60→30px に縮小、`onChestOpen` コールバック追加、方向インジケーターを幅広シェブロン（`<` 形）に変更 |
+| `src/constants.js` | `STK_FRAME_W/H_PCT`・`STK_FRAME_HALF_W/H` を 48.875→36.656（×0.75）に縮小 |
+| `src/sound.js` | `playChestOpen()` メソッド追加（宝箱開封時の短い音） |
+| `src/game.js` | `_onChestOpen()` 追加・start/resume で `ui.onChestOpen` を接続 |
+| `src/aoe.js` | 宝箱スポーンをオンスクリーン（`±0.85`）のみに変更（オフスクリーンスポーン廃止） |
+| `src/main.js` | `resetStickCursors()` を FATE JOINED オーバーレイ表示前に移動 |
+| `styles/main.css` | 宝箱CSSサイズ 60→30px、フレームサイズ 48.875→36.656%、グリッド線 opacity 0.08→0.22、方向インジケーター明滅アニメーション追加（1.4s） |
+
+### 変更仕様
+
+- **宝箱サイズ**: 従来の半分（30×30px）に縮小
+- **中央フレーム**: 従来の75%サイズ（フィールド幅の約36.7%）
+- **グリッド線**: `rgba(100,180,255,0.22)`（従来の約2.75倍の濃度）
+- **宝箱開封音**: 枠内に収めた瞬間に A5→E6 の短い2音（`playChestOpen()`）
+- **方向インジケーター**: 三角形▲から幅広シェブロン（`viewBox="0 0 24 14"`）に変更、1.4s周期でゆっくり明滅
+- **スポーン範囲**: ミニマップ内（`±0.85`）のみ。移動で画面外に出ることはある
+- **マップ初期化**: FATE JOINED アニメーション開始前に背景グリッド位置を (0,0) にリセット
+
+---
+
+## feat: 右スティックギミック「宝探し」— ミニマップスクロール宝箱キャプチャ
+
+**日付**: 2026-05-30
+
+### 変更概要
+
+右スティックギミックを「フレーム移動でマーカーを捕まえる」から「背景スクロールで宝箱を枠内に収める」方式に全面刷新。ゲーム難易度・タイミング・速度は据え置き（数学的に等価な設計）。
+
+### 変更内容
+
+| ファイル | 内容 |
+|---------|------|
+| `src/constants.js` | `STK_MARKER_RANGE/STK_CENTER_EXCLUDE_R` を削除、`STK_CHEST_SPAWN_ONSCREEN_MAX=0.85` / `STK_CHEST_SPAWN_OFFSCREEN_MAX=1.4` を追加 |
+| `index.html` | `stk-marker`（N/S/E/W矢印SVG）を削除 → `stk-chest`（宝箱）/ `stk-direction`（▲インジケーター）を追加 |
+| `styles/main.css` | `stk-marker`関連スタイル・アニメーション全削除、Rパネルフィールドにグリッド背景追加（`background-image: repeating-gradient`）、`.stk-chest` / `.stk-direction` スタイル追加 |
+| `src/ui.js` | `_moveFrameCursor` を `_moveWorldCursor` に置き換え（フレーム固定・背景スクロール実装）、方向インジケーター `_updateDirectionIndicator` 追加、`showStackWarning` / `clearStack` 更新、宝箱SVG定数 `_STK_CHEST_CLOSED_SVG` / `_STK_CHEST_OPEN_SVG` 追加 |
+| `src/aoe.js` | `_spawnStack` でスポーン範囲拡張・stickRリセット追加、`_checkStackHit` を `!ui._stkChestOpened` に簡略化 |
+
+### ゲームメカニクス仕様
+
+- **フレーム**: 常にミニマップ中央に固定（`left:50%; top:50%`）
+- **背景**: 薄いグリッド（`rgba(100,180,255,0.08)`）がスティック入力に応じてスクロール
+- **宝箱スポーン**: 50%の確率でミニマップ内（`±0.85`）、50%でミニマップ外（`±1.4`）
+- **方向インジケーター**: 宝箱がミニマップ外の場合、枠の端に ▲ が宝箱方向を指して表示
+- **キャプチャ**: 毎フレーム連続判定。宝箱が中央フレーム内に入ると閉→開に変化（一度開いたら維持）
+- **成功条件**: `AOE_WARNING_MS=3000ms` 以内に宝箱を開けること（開いた状態で時間切れ → 成功）
+- **座標系**: ワールド座標 = `stickR.x/y`（`±1`クランプ）、スクリーン座標 = `chestWorldX - worldOffsetX`
+
+### 設計ドキュメント
+
+`docs/designs/plan_chest_gimmick_2026-05-30.md` を参照。
+
+---
+
 ## refine: 頭割りギミック中央マーカーを円盤に変更
 
 **日付**: 2026-05-30
