@@ -332,11 +332,12 @@ class GameEngine {
     if (this.state !== 'showing') return;
     if (this._pendingSlotId) return;
 
-    const timeMs              = this._slotTimeMs;
+    const burstLapsed         = this._slotIsBurst && !this.isBurst;
+    const timeMs              = burstLapsed ? this._getTimeMs() : this._slotTimeMs;
     this._pendingSlotId       = this._pickNextSlotId();
     this._pendingTimerStart   = Date.now();
     this._pendingSlotTimeMs   = timeMs;
-    this._pendingSlotIsBurst  = this._slotIsBurst;
+    this._pendingSlotIsBurst  = burstLapsed ? false : this._slotIsBurst;
     this._startPendingTimer(timeMs);
 
     this.xhb.setSlotState(this._pendingSlotId, 'active');
