@@ -147,39 +147,9 @@
         <!-- R パネル -->
         <div class="stick-panel" id="stick-panel-R">
           <div class="stick-field" id="stick-field-R">
-            <div class="stk-marker" id="stk-marker-R">
-              <svg class="stk-svg" viewBox="-50 -50 100 100" xmlns="http://www.w3.org/2000/svg">
-                <!-- Center: small disc -->
-                <g class="stk-grp-center">
-                  <circle class="stk-center-disc" cx="0" cy="0" r="6"/>
-                </g>
-                <!-- N: shifted 10u toward center (outer→inner=dim→bright) -->
-                <g class="stk-grp-n">
-                  <polyline class="stk-shape stk-dim"    points="-8,-32 0,-26 8,-32"/>
-                  <polyline class="stk-shape stk-mid"    points="-8,-28 0,-22 8,-28"/>
-                  <polyline class="stk-shape stk-bright" points="-8,-24 0,-18 8,-24"/>
-                </g>
-                <!-- S: shifted 10u toward center (symmetric with N) -->
-                <g class="stk-grp-s">
-                  <polyline class="stk-shape stk-bright" points="-8,24 0,18 8,24"/>
-                  <polyline class="stk-shape stk-mid"    points="-8,28 0,22 8,28"/>
-                  <polyline class="stk-shape stk-dim"    points="-8,32 0,26 8,32"/>
-                </g>
-                <!-- W: shifted 10u toward center (outer→inner=dim→bright) -->
-                <g class="stk-grp-w">
-                  <polyline class="stk-shape stk-dim"    points="-32,-8 -26,0 -32,8"/>
-                  <polyline class="stk-shape stk-mid"    points="-28,-8 -22,0 -28,8"/>
-                  <polyline class="stk-shape stk-bright" points="-24,-8 -18,0 -24,8"/>
-                </g>
-                <!-- E: shifted 10u toward center (inner→outer=bright→dim) -->
-                <g class="stk-grp-e">
-                  <polyline class="stk-shape stk-bright" points="24,-8 18,0 24,8"/>
-                  <polyline class="stk-shape stk-mid"    points="28,-8 22,0 28,8"/>
-                  <polyline class="stk-shape stk-dim"    points="32,-8 26,0 32,8"/>
-                </g>
-              </svg>
-            </div>
+            <div class="stk-chest" id="stk-chest-R"></div>
             <div class="stk-frame" id="stk-frame-R"></div>
+            <div class="stk-direction" id="stk-direction-R"></div>
           </div>
           <div class="stick-side-label">R</div>
         </div>

@@ -1,3 +1,23 @@
+// 宝箱SVG（閉じた状態：teal/cyan色系、ぼんやり発光）
+const _STK_CHEST_CLOSED_SVG = `<svg viewBox="-20 -20 40 40" width="60" height="60" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 0 6px rgba(160,220,255,0.7)) drop-shadow(0 0 14px rgba(100,180,255,0.4))">
+  <rect x="-14" y="-4" width="28" height="14" rx="1.5" fill="rgba(100,180,255,0.08)" stroke="#a0e8f8" stroke-width="1.8"/>
+  <rect x="-14" y="-14" width="28" height="11" rx="1.5" fill="rgba(100,180,255,0.06)" stroke="#a0e8f8" stroke-width="1.8"/>
+  <rect x="-3.5" y="-6.5" width="7" height="5.5" rx="1" fill="none" stroke="#a0e8f8" stroke-width="1.6"/>
+  <line x1="-14" y1="-3.5" x2="14" y2="-3.5" stroke="#a0e8f8" stroke-width="1.2" opacity="0.5"/>
+</svg>`;
+
+// 宝箱SVG（開いた状態：黄金色、輝き演出）
+const _STK_CHEST_OPEN_SVG = `<svg viewBox="-20 -20 40 40" width="60" height="60" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 0 8px rgba(255,215,0,0.9)) drop-shadow(0 0 18px rgba(255,180,0,0.6))">
+  <rect x="-14" y="0" width="28" height="14" rx="1.5" fill="rgba(255,210,0,0.12)" stroke="#ffe080" stroke-width="1.8"/>
+  <rect x="-14" y="-14" width="28" height="11" rx="1.5" fill="rgba(255,210,0,0.08)" stroke="#ffe080" stroke-width="1.8" transform="rotate(-45 -14 -3.5)"/>
+  <circle cx="0" cy="6" r="4.5" fill="rgba(255,220,80,0.35)" stroke="none"/>
+  <line x1="0" y1="-16" x2="0" y2="-12" stroke="#ffe080" stroke-width="1.8" stroke-linecap="round"/>
+  <line x1="11" y1="-13" x2="9" y2="-10" stroke="#ffe080" stroke-width="1.8" stroke-linecap="round"/>
+  <line x1="-11" y1="-13" x2="-9" y2="-10" stroke="#ffe080" stroke-width="1.8" stroke-linecap="round"/>
+  <line x1="15" y1="-6" x2="12" y2="-4" stroke="#ffe080" stroke-width="1.8" stroke-linecap="round"/>
+  <line x1="-15" y1="-6" x2="-12" y2="-4" stroke="#ffe080" stroke-width="1.8" stroke-linecap="round"/>
+</svg>`;
+
 function _fmtNum(n) { return Number(n).toLocaleString(); }
 
 function _buildFanClipPath(baseDeg, halfDeg, cx = 0, cy = 0) {
@@ -38,13 +58,17 @@ class UIManager {
     this._aoeZone   = { L: document.getElementById('aoe-zone-L') };
     this._stickCur  = { L: document.getElementById('stick-cursor-L') };
     this._stickField = { L: document.getElementById('stick-field-L'), R: document.getElementById('stick-field-R') };
-    // 頭割りギミック（右パネル）
-    this._stkMarker  = document.getElementById('stk-marker-R');
-    this._stkFrame   = document.getElementById('stk-frame-R');
-    this._stkActive  = false;
-    this._stkMarkerX = 0;
-    this._stkMarkerY = 0;
-    this._stkOverlay = null;
+    // 宝箱ギミック（右パネル）
+    this._stkFrame      = document.getElementById('stk-frame-R');
+    this._stkChest      = document.getElementById('stk-chest-R');
+    this._stkDirection  = document.getElementById('stk-direction-R');
+    this._stkActive     = false;
+    this._stkMarkerX    = 0;
+    this._stkMarkerY    = 0;
+    this._stkChestOpened = false;
+    this._worldOffsetX  = 0;
+    this._worldOffsetY  = 0;
+    this._stkOverlay    = null;
     // AOEカーソル色（左パネル）
     this._aoeActive  = false;
     this._aoeData    = null;
@@ -337,7 +361,7 @@ class UIManager {
 
   updateStickCursors(stickL, stickR) {
     this._moveCursor(this._stickCur.L, stickL.x, stickL.y);
-    this._moveFrameCursor(stickR.x, stickR.y);
+    this._moveWorldCursor(stickR.x, stickR.y);
   }
 
   _moveCursor(el, x, y) {
@@ -356,21 +380,78 @@ class UIManager {
     }
   }
 
-  _moveFrameCursor(x, y) {
-    if (!this._stkFrame) return;
-    const halfW = STK_FRAME_W_PCT / 2;
-    const halfH = STK_FRAME_H_PCT / 2;
-    const leftPct = Math.max(halfW, Math.min(100 - halfW, (x + 1) / 2 * 100));
-    const topPct  = Math.max(halfH, Math.min(100 - halfH, (y + 1) / 2 * 100));
-    this._stkFrame.style.left = leftPct + '%';
-    this._stkFrame.style.top  = topPct  + '%';
+  _moveWorldCursor(x, y) {
+    this._worldOffsetX = x;
+    this._worldOffsetY = y;
 
-    if (this._stkActive) {
-      const cx = Math.max(-(1 - STK_FRAME_HALF_W), Math.min(1 - STK_FRAME_HALF_W, x));
-      const cy = Math.max(-(1 - STK_FRAME_HALF_H), Math.min(1 - STK_FRAME_HALF_H, y));
-      const inside = Math.abs(this._stkMarkerX - cx) <= STK_FRAME_HALF_W &&
-                     Math.abs(this._stkMarkerY - cy) <= STK_FRAME_HALF_H;
-      this._stkFrame.className = 'stk-frame ' + (inside ? 'stk-frame--in' : 'stk-frame--out');
+    // グリッド背景をスクロール
+    const field = this._stickField.R;
+    if (field) {
+      const W = field.offsetWidth;
+      const H = field.offsetHeight;
+      const cellW = W * 0.20;
+      const cellH = H * 0.30;
+      const bpx = ((-x * W / 2) % cellW + cellW) % cellW;
+      const bpy = ((-y * H / 2) % cellH + cellH) % cellH;
+      field.style.backgroundPosition = `${bpx}px ${bpy}px`;
+    }
+
+    if (!this._stkActive) return;
+
+    // 宝箱のスクリーン位置を更新
+    const sx = this._stkMarkerX - x;
+    const sy = this._stkMarkerY - y;
+    if (this._stkChest) {
+      this._stkChest.style.left = ((sx + 1) / 2 * 100) + '%';
+      this._stkChest.style.top  = ((sy + 1) / 2 * 100) + '%';
+    }
+
+    // 連続キャプチャ判定（一度開いたら維持）
+    if (!this._stkChestOpened) {
+      const captured = Math.abs(sx) <= STK_FRAME_HALF_W &&
+                       Math.abs(sy) <= STK_FRAME_HALF_H;
+      if (captured) {
+        this._stkChestOpened = true;
+        if (this._stkChest) {
+          this._stkChest.innerHTML = _STK_CHEST_OPEN_SVG;
+          this._stkChest.classList.add('stk-chest--opened');
+        }
+        if (this._stkFrame) {
+          this._stkFrame.className = 'stk-frame stk-frame--in';
+        }
+      }
+    }
+
+    // 方向インジケーター更新
+    this._updateDirectionIndicator(sx, sy);
+  }
+
+  _updateDirectionIndicator(sx, sy) {
+    const el = this._stkDirection;
+    if (!el) return;
+    const onScreen = Math.abs(sx) <= 1 && Math.abs(sy) <= 1;
+    if (onScreen || this._stkChestOpened) {
+      el.classList.remove('stk-direction--active');
+      return;
+    }
+    el.classList.add('stk-direction--active');
+    const scale = Math.max(Math.abs(sx), Math.abs(sy));
+    const PADDING = 0.08;
+    const ex = Math.max(-1 + PADDING, Math.min(1 - PADDING, sx / scale));
+    const ey = Math.max(-1 + PADDING, Math.min(1 - PADDING, sy / scale));
+    el.style.left = ((ex + 1) / 2 * 100) + '%';
+    el.style.top  = ((ey + 1) / 2 * 100) + '%';
+    const angleDeg = Math.atan2(sy, sx) * 180 / Math.PI + 90;
+    el.style.transform = `translate(-50%, -50%) rotate(${angleDeg}deg)`;
+    if (!el.innerHTML) {
+      el.innerHTML = `<svg width="14" height="14" viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="7,0 14,14 0,14" fill="rgba(255,215,0,0.9)"
+          filter="url(#dir-glow)"/>
+        <defs><filter id="dir-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="1.5" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter></defs>
+      </svg>`;
     }
   }
 
@@ -486,13 +567,21 @@ class UIManager {
   }
 
   showStackWarning(markerX, markerY) {
-    this._stkActive  = true;
-    this._stkMarkerX = markerX;
-    this._stkMarkerY = markerY;
-    if (this._stkMarker) {
-      this._stkMarker.style.left = ((markerX + 1) / 2 * 100) + '%';
-      this._stkMarker.style.top  = ((markerY + 1) / 2 * 100) + '%';
-      this._stkMarker.className  = 'stk-marker stk-marker--active';
+    this._stkActive      = true;
+    this._stkMarkerX     = markerX;
+    this._stkMarkerY     = markerY;
+    this._worldOffsetX   = 0;
+    this._worldOffsetY   = 0;
+    this._stkChestOpened = false;
+
+    if (this._stkChest) {
+      this._stkChest.innerHTML = _STK_CHEST_CLOSED_SVG;
+      this._stkChest.className = 'stk-chest stk-chest--active';
+      this._stkChest.style.left = ((markerX + 1) / 2 * 100) + '%';
+      this._stkChest.style.top  = ((markerY + 1) / 2 * 100) + '%';
+    }
+    if (this._stkFrame) {
+      this._stkFrame.className = 'stk-frame';
     }
     if (this._stickField.R) {
       this._stickField.R.classList.add('stick-field--active');
@@ -525,9 +614,11 @@ class UIManager {
   }
 
   clearStack() {
-    this._stkActive = false;
-    if (this._stkMarker) this._stkMarker.className = 'stk-marker';
-    if (this._stkFrame)  this._stkFrame.className  = 'stk-frame';
+    this._stkActive      = false;
+    this._stkChestOpened = false;
+    if (this._stkChest)     this._stkChest.className = 'stk-chest';
+    if (this._stkDirection) this._stkDirection.classList.remove('stk-direction--active');
+    if (this._stkFrame)     this._stkFrame.className  = 'stk-frame';
     if (this._stickField.R) this._stickField.R.classList.remove('stick-field--active');
     if (this._stkOverlay) { this._stkOverlay.remove(); this._stkOverlay = null; }
   }

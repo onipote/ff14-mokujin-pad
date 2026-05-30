@@ -169,10 +169,17 @@ class AoeEngine {
   }
 
   _spawnStack() {
+    // ワールドオフセットを必ず (0,0) から開始するため stickR をリセット
+    this.input.stickR.x = 0;
+    this.input.stickR.y = 0;
+
+    // 50% の確率でミニマップ外（方向インジケーター必要）にスポーン
+    const offscreen = Math.random() < 0.5;
+    const maxRange  = offscreen ? STK_CHEST_SPAWN_OFFSCREEN_MAX : STK_CHEST_SPAWN_ONSCREEN_MAX;
     let markerX, markerY;
     do {
-      markerX = (Math.random() * 2 - 1) * STK_MARKER_RANGE;
-      markerY = (Math.random() * 2 - 1) * STK_MARKER_RANGE;
+      markerX = (Math.random() * 2 - 1) * maxRange;
+      markerY = (Math.random() * 2 - 1) * maxRange;
     } while (Math.abs(markerX) <= STK_FRAME_HALF_W && Math.abs(markerY) <= STK_FRAME_HALF_H);
     this._stkMarkerX = markerX;
     this._stkMarkerY = markerY;
@@ -185,10 +192,7 @@ class AoeEngine {
 
   _fireStack() {
     if (!this._active) return;
-    const isHit = this._checkStackHit(
-      this.input.stickR.x, this.input.stickR.y,
-      this._stkMarkerX, this._stkMarkerY
-    );
+    const isHit = this._checkStackHit();
     this.ui.showStackResult(isHit);
     if (isHit) { if (this.onHit)   this.onHit();      }
     else        { if (this.onDodge) this.onDodge('R'); }
@@ -288,12 +292,8 @@ class AoeEngine {
     return false;
   }
 
-  // 頭割りマーカーをフレームでキャプチャできたか判定（右パネル用）。ヒット = キャプチャ失敗
-  _checkStackHit(rx, ry, markerX, markerY) {
-    const cx = Math.max(-(1 - STK_FRAME_HALF_W), Math.min(1 - STK_FRAME_HALF_W, rx));
-    const cy = Math.max(-(1 - STK_FRAME_HALF_H), Math.min(1 - STK_FRAME_HALF_H, ry));
-    const captured = Math.abs(markerX - cx) <= STK_FRAME_HALF_W &&
-                     Math.abs(markerY - cy) <= STK_FRAME_HALF_H;
-    return !captured;
+  // 宝箱ギミック判定（右パネル用）。ヒット = 一度も枠内に収まらなかった
+  _checkStackHit() {
+    return !this.ui._stkChestOpened;
   }
 }

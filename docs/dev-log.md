@@ -2,6 +2,40 @@
 
 ---
 
+## feat: 右スティックギミック「宝探し」— ミニマップスクロール宝箱キャプチャ
+
+**日付**: 2026-05-30
+
+### 変更概要
+
+右スティックギミックを「フレーム移動でマーカーを捕まえる」から「背景スクロールで宝箱を枠内に収める」方式に全面刷新。ゲーム難易度・タイミング・速度は据え置き（数学的に等価な設計）。
+
+### 変更内容
+
+| ファイル | 内容 |
+|---------|------|
+| `src/constants.js` | `STK_MARKER_RANGE/STK_CENTER_EXCLUDE_R` を削除、`STK_CHEST_SPAWN_ONSCREEN_MAX=0.85` / `STK_CHEST_SPAWN_OFFSCREEN_MAX=1.4` を追加 |
+| `index.html` | `stk-marker`（N/S/E/W矢印SVG）を削除 → `stk-chest`（宝箱）/ `stk-direction`（▲インジケーター）を追加 |
+| `styles/main.css` | `stk-marker`関連スタイル・アニメーション全削除、Rパネルフィールドにグリッド背景追加（`background-image: repeating-gradient`）、`.stk-chest` / `.stk-direction` スタイル追加 |
+| `src/ui.js` | `_moveFrameCursor` を `_moveWorldCursor` に置き換え（フレーム固定・背景スクロール実装）、方向インジケーター `_updateDirectionIndicator` 追加、`showStackWarning` / `clearStack` 更新、宝箱SVG定数 `_STK_CHEST_CLOSED_SVG` / `_STK_CHEST_OPEN_SVG` 追加 |
+| `src/aoe.js` | `_spawnStack` でスポーン範囲拡張・stickRリセット追加、`_checkStackHit` を `!ui._stkChestOpened` に簡略化 |
+
+### ゲームメカニクス仕様
+
+- **フレーム**: 常にミニマップ中央に固定（`left:50%; top:50%`）
+- **背景**: 薄いグリッド（`rgba(100,180,255,0.08)`）がスティック入力に応じてスクロール
+- **宝箱スポーン**: 50%の確率でミニマップ内（`±0.85`）、50%でミニマップ外（`±1.4`）
+- **方向インジケーター**: 宝箱がミニマップ外の場合、枠の端に ▲ が宝箱方向を指して表示
+- **キャプチャ**: 毎フレーム連続判定。宝箱が中央フレーム内に入ると閉→開に変化（一度開いたら維持）
+- **成功条件**: `AOE_WARNING_MS=3000ms` 以内に宝箱を開けること（開いた状態で時間切れ → 成功）
+- **座標系**: ワールド座標 = `stickR.x/y`（`±1`クランプ）、スクリーン座標 = `chestWorldX - worldOffsetX`
+
+### 設計ドキュメント
+
+`docs/designs/plan_chest_gimmick_2026-05-30.md` を参照。
+
+---
+
 ## refine: 頭割りギミック中央マーカーを円盤に変更
 
 **日付**: 2026-05-30
