@@ -147,7 +147,40 @@
         <!-- R パネル -->
         <div class="stick-panel" id="stick-panel-R">
           <div class="stick-field" id="stick-field-R">
-            <div class="gaze-eye" id="gaze-eye-R"></div>
+            <div class="stk-marker" id="stk-marker-R">
+              <svg class="stk-svg" viewBox="-50 -50 100 100" xmlns="http://www.w3.org/2000/svg">
+                <!-- Center: 3 downward ∨ shapes (bottom=brightest) -->
+                <g class="stk-grp-center">
+                  <polyline class="stk-shape stk-dim"    points="-5,-22 0,-17 5,-22"/>
+                  <polyline class="stk-shape stk-mid"    points="-6,-14 0,-9  6,-14"/>
+                  <polyline class="stk-shape stk-bright" points="-7,-6  0,-1  7,-6"/>
+                </g>
+                <!-- N: pointing down toward center, outer→inner=dim→bright -->
+                <g class="stk-grp-n">
+                  <polyline class="stk-shape stk-dim"    points="-5,-42 0,-37 5,-42"/>
+                  <polyline class="stk-shape stk-mid"    points="-5,-34 0,-29 5,-34"/>
+                  <polyline class="stk-shape stk-bright" points="-5,-26 0,-21 5,-26"/>
+                </g>
+                <!-- S: pointing up toward center, inner→outer=bright→dim -->
+                <g class="stk-grp-s">
+                  <polyline class="stk-shape stk-bright" points="-5,12 0,7  5,12"/>
+                  <polyline class="stk-shape stk-mid"    points="-5,20 0,15 5,20"/>
+                  <polyline class="stk-shape stk-dim"    points="-5,28 0,23 5,28"/>
+                </g>
+                <!-- W: pointing right toward center, outer→inner=dim→bright -->
+                <g class="stk-grp-w">
+                  <polyline class="stk-shape stk-dim"    points="-42,-5 -37,0 -42,5"/>
+                  <polyline class="stk-shape stk-mid"    points="-34,-5 -29,0 -34,5"/>
+                  <polyline class="stk-shape stk-bright" points="-26,-5 -21,0 -26,5"/>
+                </g>
+                <!-- E: pointing left toward center, inner→outer=bright→dim -->
+                <g class="stk-grp-e">
+                  <polyline class="stk-shape stk-bright" points="26,-5 21,0 26,5"/>
+                  <polyline class="stk-shape stk-mid"    points="34,-5 29,0 34,5"/>
+                  <polyline class="stk-shape stk-dim"    points="42,-5 37,0 42,5"/>
+                </g>
+              </svg>
+            </div>
             <div class="gaze-frame" id="gaze-frame-R"></div>
           </div>
           <div class="stick-side-label">R</div>

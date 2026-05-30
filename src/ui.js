@@ -38,8 +38,8 @@ class UIManager {
     this._aoeZone   = { L: document.getElementById('aoe-zone-L') };
     this._stickCur  = { L: document.getElementById('stick-cursor-L') };
     this._stickField = { L: document.getElementById('stick-field-L'), R: document.getElementById('stick-field-R') };
-    // 視線ギミック（右パネル）
-    this._gazeEye    = document.getElementById('gaze-eye-R');
+    // 頭割りマーカー（右パネル）
+    this._stkMarker  = document.getElementById('stk-marker-R');
     this._gazeFrame  = document.getElementById('gaze-frame-R');
     this._gazeActive  = false;
     this._gazeEyeX    = 0;
@@ -358,10 +358,6 @@ class UIManager {
       const inside = Math.abs(this._gazeEyeX - cx) <= GAZE_FRAME_HALF_W &&
                      Math.abs(this._gazeEyeY - cy) <= GAZE_FRAME_HALF_H;
       this._gazeFrame.className = 'gaze-frame ' + (inside ? 'gaze-frame--in' : 'gaze-frame--out');
-      if (this._gazeEye) {
-        this._gazeEye.className = 'gaze-eye gaze-eye--visible ' +
-                                  (inside ? 'gaze-eye--captured' : 'gaze-eye--danger');
-      }
     }
   }
 
@@ -480,10 +476,10 @@ class UIManager {
     this._gazeActive = true;
     this._gazeEyeX   = eyeX;
     this._gazeEyeY   = eyeY;
-    if (this._gazeEye) {
-      this._gazeEye.style.left = ((eyeX + 1) / 2 * 100) + '%';
-      this._gazeEye.style.top  = ((eyeY + 1) / 2 * 100) + '%';
-      this._gazeEye.className  = 'gaze-eye gaze-eye--visible gaze-eye--danger';
+    if (this._stkMarker) {
+      this._stkMarker.style.left = ((eyeX + 1) / 2 * 100) + '%';
+      this._stkMarker.style.top  = ((eyeY + 1) / 2 * 100) + '%';
+      this._stkMarker.className  = 'stk-marker stk-marker--active';
     }
     if (this._stickField.R) {
       this._stickField.R.classList.add('stick-field--active');
@@ -497,9 +493,6 @@ class UIManager {
 
   showGazeResult(isHit) {
     this._gazeActive = false;
-    if (this._gazeEye) {
-      this._gazeEye.className = 'gaze-eye ' + (isHit ? 'gaze-eye--hit' : 'gaze-eye--dodge');
-    }
     if (this._gazeFrame) {
       this._gazeFrame.className = 'gaze-frame ' + (isHit ? 'gaze-frame--hit' : 'gaze-frame--dodge');
     }
@@ -520,8 +513,8 @@ class UIManager {
 
   clearGaze() {
     this._gazeActive = false;
-    if (this._gazeEye)   this._gazeEye.className  = 'gaze-eye';
-    if (this._gazeFrame) this._gazeFrame.className = 'gaze-frame';
+    if (this._stkMarker) this._stkMarker.className = 'stk-marker';
+    if (this._gazeFrame)  this._gazeFrame.className  = 'gaze-frame';
     if (this._stickField.R) this._stickField.R.classList.remove('stick-field--active');
     if (this._gazeOverlay) { this._gazeOverlay.remove(); this._gazeOverlay = null; }
   }
