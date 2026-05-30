@@ -1794,6 +1794,48 @@ body {
   50%       { transform: translate(-50%, -50%) scale(1.08); }
 }
 
+/* ===== STACK MARKER (頭割り) ===== */
+.stk-marker {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 3;
+  display: none;
+}
+.stk-marker--active { display: block; }
+
+.stk-svg { width: 100%; height: 100%; overflow: visible; }
+
+.stk-shape {
+  fill: none;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.stk-dim    { stroke: #FFB844; opacity: 0.30; filter: drop-shadow(0 0 3px #FF9900); }
+.stk-mid    { stroke: #FF9900; opacity: 0.65; filter: drop-shadow(0 0 4px #FF8800) drop-shadow(0 0 8px #FF6600); }
+.stk-bright { stroke: #FFFAE8; opacity: 1.0;  filter: drop-shadow(0 0 5px #FFFDE0) drop-shadow(0 0 12px #FFE000) drop-shadow(0 0 22px #FFC000); }
+
+.stk-grp-center .stk-shape { stroke-width: 3; }
+.stk-grp-center { animation: stk-bob 1.6s ease-in-out infinite; }
+@keyframes stk-bob {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-2.5px); }
+}
+
+.stk-grp-n { animation: stk-pulse-n 1.6s ease-in-out infinite; }
+.stk-grp-s { animation: stk-pulse-s 1.6s ease-in-out infinite; }
+.stk-grp-w { animation: stk-pulse-w 1.6s ease-in-out infinite; }
+.stk-grp-e { animation: stk-pulse-e 1.6s ease-in-out infinite; }
+@keyframes stk-pulse-n { 0%,100%{transform:translateY(0px)}  50%{transform:translateY(-8px)} }
+@keyframes stk-pulse-s { 0%,100%{transform:translateY(0px)}  50%{transform:translateY(8px)}  }
+@keyframes stk-pulse-w { 0%,100%{transform:translateX(0px)}  50%{transform:translateX(-8px)} }
+@keyframes stk-pulse-e { 0%,100%{transform:translateX(0px)}  50%{transform:translateX(8px)}  }
+
+#stick-panel-R .stick-field { overflow: visible; }
+
 /* ===== G.A.T.E JOINED Overlay ===== */
 #gate-joined-overlay {
   position: fixed;
