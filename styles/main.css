@@ -28,6 +28,10 @@
 }
 
 /* ===== Reset ===== */
+html {
+  overflow: hidden;
+}
+
 *,
 *::before,
 *::after {
@@ -1003,7 +1007,7 @@ body {
 .aoe-zone--warning-out,
 .aoe-zone--hit,
 .aoe-zone--dodge {
-  background: rgba(255, 100, 0, 0.06);
+  background: rgba(255, 100, 0, 0.14);
   border: 2px solid #FFA850;
   box-shadow:
     0 0 12px rgba(255, 140, 30, 0.50),
@@ -1037,9 +1041,9 @@ body {
   /* clip-path により inset shadow が効かないため radial-gradient で代替 */
   background: radial-gradient(
     ellipse at 50% 50%,
-    transparent 0%,
-    transparent 12%,
-    rgba(255, 100, 0, 0.10) 35%,
+    rgba(255, 100, 0, 0.07) 0%,
+    rgba(255, 100, 0, 0.07) 12%,
+    rgba(255, 100, 0, 0.13) 35%,
     rgba(255, 105, 0, 0.28) 60%,
     rgba(255, 110, 0, 0.50) 80%,
     rgba(255, 115, 0, 0.68) 100%
@@ -1589,8 +1593,8 @@ body {
   margin-top: -8px;
 }
 
-/* ===== 視線ギミック（右パネル）===== */
-.gaze-frame {
+/* ===== 頭割りギミック・フレーム（右パネル）===== */
+.stk-frame {
   position: absolute;
   width: 48.875%;
   height: 48.875%;
@@ -1606,19 +1610,19 @@ body {
     0 0 8px rgba(160, 232, 248, 0.4),
     inset 0 0 6px rgba(160, 232, 248, 0.08);
 }
-.gaze-frame--in {
+.stk-frame--in {
   border-color: rgba(55, 200, 85, 0.85);
   box-shadow:
     0 0 14px rgba(35, 185, 75, 0.6),
     inset 0 0 10px rgba(35, 185, 75, 0.2);
 }
-.gaze-frame--out {
+.stk-frame--out {
   border-color: rgba(220, 60, 60, 0.85);
   box-shadow:
     0 0 14px rgba(200, 40, 40, 0.6),
     inset 0 0 10px rgba(200, 40, 40, 0.15);
 }
-.gaze-overlay {
+.stk-overlay {
   position: absolute;
   left: 0;
   top: 0;
@@ -1628,126 +1632,17 @@ body {
   pointer-events: none;
   z-index: 0;
 }
-.gaze-frame--hit {
+.stk-frame--hit {
   border-color: rgba(230, 60, 60, 0.9);
   box-shadow:
     0 0 18px rgba(210, 40, 40, 0.7),
     inset 0 0 12px rgba(210, 40, 40, 0.3);
 }
-.gaze-frame--dodge {
+.stk-frame--dodge {
   border-color: rgba(55, 200, 85, 0.75);
   box-shadow:
     0 0 16px rgba(35, 185, 75, 0.5),
     inset 0 0 10px rgba(35, 185, 75, 0.2);
-}
-
-/* ===== 探検アイコン（右パネル：捕獲ギミック）===== */
-.gaze-eye {
-  position: absolute;
-  width: 15px;
-  height: 15px;
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-  z-index: 3;
-  display: none;
-  border: 1px solid transparent;
-  box-sizing: border-box;
-}
-
-/* オーラリング（回転＋呼吸） */
-.gaze-eye::before {
-  content: '';
-  position: absolute;
-  inset: -12px;
-  border-radius: 50%;
-  animation: tanken-spin 5s linear infinite, tanken-aura-breathe 3s ease-in-out infinite;
-  mask-image: radial-gradient(circle, transparent 40%, black 50%, black 66%, transparent 82%);
-  -webkit-mask-image: radial-gradient(circle, transparent 40%, black 50%, black 66%, transparent 82%);
-}
-
-.gaze-eye--visible {
-  display: block;
-  animation: tanken-pulse 2.5s ease-in-out infinite;
-}
-
-/* 枠外（赤：未キャプチャ） */
-.gaze-eye--danger {
-  display: block;
-  background: radial-gradient(circle,
-    rgba(255, 200, 180, 0.95) 0%,
-    rgba(220, 55, 55, 0.78)  40%,
-    rgba(180, 20, 20, 0.15)  75%,
-    transparent              100%);
-  border-color: rgba(220, 50, 50, 0.35);
-  box-shadow: 0 0 9px rgba(220, 50, 50, 0.9);
-}
-.gaze-eye--danger::before {
-  background: conic-gradient(
-    rgba(220, 50, 50, 0.45), rgba(220, 50, 50, 0.03) 90deg,
-    rgba(220, 50, 50, 0.45) 180deg, rgba(220, 50, 50, 0.03) 270deg,
-    rgba(220, 50, 50, 0.45)
-  );
-}
-
-/* 枠内（緑：キャプチャ中） */
-.gaze-eye--captured {
-  display: block;
-  background: radial-gradient(circle,
-    rgba(220, 255, 220, 0.95) 0%,
-    rgba(50, 200, 85, 0.78)   40%,
-    rgba(15, 140, 45, 0.15)   75%,
-    transparent               100%);
-  border-color: rgba(55, 200, 85, 0.35);
-  box-shadow: 0 0 9px rgba(55, 200, 85, 0.9);
-}
-.gaze-eye--captured::before {
-  background: conic-gradient(
-    rgba(50, 200, 85, 0.45), rgba(50, 200, 85, 0.03) 90deg,
-    rgba(50, 200, 85, 0.45) 180deg, rgba(50, 200, 85, 0.03) 270deg,
-    rgba(50, 200, 85, 0.45)
-  );
-}
-
-/* 結果：キャプチャ失敗（赤強調） */
-.gaze-eye--hit {
-  display: block;
-  background: radial-gradient(circle,
-    rgba(255, 200, 180, 0.95) 0%,
-    rgba(220, 40, 40, 0.78)   40%,
-    rgba(180, 15, 15, 0.15)   75%,
-    transparent               100%);
-  border-color: rgba(255, 50, 50, 0.5);
-  box-shadow: 0 0 12px rgba(255, 50, 50, 0.9);
-  animation: none;
-}
-.gaze-eye--hit::before {
-  background: conic-gradient(
-    rgba(255, 50, 50, 0.45), rgba(255, 50, 50, 0.03) 90deg,
-    rgba(255, 50, 50, 0.45) 180deg, rgba(255, 50, 50, 0.03) 270deg,
-    rgba(255, 50, 50, 0.45)
-  );
-}
-
-/* 結果：キャプチャ成功（緑強調） */
-.gaze-eye--dodge {
-  display: block;
-  background: radial-gradient(circle,
-    rgba(220, 255, 220, 0.95) 0%,
-    rgba(50, 200, 85, 0.78)   40%,
-    rgba(15, 140, 45, 0.15)   75%,
-    transparent               100%);
-  border-color: rgba(55, 220, 90, 0.5);
-  box-shadow: 0 0 12px rgba(55, 220, 90, 0.9);
-  animation: none;
-  opacity: 0.7;
-}
-.gaze-eye--dodge::before {
-  background: conic-gradient(
-    rgba(55, 220, 90, 0.45), rgba(55, 220, 90, 0.03) 90deg,
-    rgba(55, 220, 90, 0.45) 180deg, rgba(55, 220, 90, 0.03) 270deg,
-    rgba(55, 220, 90, 0.45)
-  );
 }
 
 @keyframes gimmick-success-anim {

@@ -14,8 +14,20 @@ class AoeEngine {
     this._side    = null; // 'L' | 'R'
     this._type    = null;
     this._aoeData = null; // 幾何データ
-    this._gazeEyeX = 0;
-    this._gazeEyeY = 0;
+    this._stkMarkerX = 0;
+    this._stkMarkerY = 0;
+
+    // ポーズ/復帰のためのタイマー追跡
+    this._phase = 'idle';       // 'idle' | 'warning' | 'result'
+    this._schedSetAt = 0;
+    this._schedDelay = 0;
+    this._fireSetAt  = 0;
+    this._clearSetAt = 0;
+    this._pausedPhase     = null;
+    this._pausedRemaining = 0;
+
+    this._leftStreak  = 0;
+    this._rightStreak = 0;
   }
 
   start() {
@@ -32,27 +44,97 @@ class AoeEngine {
     this._schedId = this._fireId = this._clearId = null;
     if (this.ui) {
       this.ui.clearAoe('L');
-      this.ui.clearGaze();
+      this.ui.clearStack();
     }
     this._side = null;
     this._type = null;
     this._aoeData = null;
-    this._gazeEyeX = 0;
-    this._gazeEyeY = 0;
+    this._stkMarkerX = 0;
+    this._stkMarkerY = 0;
+    this._phase = 'idle';
+    this._leftStreak  = 0;
+    this._rightStreak = 0;
+  }
+
+  // ポーズ：タイマーのみ停止。UIと状態変数は保持する
+  pauseTimers() {
+    if (!this._active) return;
+    const now = Date.now();
+    this._pausedPhase = this._phase;
+
+    // _phase を基準にどのタイマーが有効かを判断する
+    // (_fireId は発火後も古いIDが残るため truthy チェックでは判断できない)
+    switch (this._phase) {
+      case 'idle':
+        this._pausedRemaining = Math.max(0, this._schedDelay - (now - this._schedSetAt));
+        clearTimeout(this._schedId);
+        this._schedId = null;
+        break;
+      case 'warning':
+        this._pausedRemaining = Math.max(0, AOE_WARNING_MS - (now - this._fireSetAt));
+        clearTimeout(this._fireId);
+        this._fireId = null;
+        break;
+      case 'result':
+        this._pausedRemaining = Math.max(0, AOE_FIRE_MS - (now - this._clearSetAt));
+        clearTimeout(this._clearId);
+        this._clearId = null;
+        break;
+      default:
+        this._pausedRemaining = 0;
+        this._pausedPhase = 'idle';
+    }
+
+    this._active = false;
+  }
+
+  // 復帰：保存した残り時間でタイマーを再始動。UIは触らない
+  resumeTimers() {
+    this._active = true;
+    const remaining = this._pausedRemaining;
+
+    switch (this._pausedPhase) {
+      case 'idle':
+        this._schedSetAt = Date.now();
+        this._schedDelay = remaining;
+        this._schedId = setTimeout(() => this._spawn(), remaining);
+        break;
+      case 'warning':
+        this._fireSetAt = Date.now();
+        this._fireId = this._side === 'R'
+          ? setTimeout(() => this._fireStack(), remaining)
+          : setTimeout(() => this._fireAoe(),   remaining);
+        break;
+      case 'result':
+        this._clearSetAt = Date.now();
+        this._clearId = this._side === 'R'
+          ? setTimeout(() => this._clearStack(), remaining)
+          : setTimeout(() => this._clearAoe(),   remaining);
+        break;
+    }
   }
 
   _scheduleNext() {
     if (!this._active) return;
     const delay = AOE_MIN_DELAY_MS + Math.random() * (AOE_MAX_DELAY_MS - AOE_MIN_DELAY_MS);
+    this._phase = 'idle';
+    this._schedSetAt = Date.now();
+    this._schedDelay = delay;
     this._schedId = setTimeout(() => this._spawn(), delay);
   }
 
   _spawn() {
     if (!this._active) return;
-    this._side = Math.random() < 0.5 ? 'L' : 'R';
+    let side;
+    if (this._leftStreak >= 3)       side = 'R';
+    else if (this._rightStreak >= 2) side = 'L';
+    else                              side = Math.random() < 0.5 ? 'L' : 'R';
+    this._side = side;
+    if (side === 'L') { this._leftStreak++; this._rightStreak = 0; }
+    else              { this._rightStreak++; this._leftStreak = 0; }
 
     if (this._side === 'R') {
-      this._spawnGaze();
+      this._spawnStack();
       return;
     }
 
@@ -62,48 +144,66 @@ class AoeEngine {
     this._aoeData = this._buildAoeData(this._type);
     this.ui.showAoeWarning(this._side, this._aoeData);
 
-    this._fireId = setTimeout(() => {
-      if (!this._active) return;
-      const isHit = this._checkHit(this.input.stickL.x, this.input.stickL.y, this._aoeData);
-      this.ui.showAoeResult(this._side, this._aoeData, isHit);
-      if (isHit) { if (this.onHit)   this.onHit();      }
-      else        { if (this.onDodge) this.onDodge('L'); }
-      this._clearId = setTimeout(() => {
-        if (!this._active) return;
-        this.ui.clearAoe(this._side);
-        this._side = this._type = this._aoeData = null;
-        this._scheduleNext();
-      }, AOE_FIRE_MS);
-    }, AOE_WARNING_MS);
+    this._phase = 'warning';
+    this._fireSetAt = Date.now();
+    this._fireId = setTimeout(() => this._fireAoe(), AOE_WARNING_MS);
   }
 
-  _spawnGaze() {
-    let eyeX, eyeY;
-    do {
-      eyeX = (Math.random() * 2 - 1) * GAZE_EYE_RANGE;
-      eyeY = (Math.random() * 2 - 1) * GAZE_EYE_RANGE;
-    } while (Math.abs(eyeX) <= GAZE_FRAME_HALF_W && Math.abs(eyeY) <= GAZE_FRAME_HALF_H);
-    this._gazeEyeX = eyeX;
-    this._gazeEyeY = eyeY;
-    this.ui.showGazeWarning(this._gazeEyeX, this._gazeEyeY);
+  _fireAoe() {
+    if (!this._active) return;
+    const isHit = this._checkHit(this.input.stickL.x, this.input.stickL.y, this._aoeData);
+    this.ui.showAoeResult(this._side, this._aoeData, isHit);
+    if (isHit) { if (this.onHit)   this.onHit();      }
+    else        { if (this.onDodge) this.onDodge('L'); }
 
-    this._fireId = setTimeout(() => {
-      if (!this._active) return;
-      const isHit = this._checkGazeHit(
-        this.input.stickR.x, this.input.stickR.y,
-        this._gazeEyeX, this._gazeEyeY
-      );
-      this.ui.showGazeResult(isHit);
-      if (isHit) { if (this.onHit)   this.onHit();      }
-      else        { if (this.onDodge) this.onDodge('R'); }
-      this._clearId = setTimeout(() => {
-        if (!this._active) return;
-        this.ui.clearGaze();
-        this._side = null;
-        this._gazeEyeX = this._gazeEyeY = 0;
-        this._scheduleNext();
-      }, AOE_FIRE_MS);
-    }, AOE_WARNING_MS);
+    this._phase = 'result';
+    this._clearSetAt = Date.now();
+    this._clearId = setTimeout(() => this._clearAoe(), AOE_FIRE_MS);
+  }
+
+  _clearAoe() {
+    if (!this._active) return;
+    this.ui.clearAoe(this._side);
+    this._side = this._type = this._aoeData = null;
+    this._scheduleNext();
+  }
+
+  _spawnStack() {
+    let markerX, markerY;
+    do {
+      markerX = (Math.random() * 2 - 1) * STK_MARKER_RANGE;
+      markerY = (Math.random() * 2 - 1) * STK_MARKER_RANGE;
+    } while (Math.abs(markerX) <= STK_FRAME_HALF_W && Math.abs(markerY) <= STK_FRAME_HALF_H);
+    this._stkMarkerX = markerX;
+    this._stkMarkerY = markerY;
+    this.ui.showStackWarning(this._stkMarkerX, this._stkMarkerY);
+
+    this._phase = 'warning';
+    this._fireSetAt = Date.now();
+    this._fireId = setTimeout(() => this._fireStack(), AOE_WARNING_MS);
+  }
+
+  _fireStack() {
+    if (!this._active) return;
+    const isHit = this._checkStackHit(
+      this.input.stickR.x, this.input.stickR.y,
+      this._stkMarkerX, this._stkMarkerY
+    );
+    this.ui.showStackResult(isHit);
+    if (isHit) { if (this.onHit)   this.onHit();      }
+    else        { if (this.onDodge) this.onDodge('R'); }
+
+    this._phase = 'result';
+    this._clearSetAt = Date.now();
+    this._clearId = setTimeout(() => this._clearStack(), AOE_FIRE_MS);
+  }
+
+  _clearStack() {
+    if (!this._active) return;
+    this.ui.clearStack();
+    this._side = null;
+    this._stkMarkerX = this._stkMarkerY = 0;
+    this._scheduleNext();
   }
 
   _buildAoeData(type) {
@@ -188,12 +288,12 @@ class AoeEngine {
     return false;
   }
 
-  // 探検アイコンがキャプチャできたか判定（右パネル用）。ヒット = キャプチャ失敗
-  _checkGazeHit(rx, ry, eyeX, eyeY) {
-    const cx = Math.max(-(1 - GAZE_FRAME_HALF_W), Math.min(1 - GAZE_FRAME_HALF_W, rx));
-    const cy = Math.max(-(1 - GAZE_FRAME_HALF_H), Math.min(1 - GAZE_FRAME_HALF_H, ry));
-    const captured = Math.abs(eyeX - cx) <= GAZE_FRAME_HALF_W &&
-                     Math.abs(eyeY - cy) <= GAZE_FRAME_HALF_H;
+  // 頭割りマーカーをフレームでキャプチャできたか判定（右パネル用）。ヒット = キャプチャ失敗
+  _checkStackHit(rx, ry, markerX, markerY) {
+    const cx = Math.max(-(1 - STK_FRAME_HALF_W), Math.min(1 - STK_FRAME_HALF_W, rx));
+    const cy = Math.max(-(1 - STK_FRAME_HALF_H), Math.min(1 - STK_FRAME_HALF_H, ry));
+    const captured = Math.abs(markerX - cx) <= STK_FRAME_HALF_W &&
+                     Math.abs(markerY - cy) <= STK_FRAME_HALF_H;
     return !captured;
   }
 }

@@ -38,13 +38,13 @@ class UIManager {
     this._aoeZone   = { L: document.getElementById('aoe-zone-L') };
     this._stickCur  = { L: document.getElementById('stick-cursor-L') };
     this._stickField = { L: document.getElementById('stick-field-L'), R: document.getElementById('stick-field-R') };
-    // 頭割りマーカー（右パネル）
+    // 頭割りギミック（右パネル）
     this._stkMarker  = document.getElementById('stk-marker-R');
-    this._gazeFrame  = document.getElementById('gaze-frame-R');
-    this._gazeActive  = false;
-    this._gazeEyeX    = 0;
-    this._gazeEyeY    = 0;
-    this._gazeOverlay = null;
+    this._stkFrame   = document.getElementById('stk-frame-R');
+    this._stkActive  = false;
+    this._stkMarkerX = 0;
+    this._stkMarkerY = 0;
+    this._stkOverlay = null;
     // AOEカーソル色（左パネル）
     this._aoeActive  = false;
     this._aoeData    = null;
@@ -114,6 +114,19 @@ class UIManager {
     this.setTimerFill(0);
     this.setCountdown(GAME_DURATION_MS);
     this.resetLimitGaugeInstant();
+  }
+
+  resetStickCursors() {
+    if (this._stickCur.L) {
+      this._stickCur.L.style.left = '50%';
+      this._stickCur.L.style.top  = '50%';
+      this._stickCur.L.className  = 'stick-cursor';
+    }
+    if (this._stkFrame) {
+      this._stkFrame.style.left = '50%';
+      this._stkFrame.style.top  = '50%';
+      this._stkFrame.className  = 'stk-frame';
+    }
   }
 
   setBurstState(active) {
@@ -344,20 +357,20 @@ class UIManager {
   }
 
   _moveFrameCursor(x, y) {
-    if (!this._gazeFrame) return;
-    const halfW = GAZE_FRAME_W_PCT / 2;
-    const halfH = GAZE_FRAME_H_PCT / 2;
+    if (!this._stkFrame) return;
+    const halfW = STK_FRAME_W_PCT / 2;
+    const halfH = STK_FRAME_H_PCT / 2;
     const leftPct = Math.max(halfW, Math.min(100 - halfW, (x + 1) / 2 * 100));
     const topPct  = Math.max(halfH, Math.min(100 - halfH, (y + 1) / 2 * 100));
-    this._gazeFrame.style.left = leftPct + '%';
-    this._gazeFrame.style.top  = topPct  + '%';
+    this._stkFrame.style.left = leftPct + '%';
+    this._stkFrame.style.top  = topPct  + '%';
 
-    if (this._gazeActive) {
-      const cx = Math.max(-(1 - GAZE_FRAME_HALF_W), Math.min(1 - GAZE_FRAME_HALF_W, x));
-      const cy = Math.max(-(1 - GAZE_FRAME_HALF_H), Math.min(1 - GAZE_FRAME_HALF_H, y));
-      const inside = Math.abs(this._gazeEyeX - cx) <= GAZE_FRAME_HALF_W &&
-                     Math.abs(this._gazeEyeY - cy) <= GAZE_FRAME_HALF_H;
-      this._gazeFrame.className = 'gaze-frame ' + (inside ? 'gaze-frame--in' : 'gaze-frame--out');
+    if (this._stkActive) {
+      const cx = Math.max(-(1 - STK_FRAME_HALF_W), Math.min(1 - STK_FRAME_HALF_W, x));
+      const cy = Math.max(-(1 - STK_FRAME_HALF_H), Math.min(1 - STK_FRAME_HALF_H, y));
+      const inside = Math.abs(this._stkMarkerX - cx) <= STK_FRAME_HALF_W &&
+                     Math.abs(this._stkMarkerY - cy) <= STK_FRAME_HALF_H;
+      this._stkFrame.className = 'stk-frame ' + (inside ? 'stk-frame--in' : 'stk-frame--out');
     }
   }
 
@@ -472,29 +485,29 @@ class UIManager {
     return false;
   }
 
-  showGazeWarning(eyeX, eyeY) {
-    this._gazeActive = true;
-    this._gazeEyeX   = eyeX;
-    this._gazeEyeY   = eyeY;
+  showStackWarning(markerX, markerY) {
+    this._stkActive  = true;
+    this._stkMarkerX = markerX;
+    this._stkMarkerY = markerY;
     if (this._stkMarker) {
-      this._stkMarker.style.left = ((eyeX + 1) / 2 * 100) + '%';
-      this._stkMarker.style.top  = ((eyeY + 1) / 2 * 100) + '%';
+      this._stkMarker.style.left = ((markerX + 1) / 2 * 100) + '%';
+      this._stkMarker.style.top  = ((markerY + 1) / 2 * 100) + '%';
       this._stkMarker.className  = 'stk-marker stk-marker--active';
     }
     if (this._stickField.R) {
       this._stickField.R.classList.add('stick-field--active');
-      if (!this._gazeOverlay) {
-        this._gazeOverlay = document.createElement('div');
-        this._gazeOverlay.className = 'gaze-overlay';
-        this._stickField.R.appendChild(this._gazeOverlay);
+      if (!this._stkOverlay) {
+        this._stkOverlay = document.createElement('div');
+        this._stkOverlay.className = 'stk-overlay';
+        this._stickField.R.appendChild(this._stkOverlay);
       }
     }
   }
 
-  showGazeResult(isHit) {
-    this._gazeActive = false;
-    if (this._gazeFrame) {
-      this._gazeFrame.className = 'gaze-frame ' + (isHit ? 'gaze-frame--hit' : 'gaze-frame--dodge');
+  showStackResult(isHit) {
+    this._stkActive = false;
+    if (this._stkFrame) {
+      this._stkFrame.className = 'stk-frame ' + (isHit ? 'stk-frame--hit' : 'stk-frame--dodge');
     }
   }
 
@@ -511,12 +524,12 @@ class UIManager {
     setTimeout(() => { if (el.parentNode) el.parentNode.removeChild(el); }, 1500);
   }
 
-  clearGaze() {
-    this._gazeActive = false;
+  clearStack() {
+    this._stkActive = false;
     if (this._stkMarker) this._stkMarker.className = 'stk-marker';
-    if (this._gazeFrame)  this._gazeFrame.className  = 'gaze-frame';
+    if (this._stkFrame)  this._stkFrame.className  = 'stk-frame';
     if (this._stickField.R) this._stickField.R.classList.remove('stick-field--active');
-    if (this._gazeOverlay) { this._gazeOverlay.remove(); this._gazeOverlay = null; }
+    if (this._stkOverlay) { this._stkOverlay.remove(); this._stkOverlay = null; }
   }
 
   hideGameOver() {
