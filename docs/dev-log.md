@@ -2,6 +2,28 @@
 
 ---
 
+## revert: スクロールバー抑制を撤回・ゲームオーバー画面のスクロール方式を変更
+
+**日付**: 2026-05-30
+
+### 概要
+
+`cf79302` で追加した「スクロールバー抑制」を撤回し、スクロールの主体を変更した。  
+変更前：パネル内部がスクロールし、ウインドウはスクロールしない  
+変更後：パネル内部はスクロールせず、ゲームオーバー画面（オーバーレイ）自体がスクロールする
+
+### 変更内容
+
+| # | 変更内容 | ファイル |
+|---|---------|---------|
+| 1 | `html { overflow: hidden; }` を削除（スクロールバー抑制を撤回） | `styles/main.css` |
+| 2 | `#screen-gameover .screen-panel` の `overflow-y: auto` / `max-height` を削除（パネル内部スクロール解除） | `styles/main.css` |
+| 3 | `#screen-gameover` に `overflow-y: auto; align-items: flex-start; padding: 16px 8px` を追加（オーバーレイ自体をスクロール可能に） | `styles/main.css` |
+
+設計詳細: [docs/designs/plan_scrollbar_revert.md](designs/plan_scrollbar_revert.md)
+
+---
+
 ## fix: LBゲージ終了タイミングでのリキャスト速度急低下を修正
 
 **日付**: 2026-05-30

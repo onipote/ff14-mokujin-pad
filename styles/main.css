@@ -28,10 +28,6 @@
 }
 
 /* ===== Reset ===== */
-html {
-  overflow: hidden;
-}
-
 *,
 *::before,
 *::after {
@@ -449,13 +445,17 @@ body {
   max-width: calc(100% - 16px);
 }
 
+#screen-gameover {
+  overflow-y: auto;
+  align-items: flex-start;
+  padding: 16px 8px;
+}
+
 #screen-gameover .screen-panel {
   width: 760px;
   max-width: calc(100% - 16px);
   padding: 28px 36px;
   gap: 14px;
-  overflow-y: auto;
-  max-height: calc(100vh - 32px);
 }
 
 /* ===== Buttons ===== */
