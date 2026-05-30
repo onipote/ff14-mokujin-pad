@@ -2,6 +2,26 @@
 
 ---
 
+## refine: 頭割りギミック中央マーカーを円盤に変更
+
+**日付**: 2026-05-30
+
+### 変更内容
+
+| ファイル | 内容 |
+|---------|------|
+| `index.html` | `stk-grp-center` 内の∨形矢印2本を `<circle r="6">` に置き換え |
+| `styles/main.css` | `.stk-center-disc` クラス追加（fill: #FFFAE8、stroke: #FF9900、opacity: 0.3、グロー） |
+
+### デザイン仕様
+
+- **形状**: 半径6の円盤（SVG viewBox -50〜50 基準）、中心がギミック中心点(0,0)と一致
+- **外観**: 白いコア（`fill: #FFFAE8`）＋オレンジのアウトライン（`stroke: #FF9900`）＋黄金色グロー
+- **透明度**: `opacity: 0.3`（控えめな存在感）
+- **アニメーション**: 従来の `stk-bob`（上下ふわふわ）をそのまま継承
+
+---
+
 ## fix: バースト終了後にスロット速度が通常速度へ戻らない問題を修正
 
 **日付**: 2026-05-30
@@ -2076,3 +2096,4 @@ CSS 回転角は `atan2(sin θ × H/W, cos θ) = atan2(sin θ × 2/3, cos θ)` �
 - **リザルト画面**: `#screen-gameover` にも同様の星空背景を適用（`.start-particles` div 追加 + CSS セレクタを `#screen-start, #screen-gameover` に拡張）
 
 ---
+
