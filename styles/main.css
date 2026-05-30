@@ -1810,15 +1810,15 @@ body {
 
 .stk-shape {
   fill: none;
-  stroke-width: 2.5;
+  stroke-width: 3.5;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
-.stk-dim    { stroke: #FFE566; opacity: 0.48; filter: drop-shadow(0 0 3px #FFDD00); }
-.stk-mid    { stroke: #FFB800; opacity: 0.74; filter: drop-shadow(0 0 4px #FFAA00) drop-shadow(0 0 8px #FF8800); }
-.stk-bright { stroke: #FF7700; opacity: 1.0;  filter: drop-shadow(0 0 5px #FF9900) drop-shadow(0 0 10px #FF6600) drop-shadow(0 0 18px #FF3300); }
+.stk-dim    { stroke: #FFB844; opacity: 0.30; filter: drop-shadow(0 0 3px #FF9900); }
+.stk-mid    { stroke: #FF9900; opacity: 0.65; filter: drop-shadow(0 0 4px #FF8800) drop-shadow(0 0 8px #FF6600); }
+.stk-bright { stroke: #FFFAE8; opacity: 1.0;  filter: drop-shadow(0 0 5px #FFFDE0) drop-shadow(0 0 12px #FFE000) drop-shadow(0 0 22px #FFC000); }
 
-.stk-grp-center { animation: stk-bob 1.4s ease-in-out infinite; }
+.stk-grp-center { animation: stk-bob 1.6s ease-in-out infinite; }
 @keyframes stk-bob {
   0%, 100% { transform: translateY(0px); }
   50%       { transform: translateY(-5px); }
