@@ -149,34 +149,34 @@
           <div class="stick-field" id="stick-field-R">
             <div class="stk-marker" id="stk-marker-R">
               <svg class="stk-svg" viewBox="-50 -50 100 100" xmlns="http://www.w3.org/2000/svg">
-                <!-- Center: 2 downward ∨ shapes; lower tip at y=-3 (slightly above geometric center y=0) -->
+                <!-- Center: 2 downward ∨ shapes; no gap between upper and lower -->
                 <g class="stk-grp-center">
-                  <polyline class="stk-shape stk-mid"    points="-3,-16 0,-10 3,-16"/>
-                  <polyline class="stk-shape stk-bright" points="-5,-9  0,-3  5,-9"/>
+                  <polyline class="stk-shape stk-mid"    points="-2.5,-10 0,-5 2.5,-10"/>
+                  <polyline class="stk-shape stk-bright" points="-4,-5 0,0 4,-5"/>
                 </g>
-                <!-- N: pointing down toward center, outer→inner=dim→bright, overlap=2 -->
+                <!-- N: shifted 10u toward center (outer→inner=dim→bright) -->
                 <g class="stk-grp-n">
-                  <polyline class="stk-shape stk-dim"    points="-8,-42 0,-36 8,-42"/>
-                  <polyline class="stk-shape stk-mid"    points="-8,-38 0,-32 8,-38"/>
-                  <polyline class="stk-shape stk-bright" points="-8,-34 0,-28 8,-34"/>
+                  <polyline class="stk-shape stk-dim"    points="-8,-32 0,-26 8,-32"/>
+                  <polyline class="stk-shape stk-mid"    points="-8,-28 0,-22 8,-28"/>
+                  <polyline class="stk-shape stk-bright" points="-8,-24 0,-18 8,-24"/>
                 </g>
-                <!-- S: inner tip at y=28 (symmetric with N at y=-28); W/E at y=0 = midpoint(-28,28) -->
+                <!-- S: shifted 10u toward center (symmetric with N) -->
                 <g class="stk-grp-s">
-                  <polyline class="stk-shape stk-bright" points="-8,34 0,28 8,34"/>
-                  <polyline class="stk-shape stk-mid"    points="-8,38 0,32 8,38"/>
-                  <polyline class="stk-shape stk-dim"    points="-8,42 0,36 8,42"/>
+                  <polyline class="stk-shape stk-bright" points="-8,24 0,18 8,24"/>
+                  <polyline class="stk-shape stk-mid"    points="-8,28 0,22 8,28"/>
+                  <polyline class="stk-shape stk-dim"    points="-8,32 0,26 8,32"/>
                 </g>
-                <!-- W: pointing right toward center, outer→inner=dim→bright, overlap=2 -->
+                <!-- W: shifted 10u toward center (outer→inner=dim→bright) -->
                 <g class="stk-grp-w">
-                  <polyline class="stk-shape stk-dim"    points="-42,-8 -36,0 -42,8"/>
-                  <polyline class="stk-shape stk-mid"    points="-38,-8 -32,0 -38,8"/>
-                  <polyline class="stk-shape stk-bright" points="-34,-8 -28,0 -34,8"/>
+                  <polyline class="stk-shape stk-dim"    points="-32,-8 -26,0 -32,8"/>
+                  <polyline class="stk-shape stk-mid"    points="-28,-8 -22,0 -28,8"/>
+                  <polyline class="stk-shape stk-bright" points="-24,-8 -18,0 -24,8"/>
                 </g>
-                <!-- E: pointing left toward center, inner→outer=bright→dim, overlap=2 -->
+                <!-- E: shifted 10u toward center (inner→outer=bright→dim) -->
                 <g class="stk-grp-e">
-                  <polyline class="stk-shape stk-bright" points="34,-8 28,0 34,8"/>
-                  <polyline class="stk-shape stk-mid"    points="38,-8 32,0 38,8"/>
-                  <polyline class="stk-shape stk-dim"    points="42,-8 36,0 42,8"/>
+                  <polyline class="stk-shape stk-bright" points="24,-8 18,0 24,8"/>
+                  <polyline class="stk-shape stk-mid"    points="28,-8 22,0 28,8"/>
+                  <polyline class="stk-shape stk-dim"    points="32,-8 26,0 32,8"/>
                 </g>
               </svg>
             </div>

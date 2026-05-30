@@ -1818,10 +1818,11 @@ body {
 .stk-mid    { stroke: #FF9900; opacity: 0.65; filter: drop-shadow(0 0 4px #FF8800) drop-shadow(0 0 8px #FF6600); }
 .stk-bright { stroke: #FFFAE8; opacity: 1.0;  filter: drop-shadow(0 0 5px #FFFDE0) drop-shadow(0 0 12px #FFE000) drop-shadow(0 0 22px #FFC000); }
 
+.stk-grp-center .stk-shape { stroke-width: 3; }
 .stk-grp-center { animation: stk-bob 1.6s ease-in-out infinite; }
 @keyframes stk-bob {
   0%, 100% { transform: translateY(0px); }
-  50%       { transform: translateY(-5px); }
+  50%       { transform: translateY(-2.5px); }
 }
 
 .stk-grp-n { animation: stk-pulse-n 1.6s ease-in-out infinite; }
