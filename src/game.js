@@ -100,6 +100,8 @@ class GameEngine {
     this._pendingTimerStart = 0;
     this._halfTimeId        = null;
 
+    this.input.stickL = { x: 0, y: 0 };
+    this.input.stickR = { x: 0, y: 0 };
     this.input.onInput         = (slotId) => this._onInput(slotId);
     this.input.onStickUpdate   = (l, r)   => this.ui.updateStickCursors(l, r);
     this.input.onTriggerChange = (side)   => this.xhb.setHalfActive(side);
@@ -175,7 +177,7 @@ class GameEngine {
     this.input.onTriggerChange = null;
     this.input.stop();
     this.xhb.setHalfActive(null);
-    this.aoe.stop();
+    this.aoe.pauseTimers();
     this.sound.stopRhythm();
   }
 
@@ -189,7 +191,7 @@ class GameEngine {
 
     this.aoe.onHit   = () => this._onAoeHit();
     this.aoe.onDodge = (side) => this._onAoeDodge(side);
-    this.aoe.start();
+    this.aoe.resumeTimers();
     this.sound.startRhythm(this.isBurst);
 
     this.remainingMs = this._pausedCountdownMs;

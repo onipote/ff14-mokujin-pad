@@ -23,8 +23,6 @@ class InputHandler {
 
   start() {
     this._active = true;
-    this.stickL  = { x: 0, y: 0 };
-    this.stickR  = { x: 0, y: 0 };
     this._keysHeld = {};
 
     document.addEventListener('keydown', this._boundKeydown);

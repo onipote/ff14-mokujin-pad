@@ -70,13 +70,13 @@ const STICK_SPEED      = 1.275; // normalized units per second (keyboard & gamep
 const STICK_SPEED_L    = STICK_SPEED * 0.85; // 左スティックのみ15%減速
 const STICK_DEADZONE   = 0.15;
 
-// 視線ギミック（右パネル）
-const GAZE_FRAME_W_PCT  = 48.875;   // フレーム幅（フィールドwidth比%）
-const GAZE_FRAME_H_PCT  = 48.875;   // フレーム高さ（フィールドheight比%）= W_PCTと同値→3:2比率
-const GAZE_FRAME_HALF_W = 0.48875; // 正規化半幅 = (GAZE_FRAME_W_PCT/2) / 50
-const GAZE_FRAME_HALF_H = 0.48875; // 正規化半高 = (GAZE_FRAME_H_PCT/2) / 50
-const GAZE_EYE_RANGE    = 0.8;  // 目スポーン範囲 ±0.8（正規化）
-const GAZE_CENTER_EXCLUDE_R = GAZE_FRAME_HALF_W * 0.25; // 中央除外半径 ≈ 0.122（辺の1/4相当）
+// 頭割りギミック（右パネル）
+const STK_FRAME_W_PCT  = 48.875;   // フレーム幅（フィールドwidth比%）
+const STK_FRAME_H_PCT  = 48.875;   // フレーム高さ（フィールドheight比%）= W_PCTと同値→3:2比率
+const STK_FRAME_HALF_W = 0.48875; // 正規化半幅 = (STK_FRAME_W_PCT/2) / 50
+const STK_FRAME_HALF_H = 0.48875; // 正規化半高 = (STK_FRAME_H_PCT/2) / 50
+const STK_MARKER_RANGE    = 0.8;  // マーカースポーン範囲 ±0.8（正規化）
+const STK_CENTER_EXCLUDE_R = STK_FRAME_HALF_W * 0.25; // 中央除外半径 ≈ 0.122（辺の1/4相当）
 
 // AoE サイズランダム振れ幅（±15%）
 const AOE_SIZE_SCALE_BASE  = 0.85;
