@@ -60,6 +60,11 @@ class GameEngine {
     this._halfTimeId        = null;
     this._burstSoundId      = null;
     this._aoeEndId          = null;
+
+    this._slotTimeMs          = 0;
+    this._slotIsBurst         = false;
+    this._pendingSlotTimeMs   = 0;
+    this._pendingSlotIsBurst  = false;
   }
 
   getBestScore(difficulty) {
@@ -99,6 +104,10 @@ class GameEngine {
     this._pendingSlotId     = null;
     this._pendingTimerStart = 0;
     this._halfTimeId        = null;
+    this._slotTimeMs         = 0;
+    this._slotIsBurst        = false;
+    this._pendingSlotTimeMs  = 0;
+    this._pendingSlotIsBurst = false;
 
     this.input.stickL = { x: 0, y: 0 };
     this.input.stickR = { x: 0, y: 0 };
@@ -162,7 +171,7 @@ class GameEngine {
     if (this._pendingTimerRaf){ cancelAnimationFrame(this._pendingTimerRaf); this._pendingTimerRaf = null; }
     this._pendingSlotId = null;
 
-    const totalMs = this._getTimeMs();
+    const totalMs = this._slotTimeMs;
     this._pausedTimerRemaining = this._pausedFromState === 'showing'
       ? Math.max(0, totalMs - (Date.now() - this._timerStart))
       : 0;
@@ -205,7 +214,7 @@ class GameEngine {
     if (this._pausedFromState === 'showing') {
       this.state = 'showing';
       const remaining = this._pausedTimerRemaining;
-      const totalMs   = this._getTimeMs();
+      const totalMs   = this._slotTimeMs;
       this._timerStart = Date.now() - (totalMs - remaining);
       this._runTimer(totalMs);
       this._halfTimeId = setTimeout(() => this._onGaugeFull(), remaining);
@@ -255,16 +264,24 @@ class GameEngine {
     this.total++;
 
     let slotId;
+    let timeMs;
     if (this._pendingSlotId) {
       slotId = this._pendingSlotId;
       this._timerStart = this._pendingTimerStart;
+      timeMs = this._pendingSlotTimeMs;
+      this._slotIsBurst = this._pendingSlotIsBurst;
       this._pendingSlotId = null;
       this._pendingTimerStart = 0;
+      this._pendingSlotTimeMs = 0;
+      this._pendingSlotIsBurst = false;
       if (this._pendingTimerRaf) { cancelAnimationFrame(this._pendingTimerRaf); this._pendingTimerRaf = null; }
     } else {
       slotId = this._pickNextSlotId();
       this._timerStart = Date.now();
+      timeMs = this._getTimeMs();
+      this._slotIsBurst = this.isBurst;
     }
+    this._slotTimeMs = timeMs;
     this.activeSlotId = slotId;
     this.slotStats[slotId].total++;
 
@@ -274,7 +291,6 @@ class GameEngine {
     this.xhb.setSlotState(slotId, 'active');
     this.ui.showPrompt(SLOT_BY_ID[slotId]);
 
-    const timeMs = this._getTimeMs();
     this._runTimer(timeMs);
 
     const elapsed        = Date.now() - this._timerStart;
@@ -316,9 +332,11 @@ class GameEngine {
     if (this.state !== 'showing') return;
     if (this._pendingSlotId) return;
 
-    const timeMs            = this._getTimeMs();
-    this._pendingSlotId     = this._pickNextSlotId();
-    this._pendingTimerStart = Date.now();
+    const timeMs              = this._slotTimeMs;
+    this._pendingSlotId       = this._pickNextSlotId();
+    this._pendingTimerStart   = Date.now();
+    this._pendingSlotTimeMs   = timeMs;
+    this._pendingSlotIsBurst  = this._slotIsBurst;
     this._startPendingTimer(timeMs);
 
     this.xhb.setSlotState(this._pendingSlotId, 'active');
@@ -326,7 +344,7 @@ class GameEngine {
 
   _onInput(slotId) {
     if (this.state !== 'showing') return;
-    const timeMs       = this._getTimeMs();
+    const timeMs       = this._slotTimeMs;
     const elapsedRatio = (Date.now() - this._timerStart) / timeMs;
 
     if (elapsedRatio < GREAT_RATIO_MIN) {
@@ -377,7 +395,7 @@ class GameEngine {
       const decayBonus = Math.max(0, Math.floor((2.0 - elapsedRatio) * 10) * 10);
       pts = baseScore + decayBonus;
     }
-    if (this.isBurst) pts *= BURST_SCORE_MULTIPLIER;
+    if (this._slotIsBurst) pts *= BURST_SCORE_MULTIPLIER;
     this.score += pts;
 
     if (judgment === 'great') {
@@ -395,7 +413,7 @@ class GameEngine {
     this.ui.updateAll(this);
     this.ui.flashEnemy('hit', this.combo);
     this.ui.showJudgment(judgment, pts);
-    this.sound.playHit(this.combo, judgment, this.isBurst);
+    this.sound.playHit(this.combo, judgment, this._slotIsBurst);
 
     this._feedbackId = setTimeout(() => {
       if (this.state !== 'gameover') this._nextSlot();
@@ -462,7 +480,7 @@ class GameEngine {
   }
 
   _processMiss() {
-    if (!this.isBurst) {
+    if (!this._slotIsBurst) {
       this.combo         = 0;
       this.gaugeLevel    = 0;
       this.gaugeProgress = 0;

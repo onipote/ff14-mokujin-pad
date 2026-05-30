@@ -2,6 +2,45 @@
 
 ---
 
+## fix: LBゲージ終了タイミングでのリキャスト速度急低下を修正
+
+**日付**: 2026-05-30
+
+### 概要
+
+バーストモード（LIMIT BREAK）中に表示されたスロットは 1.4倍速の GCD で回転を開始するが、LBゲージが 0 になった瞬間に `isBurst = false` に即時切り替わるため、同じスロットのライフサイクル内（入力判定・pendingスロット生成・スコア計算）で通常 GCD 時間が適用されてしまい、「速度が急低下したように見える」問題があった。
+
+### 根本原因
+
+`_onInput()` / `_onGaugeFull()` / `_processHit()` / `_processMiss()` がいずれも呼び出し時点の `this._getTimeMs()` や `this.isBurst` を参照していたため、スロット開始後にバーストが終了するとその場で挙動が切り替わっていた。
+
+### 修正方針：スロット開始時に GCD 状態をスナップショット保存
+
+各スロットが「回り始めた」瞬間の `timeMs` と `isBurst` を新規フィールドに記録し、そのスロットのライフサイクル全体でその値を使用する。pending スロットも生成時の値を引き継ぐ。
+
+### 変更内容
+
+| # | 変更箇所 | 内容 |
+|---|---------|------|
+| 1 | `constructor` / `start()` | `_slotTimeMs` / `_slotIsBurst` / `_pendingSlotTimeMs` / `_pendingSlotIsBurst` を追加・初期化 |
+| 2 | `_nextSlot()` | スロット開始時に上記4フィールドをキャプチャ |
+| 3 | `_onGaugeFull()` | `_getTimeMs()` → `_slotTimeMs`・`_slotIsBurst` を pending に引き継ぐ |
+| 4 | `_onInput()` | `_getTimeMs()` → `_slotTimeMs`（入力判定タイミングのズレ解消） |
+| 5 | `_processHit()` | `this.isBurst` → `this._slotIsBurst`（スコア倍率・サウンド） |
+| 6 | `_processMiss()` | `this.isBurst` → `this._slotIsBurst`（コンボ保護） |
+| 7 | `pause()` / `resume()` | `_getTimeMs()` → `_slotTimeMs`（一時停止中にバーストが終了しても速度を保持） |
+
+### 効果
+
+- LBゲージ 0 直後も回転速度が変わらない（バースト GCD を最後まで維持）
+- LBゲージ 0 直後のスコアもバースト倍率（×2）を維持
+- pending スロット（次スロットの先読み表示）も同じ速度・倍率を引き継ぐ
+- 次の「新規スロット」から通常速度へ自然に移行
+
+**変更ファイル**: `src/game.js` のみ
+
+---
+
 ## UXポリッシュ・バランス調整（スクロールバー・カーソル・ギミック比率・AoEグラデーション）
 
 **日付**: 2026-05-30
