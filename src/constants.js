@@ -67,7 +67,8 @@ const AOE_FIRE_MS      = 500;
 const AOE_MIN_DELAY_MS = 3000;
 const AOE_MAX_DELAY_MS = 7000;
 const STICK_SPEED      = 1.275; // normalized units per second (keyboard & gamepad)
-const STICK_SPEED_L    = STICK_SPEED * 0.85; // 左スティックのみ15%減速
+const STICK_SPEED_L    = STICK_SPEED * 0.65; // 左スティック（AoE回避）
+const STICK_SPEED_R    = STICK_SPEED * 0.65; // 右スティック（宝探しマップ）
 const STICK_DEADZONE   = 0.15;
 
 // 宝箱ギミック（右パネル）— フレーム固定・背景スクロール方式

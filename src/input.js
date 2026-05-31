@@ -113,8 +113,8 @@ class InputHandler {
 
       this.stickL.x = Math.max(-1, Math.min(1, this.stickL.x + lx * STICK_SPEED_L * dt));
       this.stickL.y = Math.max(-1, Math.min(1, this.stickL.y + ly * STICK_SPEED_L * dt));
-      this.stickR.x = Math.max(-1, Math.min(1, this.stickR.x + rx * STICK_SPEED   * dt));
-      this.stickR.y = Math.max(-1, Math.min(1, this.stickR.y + ry * STICK_SPEED   * dt));
+      this.stickR.x = Math.max(-1, Math.min(1, this.stickR.x + rx * STICK_SPEED_R * dt));
+      this.stickR.y = Math.max(-1, Math.min(1, this.stickR.y + ry * STICK_SPEED_R * dt));
 
       // ゲームパッド: スティック軸 + ボタン
       if (this._padIndex !== null) {
@@ -132,8 +132,8 @@ class InputHandler {
             this.stickL.y = Math.max(-1, Math.min(1, this.stickL.y + lay * STICK_SPEED_L * dt));
           }
           if (rax !== 0 || ray !== 0) {
-            this.stickR.x = Math.max(-1, Math.min(1, this.stickR.x + rax * STICK_SPEED * dt));
-            this.stickR.y = Math.max(-1, Math.min(1, this.stickR.y + ray * STICK_SPEED * dt));
+            this.stickR.x = Math.max(-1, Math.min(1, this.stickR.x + rax * STICK_SPEED_R * dt));
+            this.stickR.y = Math.max(-1, Math.min(1, this.stickR.y + ray * STICK_SPEED_R * dt));
           }
 
           // システムボタン (OPTIONS = 9)
