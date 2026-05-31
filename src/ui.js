@@ -276,6 +276,9 @@ class UIManager {
     const badge = document.getElementById('new-record-badge');
     badge.classList.toggle('hidden', !isNewRecord);
 
+    ['header', 'info-bar', 'game-area', 'xhb-wrap'].forEach(id =>
+      document.getElementById(id).classList.add('hidden')
+    );
     document.getElementById('screen-gameover').classList.remove('hidden');
   }
 

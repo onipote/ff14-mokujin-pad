@@ -189,6 +189,9 @@ document.addEventListener('DOMContentLoaded', () => {
   function startGame() {
     stopMenuLoop();
     document.getElementById('screen-start').classList.add('hidden');
+    ['header', 'info-bar', 'game-area', 'xhb-wrap'].forEach(id =>
+      document.getElementById(id).classList.remove('hidden')
+    );
     ui.hidePause();
     ui.hideGameOver();
 
