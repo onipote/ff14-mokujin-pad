@@ -177,7 +177,7 @@ class AoeEngine {
     do {
       markerX = (Math.random() * 2 - 1) * STK_CHEST_SPAWN_ONSCREEN_MAX;
       markerY = (Math.random() * 2 - 1) * STK_CHEST_SPAWN_ONSCREEN_MAX;
-    } while (Math.abs(markerX) <= STK_FRAME_HALF_W && Math.abs(markerY) <= STK_FRAME_HALF_H);
+    } while (Math.abs(markerX) <= STK_CHEST_SPAWN_EXCLUDE_HALF && Math.abs(markerY) <= STK_CHEST_SPAWN_EXCLUDE_HALF);
     this._stkMarkerX = markerX;
     this._stkMarkerY = markerY;
     this.ui.showStackWarning(this._stkMarkerX, this._stkMarkerY);

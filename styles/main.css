@@ -1602,8 +1602,8 @@ body {
 /* ===== 頭割りギミック・フレーム（右パネル）===== */
 .stk-frame {
   position: absolute;
-  width: 36.656%;
-  height: 36.656%;
+  width: 32.990%;
+  height: 32.990%;
   transform: translate(-50%, -50%);
   left: 50%;
   top: 50%;
