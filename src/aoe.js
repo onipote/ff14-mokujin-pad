@@ -138,9 +138,12 @@ class AoeEngine {
       return;
     }
 
-    const types = ['left', 'right', 'top', 'bottom',
-                   'large-circle', 'small-circles', 'fan', 'band'];
-    this._type    = types[Math.floor(Math.random() * types.length)];
+    const categories = ['directional', 'large-circle', 'small-circles', 'fan', 'band'];
+    const cat = categories[Math.floor(Math.random() * categories.length)];
+    const dirTypes = ['left', 'right', 'top', 'bottom'];
+    this._type = cat === 'directional'
+      ? dirTypes[Math.floor(Math.random() * dirTypes.length)]
+      : cat;
     this._aoeData = this._buildAoeData(this._type);
     this.ui.showAoeWarning(this._side, this._aoeData);
 
@@ -218,12 +221,24 @@ class AoeEngine {
       }
       case 'small-circles': {
         const r = 0.25 * sizeScale;
-        const count = 2 + Math.floor(Math.random() * 3);
-        const circles = Array.from({ length: count }, (_, i) => {
-          // ② 1つ目は必ずプレイヤーの現在位置
-          if (i === 0) return { cx: this.input.stickL.x, cy: this.input.stickL.y };
-          return { cx: (Math.random()*2-1)*(1-r), cy: (Math.random()*2-1)*(1-r) };
-        });
+        const count = 3 + Math.floor(Math.random() * 2);
+        const circles = [];
+        for (let i = 0; i < count; i++) {
+          if (i === 0) {
+            circles.push({ cx: this.input.stickL.x, cy: this.input.stickL.y });
+          } else {
+            let cx, cy, attempts = 0;
+            do {
+              cx = (Math.random() * 2 - 1) * (1 - r);
+              cy = (Math.random() * 2 - 1) * (1 - r);
+              attempts++;
+            } while (attempts < 20 && circles.some(c => {
+              const dx = cx - c.cx, dy = cy - c.cy;
+              return dx * dx + dy * dy < r * r;
+            }));
+            circles.push({ cx, cy });
+          }
+        }
         return { type, r, circles };
       }
       case 'fan': {

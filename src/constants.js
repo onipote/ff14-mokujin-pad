@@ -82,6 +82,6 @@ const STK_CHEST_SPAWN_OFFSCREEN_MAX = 1.4;  // ミニマップ外スポーン（
 // スポーン除外ゾーン: 内枠〜外枠(±1.0)の中間点より内側には出現させない
 const STK_CHEST_SPAWN_EXCLUDE_HALF  = (STK_FRAME_HALF_W + 1.0) * 0.5; // ≈ 0.66495
 
-// AoE サイズランダム振れ幅（±15%）
-const AOE_SIZE_SCALE_BASE  = 0.85;
-const AOE_SIZE_SCALE_RANGE = 0.30; // 0.85〜1.15
+// AoE サイズランダム振れ幅
+const AOE_SIZE_SCALE_BASE  = 1.00;
+const AOE_SIZE_SCALE_RANGE = 0.20; // 1.00〜1.20
