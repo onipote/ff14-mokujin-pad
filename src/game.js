@@ -170,7 +170,9 @@ class GameEngine {
     this._burstSoundId = null;
     if (this._timerRaf)       { cancelAnimationFrame(this._timerRaf);       this._timerRaf       = null; }
     if (this._pendingTimerRaf){ cancelAnimationFrame(this._pendingTimerRaf); this._pendingTimerRaf = null; }
-    this._pendingSlotId = null;
+    this._pausedPendingTimerRemaining = this._pendingSlotId
+      ? Math.max(0, this._pendingSlotTimeMs - (Date.now() - this._pendingTimerStart))
+      : 0;
 
     const totalMs = this._slotTimeMs;
     this._pausedTimerRemaining = this._pausedFromState === 'showing'
@@ -188,6 +190,7 @@ class GameEngine {
     this.input.stop();
     this.xhb.setHalfActive(null);
     this.aoe.pauseTimers();
+    this._pausedRhythmBeat = this.sound._rhythmBeat;
     this.sound.stopRhythm();
   }
 
@@ -203,7 +206,7 @@ class GameEngine {
     this.aoe.onDodge = (side) => this._onAoeDodge(side);
     this.ui.onChestOpen = () => this._onChestOpen();
     this.aoe.resumeTimers();
-    this.sound.startRhythm(this.isBurst);
+    this.sound.resumeRhythm(this.isBurst, this._pausedRhythmBeat);
 
     this.remainingMs = this._pausedCountdownMs;
     this._tickCountdown();
@@ -221,9 +224,16 @@ class GameEngine {
       this._runTimer(totalMs);
       this._halfTimeId = setTimeout(() => this._onGaugeFull(), remaining);
       this._timeoutId  = setTimeout(() => this._onTimeout(), remaining + totalMs);
+      if (this._pendingSlotId) {
+        this._pendingTimerStart = Date.now() - (this._pendingSlotTimeMs - this._pausedPendingTimerRemaining);
+        this._startPendingTimer(this._pendingSlotTimeMs);
+      }
     } else {
+      this.state = 'feedback';
       this.total--;
-      this._nextSlot();
+      this._feedbackId = setTimeout(() => {
+        if (this.state !== 'gameover') this._nextSlot();
+      }, this._feedbackMs || FEEDBACK_SUCCESS_MS);
     }
   }
 
@@ -418,6 +428,7 @@ class GameEngine {
     this.ui.showJudgment(judgment, pts);
     this.sound.playHit(this.combo, judgment, this._slotIsBurst);
 
+    this._feedbackMs = FEEDBACK_SUCCESS_MS;
     this._feedbackId = setTimeout(() => {
       if (this.state !== 'gameover') this._nextSlot();
     }, FEEDBACK_SUCCESS_MS);
@@ -502,6 +513,7 @@ class GameEngine {
     this.ui.showJudgment('miss', MISS_PENALTY_MS / 1000);
     this.sound.playMiss();
 
+    this._feedbackMs = FEEDBACK_FAIL_MS;
     this._feedbackId = setTimeout(() => {
       if (this.state === 'gameover') return;
       if (this.remainingMs <= 0) { this._endGame('time_up'); return; }

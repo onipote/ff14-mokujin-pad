@@ -2,6 +2,33 @@
 
 ---
 
+## fix: 一時停止復帰時の3つのバグ修正
+
+**日付**: 2026-05-31
+
+### 変更内容
+
+| ファイル | 内容 |
+|---------|------|
+| `src/sound.js` | `resumeRhythm(isBurst, savedBeat)` メソッドを追加 |
+| `src/game.js` | `pause()` にリズム拍位置・ペンディングタイマー残り時間の保存を追加、`resume()` を3バグ対応に修正、`_processHit/Miss` に `_feedbackMs` 保存を追加 |
+
+### 修正バグ詳細
+
+#### Bug 1：復帰時にゲーム開始音が鳴る
+- **原因**: `resume()` が `sound.startRhythm()` を呼んでいたが、この関数は最初のビートを即座に発火（`fire()` を `setInterval` 前に呼ぶ）するためゲーム開始音と同じ音が鳴っていた
+- **修正**: `resumeRhythm(isBurst, savedBeat)` を追加。`fire()` の即時呼び出しなし、かつポーズ時の拍位置（`_pausedRhythmBeat`）から再開
+
+#### Bug 2：フィードバック中にポーズすると復帰時にリキャスト表示が突変する
+- **原因**: `_pausedFromState === 'feedback'` のとき `_nextSlot()` が即座に呼ばれ、`xhb.clearAllStates()` によりリキャスト表示がリセットされていた
+- **修正**: `_processHit/Miss` で `_feedbackMs` に使用タイムアウトを保存。復帰時は `state = 'feedback'` を復元し `_feedbackMs` 後に `_nextSlot()` を呼ぶ
+
+#### Bug 3：2スロットアクティブ状態でポーズするとペンディングスロットのゲージが固定
+- **原因**: `pause()` で `_pendingSlotId = null` と無条件クリアしており、RAF も停止したまま復帰後に `_startPendingTimer()` が呼ばれなかった
+- **修正**: `pause()` で `_pendingSlotId` を保持しつつペンディングタイマー残り時間を `_pausedPendingTimerRemaining` に保存。復帰時に `_pendingTimerStart` をポーズ時間分補正して `_startPendingTimer()` を再起動
+
+---
+
 ## refine: 宝探しギミック — 内側フレーム縮小・近接スポーン抑制
 
 **日付**: 2026-05-31

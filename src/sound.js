@@ -178,6 +178,40 @@ class SoundManager {
     this._rhythmId = setInterval(fire, stepMs);
   }
 
+  resumeRhythm(isBurst, savedBeat) {
+    this.stopRhythm();
+    const stepMs = Math.round(60000 / ((isBurst ? 175 : 140) * 2));
+    this._rhythmBeat  = savedBeat || 0;
+    this._rhythmBurst = isBurst;
+    const normPattern = [
+      [[65,'sine',0.18,0.072],[131,'sine',0.14,0.040]],
+      [[6400,'square',0.014,0.016]],
+      [[196,'sine',0.14,0.055]],
+      [[200,'triangle',0.06,0.058]],
+      [[65,'sine',0.16,0.060],[174,'sine',0.14,0.048]],
+      [[6400,'square',0.014,0.014]],
+      [[233,'sine',0.14,0.050]],
+      [[200,'triangle',0.06,0.058]],
+    ];
+    const burstPattern = [
+      [[73,'sine',0.16,0.095],[147,'sine',0.12,0.052]],
+      [[220,'sine',0.09,0.042]],
+      [[131,'sine',0.13,0.070]],
+      [[220,'triangle',0.06,0.065]],
+      [[73,'sine',0.14,0.068],[196,'sine',0.13,0.060]],
+      [[220,'sine',0.09,0.040]],
+      [[220,'sine',0.13,0.065]],
+      [[220,'triangle',0.06,0.065]],
+    ];
+    const pattern = isBurst ? burstPattern : normPattern;
+    const fire = () => {
+      const notes = pattern[this._rhythmBeat % 8];
+      if (notes) notes.forEach(([f, t, d, v]) => this._beep(f, t, d, v));
+      this._rhythmBeat++;
+    };
+    this._rhythmId = setInterval(fire, stepMs);
+  }
+
   stopRhythm() {
     if (this._rhythmId !== null) {
       clearInterval(this._rhythmId);
