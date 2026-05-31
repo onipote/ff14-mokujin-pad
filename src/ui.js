@@ -6,16 +6,24 @@ const _STK_CHEST_CLOSED_SVG = `<svg viewBox="-20 -20 40 40" width="30" height="3
   <line x1="-14" y1="-3.5" x2="14" y2="-3.5" stroke="#a0e8f8" stroke-width="1.2" opacity="0.5"/>
 </svg>`;
 
-// 宝箱SVG（開いた状態：黄金色、輝き演出）
-const _STK_CHEST_OPEN_SVG = `<svg viewBox="-20 -20 40 40" width="30" height="30" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 0 8px rgba(255,215,0,0.9)) drop-shadow(0 0 18px rgba(255,180,0,0.6))">
-  <rect x="-14" y="0" width="28" height="14" rx="1.5" fill="rgba(255,210,0,0.12)" stroke="#ffe080" stroke-width="1.8"/>
-  <rect x="-14" y="-14" width="28" height="11" rx="1.5" fill="rgba(255,210,0,0.08)" stroke="#ffe080" stroke-width="1.8" transform="rotate(-45 -14 -3.5)"/>
-  <circle cx="0" cy="6" r="4.5" fill="rgba(255,220,80,0.35)" stroke="none"/>
-  <line x1="0" y1="-16" x2="0" y2="-12" stroke="#ffe080" stroke-width="1.8" stroke-linecap="round"/>
-  <line x1="11" y1="-13" x2="9" y2="-10" stroke="#ffe080" stroke-width="1.8" stroke-linecap="round"/>
-  <line x1="-11" y1="-13" x2="-9" y2="-10" stroke="#ffe080" stroke-width="1.8" stroke-linecap="round"/>
-  <line x1="15" y1="-6" x2="12" y2="-4" stroke="#ffe080" stroke-width="1.8" stroke-linecap="round"/>
-  <line x1="-15" y1="-6" x2="-12" y2="-4" stroke="#ffe080" stroke-width="1.8" stroke-linecap="round"/>
+// 宝箱SVG（開いた状態：黄金色、コイン・宝石が大きく飛び出す演出）
+const _STK_CHEST_OPEN_SVG = `<svg viewBox="-20 -20 40 40" width="30" height="30" overflow="visible" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 0 8px rgba(255,215,0,0.9)) drop-shadow(0 0 18px rgba(255,180,0,0.6))">
+  <rect x="-14" y="-4" width="28" height="14" rx="1.5" fill="rgba(255,210,0,0.15)" stroke="#ffe080" stroke-width="1.8"/>
+  <rect x="-12" y="-4" width="24" height="5" rx="0.5" fill="rgba(255,240,120,0.55)" stroke="none"/>
+  <circle cx="-5" cy="1" r="3.2" fill="rgba(255,205,0,0.92)" stroke="#ffd700" stroke-width="1"/>
+  <circle cx="5" cy="2" r="2.8" fill="rgba(255,205,0,0.88)" stroke="#ffd700" stroke-width="1"/>
+  <polygon points="-14,-4 14,-4 10,-17 -10,-17" fill="rgba(255,210,0,0.12)" stroke="#ffe080" stroke-width="1.8" stroke-linejoin="round"/>
+  <line x1="-14" y1="-4" x2="14" y2="-4" stroke="#ffe080" stroke-width="2.2"/>
+  <rect x="-3" y="-38" width="6" height="34" rx="3" fill="rgba(255,240,100,0.15)" stroke="none"/>
+  <circle cx="-4" cy="-24" r="3.0" fill="rgba(255,205,0,0.92)" stroke="#ffe080" stroke-width="1.3"/>
+  <circle cx="-16" cy="-27" r="2.8" fill="rgba(255,205,0,0.88)" stroke="#ffe080" stroke-width="1.2"/>
+  <circle cx="15" cy="-29" r="2.5" fill="rgba(255,205,0,0.84)" stroke="#ffe080" stroke-width="1.1"/>
+  <polygon points="1,-37 4,-33 1,-29 -2,-33" fill="rgba(255,205,0,0.92)" stroke="#ffe080" stroke-width="1"/>
+  <line x1="0" y1="-39" x2="0" y2="-35" stroke="#ffe080" stroke-width="1.8" stroke-linecap="round"/>
+  <line x1="17" y1="-27" x2="15" y2="-24" stroke="#ffe080" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="-17" y1="-27" x2="-15" y2="-24" stroke="#ffe080" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="16" y1="-16" x2="13" y2="-13" stroke="#ffe080" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="-16" y1="-16" x2="-13" y2="-13" stroke="#ffe080" stroke-width="1.5" stroke-linecap="round"/>
 </svg>`;
 
 function _fmtNum(n) { return Number(n).toLocaleString(); }
@@ -69,7 +77,6 @@ class UIManager {
     this.onChestOpen    = null;
     this._worldOffsetX  = 0;
     this._worldOffsetY  = 0;
-    this._stkOverlay    = null;
     // AOEカーソル色（左パネル）
     this._aoeActive  = false;
     this._aoeData    = null;
@@ -588,11 +595,6 @@ class UIManager {
     }
     if (this._stickField.R) {
       this._stickField.R.classList.add('stick-field--active');
-      if (!this._stkOverlay) {
-        this._stkOverlay = document.createElement('div');
-        this._stkOverlay.className = 'stk-overlay';
-        this._stickField.R.appendChild(this._stkOverlay);
-      }
     }
   }
 
@@ -623,7 +625,6 @@ class UIManager {
     if (this._stkDirection) this._stkDirection.classList.remove('stk-direction--active');
     if (this._stkFrame)     this._stkFrame.className  = 'stk-frame';
     if (this._stickField.R) this._stickField.R.classList.remove('stick-field--active');
-    if (this._stkOverlay) { this._stkOverlay.remove(); this._stkOverlay = null; }
   }
 
   hideGameOver() {
