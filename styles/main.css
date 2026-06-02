@@ -113,7 +113,7 @@ body {
   top: 8px;
   left: 8px;
   color: var(--gold-dim);
-  font-size: 10px;
+  font-size: 11px;
 }
 .screen-panel::after {
   content: "◆";
@@ -121,12 +121,12 @@ body {
   bottom: 8px;
   right: 8px;
   color: var(--gold-dim);
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .ornament {
   color: var(--gold-dim);
-  font-size: 12px;
+  font-size: 13px;
   letter-spacing: 0.05em;
 }
 
@@ -204,7 +204,7 @@ body {
 }
 
 .game-sub {
-  font-size: 13px;
+  font-size: 15px;
   color: #c8dfff;
   letter-spacing: 0.22em;
   text-shadow:
@@ -230,7 +230,7 @@ body {
 
 .gameover-stats {
   text-align: center;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 2;
   color: var(--text);
   width: 100%;
@@ -269,7 +269,7 @@ body {
   padding-top: 20px;
 }
 .rank-label {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   font-family: "Cinzel", serif;
   color: var(--gold-dim);
@@ -309,7 +309,7 @@ body {
   align-items: center;
 }
 .judgment-lbl {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.14em;
 }
@@ -355,7 +355,7 @@ body {
   gap: 6px;
 }
 .score-lbl {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--text);
 }
 .score-val {
@@ -383,7 +383,7 @@ body {
 }
 .heatmap-title {
   text-align: center;
-  font-size: 11px;
+  font-size: 13px;
   letter-spacing: 0.22em;
   color: var(--gold-dim);
   margin-bottom: 6px;
@@ -425,12 +425,12 @@ body {
   user-select: none;
 }
 .heatmap-slot .slot-sym {
-  font-size: 13px;
+  font-size: 14px;
   color: rgba(255, 255, 255, 0.75);
   line-height: 1;
 }
 .heatmap-pct {
-  font-size: 8px;
+  font-size: 10px;
   font-weight: 700;
   color: #fff;
   text-shadow: 0 0 3px rgba(0, 0, 0, 1);
@@ -465,7 +465,7 @@ body {
   border-radius: 4px;
   color: var(--text);
   cursor: pointer;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.5;
   padding: 8px 18px;
   text-align: center;
@@ -486,7 +486,7 @@ body {
   color: var(--gold-bright);
 }
 .btn--sm {
-  font-size: 12px;
+  font-size: 13px;
   padding: 6px 14px;
 }
 #diff-btns .btn {
@@ -516,7 +516,7 @@ body {
   width: 100%;
 }
 .setting-label {
-  font-size: 11px;
+  font-size: 13px;
   letter-spacing: 0.22em;
   color: var(--text-dim);
 }
@@ -544,14 +544,14 @@ body {
   box-shadow: inset 0 0 0 1px rgba(200, 164, 80, 0.18);
 }
 .header-title {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   font-family: "Cinzel", serif;
   color: var(--gold);
   letter-spacing: 0.06em;
 }
 .pad-status {
-  font-size: 11px;
+  font-size: 12px;
   padding: 2px 8px;
   border-radius: 2px;
   border: 1px solid;
@@ -602,7 +602,7 @@ body {
 }
 
 .info-label {
-  font-size: 11px;
+  font-size: 13px;
   letter-spacing: 0.16em;
   color: var(--text-dim);
   height: 15px;
@@ -630,7 +630,7 @@ body {
   flex-shrink: 0;
 }
 .label-sm {
-  font-size: 11px;
+  font-size: 13px;
   letter-spacing: 0.16em;
   color: var(--text-dim);
 }
@@ -693,7 +693,7 @@ body {
   text-shadow: 0 0 12px rgba(220, 192, 80, 0.3);
 }
 #combo-val {
-  font-size: 11px;
+  font-size: 13px;
   color: var(--teal);
   letter-spacing: 0.1em;
   min-height: 15px;
@@ -903,7 +903,7 @@ body {
   border-radius: 50%;
   border: 1.5px solid #a0e8f8;
   color: #c8f4ff;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   font-family: "Cinzel", serif;
   background: rgba(160, 232, 248, 0.1);
@@ -1141,7 +1141,7 @@ body {
   animation: xhb-neon-pulse 0.8s ease-in-out infinite alternate;
 }
 .xhb-label {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--gold);
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -1229,7 +1229,7 @@ body {
   transition: color 0.12s;
 }
 .slot-key {
-  font-size: 10px;
+  font-size: 11px;
   color: #5c6282;
   letter-spacing: 0.05em;
   line-height: 1;
@@ -1447,7 +1447,7 @@ body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   color: rgba(255, 255, 255, 0.95);
   text-shadow:
@@ -1537,7 +1537,7 @@ body {
 /* ===== NEW RECORD badge ===== */
 .new-record {
   color: var(--gold-bright);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.18em;
   text-shadow: 0 0 14px rgba(220, 190, 70, 0.6);
@@ -1592,7 +1592,7 @@ body {
 }
 
 .pad-hint {
-  font-size: 11px;
+  font-size: 13px;
   color: var(--text-dim);
   letter-spacing: 0.1em;
   text-align: center;
@@ -1765,7 +1765,7 @@ body.is-paused .slot-burst-ring {
   position: absolute;
   bottom: 10px;
   right: 14px;
-  font-size: 10px;
+  font-size: 11px;
   color: rgba(150, 130, 100, 0.45);
   letter-spacing: 0.04em;
   pointer-events: none;
