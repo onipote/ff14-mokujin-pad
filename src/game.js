@@ -533,6 +533,7 @@ class GameEngine {
   _onAoeHit() {
     if (this.state === 'gameover') return;
     if (!this.isBurst) this.combo = 0;
+    this.missCount++;
     this.remainingMs = Math.max(0, this.remainingMs - MISS_PENALTY_MS);
     this._rearmCountdown();
     this.ui.updateAll(this);
