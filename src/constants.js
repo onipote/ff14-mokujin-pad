@@ -53,12 +53,12 @@ const BURST_GCD_MULTIPLIER   = 1.4;
 const BURST_SCORE_MULTIPLIER = 2;
 const GREAT_RATIO_MIN        = 0.75;
 
-// 各難易度の理論最高得点（全GREAT・全リミット時間ボーナス・全バースト得点ボーナス取得時）
-// 計算方法は docs/designs/plan_score_rating.md を参照
+// 各難易度の理論最高得点（GCD 75% 押下・実効ゲーム時間 58,000ms・全GREAT・全リミット時間ボーナス・全バースト得点ボーナス取得時）
+// 計算方法は docs/score_simulation.md を参照
 const THEORETICAL_MAX_SCORE = {
-  slow:   10_500,
-  normal: 16_650,
-  fast:   35_200,
+  slow:    9_800,
+  normal: 16_200,
+  fast:   33_000,
 };
 
 // AOE dodge mechanic

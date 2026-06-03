@@ -1,4 +1,10 @@
-# 理論最高得点の計算方法
+> **⚠ このファイルは古い版です。**  
+> 現行の理論最高得点・計算方法は [`docs/score_simulation.md`](../score_simulation.md) を参照してください。  
+> 設計経緯は [`docs/designs/plan_theoretical_max_2026-06-04.md`](plan_theoretical_max_2026-06-04.md) を参照してください。
+
+---
+
+# 理論最高得点の計算方法（旧版：GCD 75% 押下・ゲーム時間 60s 基準）
 
 ## 目的
 

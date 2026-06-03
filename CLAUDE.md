@@ -115,7 +115,7 @@ GameEngine(xhb, ui, input, sound)
 
 ### スコア・レーティング
 
-難易度ごとの理論最高点は `constants.js` の `THEORETICAL_MAX_SCORE` に定義。計算方法は `docs/designs/plan_score_rating.md` 参照。
+難易度ごとの理論最高点は `constants.js` の `THEORETICAL_MAX_SCORE` に定義。計算方法は `docs/score_simulation.md` 参照。
 
 ---
 
