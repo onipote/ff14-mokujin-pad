@@ -174,7 +174,7 @@ body {
   display: inline-block;
   transform: scaleY(3);
   transform-origin: top center;
-  margin-bottom: 86px;
+  margin-bottom: 82px;
   background: linear-gradient(
     to bottom,
     #ffffff 0%,
@@ -200,7 +200,7 @@ body {
     transparent
   );
   box-shadow: 0 0 12px rgba(120, 200, 255, 0.8);
-  margin: 0 0 10px;
+  margin: 0 0 6px;
 }
 
 .game-sub {
