@@ -382,7 +382,12 @@ class GameEngine {
   _onTimeout() {
     if (this.state !== 'showing') return;
     if (this._timerRaf) { cancelAnimationFrame(this._timerRaf); this._timerRaf = null; }
-    this._processMiss();
+    // 入力ループ（RAF）が同フレームで先に動けるよう1フレーム遅延させる
+    // これにより、GOODウィンドウ終端でのボタン押下がタイムアウトより先に処理される
+    requestAnimationFrame(() => {
+      if (this.state !== 'showing') return;
+      this._processMiss();
+    });
   }
 
   _processHit(judgment, elapsedRatio) {

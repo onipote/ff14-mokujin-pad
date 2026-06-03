@@ -1,4 +1,27 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
 # PAD-MOKUJIN プロジェクト ルール
+
+## コマンド
+
+```bash
+# 開発サーバー起動（Gamepad APIに必要）
+npm start          # npx serve . → http://localhost:3000
+
+# テスト（Playwrightを使用。先にサーバーを起動しておく必要あり）
+npx serve . --listen 3399 &   # テスト用サーバー
+npm run test:aoe              # AoEパターン・当たり判定
+npm run test:gauge            # リキャストゲージ連鎖
+
+# テストURLを変える場合
+TEST_URL=http://localhost:3000 node tests/aoe-verify.js
+```
+
+Playwrightは `npm install` で `devDependencies` としてインストール済み。
+
+---
 
 ## 基本ルール
 
@@ -55,11 +78,44 @@ ff14-pad-mokujin/
 ## アーキテクチャ概要
 
 - **バックエンドなし** — ブラウザのみで完結
-- **ESモジュール不使用** — `<script>` タグ順次読み込み（file://対応のため）
+- **ESモジュール不使用** — `<script>` タグ順次読み込み（`constants.js` を必ず最初にロード）
 - **Gamepad API** — localhost/HTTPS 必須のため `npm start` でサーブ
-- **描画** — requestAnimationFrame ループによるポーリング
+- **描画** — requestAnimationFrame ループによるポーリング（メニュー・タイマー・バースト・カウントダウン用に複数のRAFが並行動作）
 - **効果音** — Web Audio API（外部ファイル不要）
 - **ハイスコア** — localStorage に保存（キー: `pad-mokujin-hs`）
+
+### モジュール依存関係とワイヤリング
+
+`main.js` がすべてのモジュールをコンストラクタインジェクションで接続する：
+
+```
+constants.js（全モジュールが参照）
+  ↓
+XHBRenderer / UIManager / InputHandler / SoundManager
+  ↓ (コンストラクタ引数として渡される)
+GameEngine(xhb, ui, input, sound)
+  └─ AoeEngine(input, ui)  ← GameEngine内部で生成
+```
+
+モジュール間の通知は `onXxx` コールバックプロパティで行う（イベントエミッターは使用しない）：
+- `engine.onGameOver` — ゲームオーバー時に `main.js` が設定
+- `aoe.onHit` / `aoe.onDodge` — `GameEngine` が設定してHP/時間に反映
+- `input.onSystemButton` — OPTIONSボタンでポーズ
+- `input.onPadStatus` — コントローラー接続状態変化
+
+### アプリケーション状態機械（main.js）
+
+`appState`: `'start'` → `'playing'` ⇄ `'paused'` → `'gameover'` → `'start'`
+
+画面遷移中はメニューRAFループ（`startMenuLoop`/`stopMenuLoop`）がコントローラーナビを管理。ゲームプレイ中はRAFを停止して `GameEngine` に制御を渡す。
+
+### CSS変数とJS連携
+
+`--slot-sz` / `--slot-gap` は `styles/main.css` で定義され、`constants.js` の `_POS` オブジェクトで `calc(var(--slot-sz) + var(--slot-gap))` として参照される。スロット位置変更時は両方を確認する。
+
+### スコア・レーティング
+
+難易度ごとの理論最高点は `constants.js` の `THEORETICAL_MAX_SCORE` に定義。計算方法は `docs/designs/plan_score_rating.md` 参照。
 
 ---
 
