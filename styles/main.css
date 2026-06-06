@@ -149,7 +149,6 @@ body {
   width: 100%;
   position: relative;
   isolation: isolate;
-  margin-bottom: 48px;
 }
 
 .logo-seedling {
@@ -514,11 +513,10 @@ body {
   align-items: center;
   gap: 8px;
   width: 100%;
+  margin-top: 4px;
 }
 .setting-label {
-  font-size: 13px;
-  letter-spacing: 0.22em;
-  color: var(--text-dim);
+  display: none;
 }
 .btn-group {
   display: flex;
@@ -1612,6 +1610,27 @@ body {
   letter-spacing: 0.1em;
   text-align: center;
   margin-top: -8px;
+}
+
+.how-to-play-link {
+  font-size: 15px;
+  color: var(--text-dim);
+  text-align: center;
+  margin-top: 28px;
+  margin-bottom: 0;
+  letter-spacing: 0.05em;
+}
+
+.how-to-play-link a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  opacity: 0.85;
+}
+
+.how-to-play-link a:hover {
+  color: #fff;
+  opacity: 1;
 }
 
 /* ===== 頭割りギミック・フレーム（右パネル）===== */
