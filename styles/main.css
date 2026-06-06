@@ -1621,7 +1621,8 @@ body {
   letter-spacing: 0.05em;
 }
 
-.how-to-play-link a {
+.how-to-play-link a,
+.how-to-play-link a:visited {
   color: var(--accent);
   text-decoration: underline;
   text-underline-offset: 2px;
